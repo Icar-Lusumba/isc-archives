@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGT | ISC BLOCKCHAIN HUB v5.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --bg: #f8f9fa; --side: #111827; --card: #ffffff; --text: #111827; --primary: #3b82f6; --border: #e5e7eb; }
+        [data-theme="dark"] { --bg: #0f172a; --side: #020617; --card: #1e293b; --text: #f8f9fa; --border: #334155; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; transition: 0.3s; }
+        .sidebar { width: 280px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; }
+        .sidebar h2 { color: var(--primary); font-size: 1.5rem; margin-bottom: 2rem; }
+        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; display: flex; align-items: center; }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+        .main { flex: 1; padding: 40px; overflow-y: auto; }
+        .section { display: none; animation: fadeIn 0.4s; }
+        .section.active { display: block; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2; width: 100%; margin-top: 10px; }
+        .btn-primary { background: var(--primary); color: white; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; }
+        th { color: var(--primary); font-size: 0.75rem; text-transform: uppercase; }
+        #qrcode { padding: 15px; background: white; border-radius: 12px; display: none; justify-content: center; margin: 0 auto; width: 150px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body data-theme="light">
+
+    <nav class="sidebar">
+        <h2>LGT HUB</h2>
+        <div class="nav-item active" onclick="show('certify')">🛡️ Certification Admin</div>
+        <div class="nav-item" onclick="show('verify')">🔍 Vérification Publique</div>
+        <div class="nav-item" onclick="show('archive')">📂 Registre Archives</div>
+        
+        <div style="margin-top: auto;">
+            <button class="btn btn-primary" onclick="toggleTheme()" style="background: transparent; border: 1px solid white;">🌓 Mode Sombre</button>
+            <p style="font-size: 0.7rem; color: #64748b; margin-top: 15px;">ISC Lubumbashi v5.0 (Icar Edition)</p>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div id="certify" class="section active">
+            <h1>🛡️ Certification Admin</h1>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+                <div class="card">
+                    <h3>Nouvel Archivage</h3>
+                    <input type="text" id="stdName" placeholder="Nom complet de l'étudiant">
+                    <input type="text" id="stdMat" placeholder="Numéro de Matricule">
+                    <input type="file" id="fileIn">
+                    <button class="btn btn-primary" onclick="processCertify()">ANCRER DANS LA BLOCKCHAIN</button>
+                    <p id="log" style="margin-top:15px; font-weight:bold;"></p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <h3>QR Code Généré</h3>
+                    <div id="qrcode" style="margin-bottom: 10px;"></div>
+                    <p id="qrTxt" style="font-size: 0.8rem; color: var(--primary);"></p>
+                    <p style="font-size: 0.7rem; color: #64748b;">Scannez pour vérifier les détails</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="verify" class="section">
+            <h1>🔍 Système de Vérification</h1>
+            <div class="card">
+                <h3>Vérification Rapide</h3>
+                <input type="text" id="verifyInput" placeholder="Entrer le Hash ou Matricule">
+                <button class="btn btn-primary" onclick="alert('Redirection vers le portail public...')">LANCER LA RECHERCHE</button>
+            </div>
+        </div>
+
+        <div id="archive" class="section">
+            <h1>📂 Registre des Archives ISC</h1>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nom Étudiant</th>
+                            <th>Matricule</th>
+                            <th>Preuve</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+<script>
+    const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+    const abi = [{"inputs":[{"internalType":"string","name":"_id","type":"string"},{"internalType":"string","name":"_hash","type":"string"}],"name":"certifierDiplome","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+
+    function show(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(event) event.currentTarget.classList.add('active');
+    }
+
+    function toggleTheme() {
+        const b = document.body;
+        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+
+    async function processCertify() {
+        const name = document.getElementById('stdName').value;
+        const mat = document.getElementById('stdMat').value;
+        const log = document.getElementById('log');
+
+        if(!name || !mat) return alert("Remplis les champs, Icar !");
+
+        try {
+            log.innerText = "⏳ Connexion MetaMask...";
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(contractAddress, abi, signer);
+
+            log.innerText = "🚀 Envoi sur la Blockchain...";
+            const tx = await contract.certifierDiplome(name, mat, { gasLimit: 500000 });
+            await tx.wait();
+
+            log.innerText = "✅ Succès !";
+            log.style.color = "#10b981";
+
+            // --- MAGIE DU QR CODE VERS GITHUB ---
+            const githubUser = "Icar-Lusumba"; // <--- TON PSEUDO EST ICI
+            const repoName = "isc-archives";
+            
+            const verifUrl = `https://${githubUser}.github.io/${repoName}/verif.html?nom=${encodeURIComponent(name)}&mat=${encodeURIComponent(mat)}&hash=${tx.hash}`;
+
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = "";
+            qrDiv.style.display = "flex";
+            new QRCode(qrDiv, { text: verifUrl, width: 150, height: 150 });
+            document.getElementById('qrTxt').innerText = "ID: " + tx.hash.substring(0,10) + "...";
+
+            const row = `<tr><td>${new Date().toLocaleDateString()}</td><td>${name}</td><td>${mat}</td><td><a href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank">Etherscan</a></td></tr>`;
+            document.getElementById('tableBody').innerHTML += row;
+
+        } catch (e) {
+            log.innerText = "❌ Erreur : " + e.message;
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGT | VERIFICATION OFFICIELLE</title>
+    <style>
+        :root { --primary: #3b82f6; --bg: #0f172a; --card: #1e293b; --text: #f8f9fa; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
+        .container { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #10b981; max-width: 400px; width: 100%; }
+        .check-icon { font-size: 50px; color: #10b981; margin-bottom: 10px; }
+        h1 { font-size: 1.2rem; color: #10b981; margin-bottom: 20px; text-transform: uppercase; }
+        .info-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left; }
+        .label { color: #64748b; font-size: 0.8rem; text-transform: uppercase; font-weight: bold; }
+        .value { font-size: 1.1rem; margin-bottom: 10px; color: #fff; }
+        .btn-download { background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: block; margin-top: 20px; transition: 0.3s; }
+        .footer { margin-top: 20px; font-size: 0.7rem; color: #64748b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="check-icon">✓</div>
+    <h1>Diplôme Authentifié</h1>
+    
+    <div class="info-box">
+        <div class="label">Étudiant :</div>
+        <div class="value" id="dispName">Chargement...</div>
+        
+        <div class="label">Matricule :</div>
+        <div class="value" id="dispMat">Chargement...</div>
+        
+        <div class="label">Preuve Blockchain (Hash) :</div>
+        <div class="value" id="dispHash" style="font-size: 0.7rem; color: #3b82f6; word-break: break-all;">---</div>
+    </div>
+
+    <p style="font-size: 0.8rem; color: #94a3b8;">Ce document est ancré sur le réseau Ethereum Sepolia.</p>
+    
+    <a href="#" id="downloadLink" class="btn-download" onclick="alert('Téléchargement du document certifié...')">📥 TELECHARGER LE DOCUMENT</a>
+    
+    <div class="footer">Système de Certification LUS GRAPHIQUE TECH<br>Pour l'ISC Lubumbashi</div>
+</div>
+
+<script>
+    // MAGIE DU SCAN : On récupère les infos dans l'URL
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        document.getElementById('dispName').innerText = urlParams.get('nom') || "Inconnu";
+        document.getElementById('dispMat').innerText = urlParams.get('mat') || "Non spécifié";
+        document.getElementById('dispHash').innerText = urlParams.get('hash') || "0x0000...";
+    };
+</script>
+
+</body>
+</html>
