@@ -3,121 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB | PORTAIL OFFICIEL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>LGT HUB | PORTAIL DE VÉRIFICATION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #10b981; --bg: #0f172a; --card: #1e293b; --text: #f8f9fa; --accent: #3b82f6; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid rgba(16, 185, 129, 0.2); max-width: 450px; width: 100%; box-sizing: border-box; }
+        .container { background: var(--card); padding: 25px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); max-width: 480px; width: 100%; box-sizing: border-box; }
         
-        /* En-tête */
-        .header-logo { text-align: center; margin-bottom: 25px; }
-        .brand { font-weight: 800; color: var(--accent); font-size: 1.6rem; letter-spacing: -1px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .brand { font-weight: 800; color: var(--accent); font-size: 1.8rem; letter-spacing: -1px; }
         .brand span { color: #fff; }
-        .subtitle { font-size: 0.7rem; color: #64748b; text-transform: uppercase; margin-top: 5px; font-weight: 600; }
+        .subtitle { font-size: 0.7rem; color: #64748b; text-transform: uppercase; margin-top: 5px; font-weight: 700; letter-spacing: 1px; }
 
-        /* Recherche */
+        /* Formulaire */
         #searchSection { text-align: center; }
-        .search-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; outline: none; }
-        .search-input:focus { border-color: var(--accent); }
-        .btn-search { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
-        .btn-search:hover { background: #2563eb; }
+        .search-input { width: 100%; padding: 16px; border-radius: 14px; border: 2px solid #334155; background: #0f172a; color: white; font-size: 1rem; margin-bottom: 15px; box-sizing: border-box; transition: 0.3s; }
+        .search-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        .btn-main { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 0.95rem; text-transform: uppercase; }
+        .btn-main:hover { background: #2563eb; transform: translateY(-2px); }
 
-        /* Résultat */
-        #resultSection { display: none; text-align: center; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Résultat & Dossier */
+        #resultSection { display: none; animation: slideUp 0.6s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .status-badge { color: var(--primary); font-weight: 700; font-size: 1.2rem; margin: 15px 0; display: block; }
-        .info-card { background: rgba(0,0,0,0.2); padding: 18px; border-radius: 15px; text-align: left; border-left: 4px solid var(--primary); }
-        .label { color: #64748b; font-size: 0.7rem; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
-        .value { font-size: 1.05rem; color: #fff; margin-bottom: 12px; font-weight: 600; }
-        .hash-display { font-family: 'Courier New', monospace; font-size: 0.65rem; color: var(--accent); word-break: break-all; background: rgba(59, 130, 246, 0.05); padding: 10px; border-radius: 8px; border: 1px dashed rgba(59, 130, 246, 0.3); }
+        .status { color: var(--primary); font-weight: 800; font-size: 1.1rem; margin: 15px 0; text-align: center; }
+        .info-card { background: rgba(15, 23, 42, 0.5); padding: 20px; border-radius: 18px; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .label { color: #64748b; font-size: 0.65rem; text-transform: uppercase; font-weight: 900; margin-bottom: 4px; }
+        .value { font-size: 1.1rem; color: #fff; margin-bottom: 15px; font-weight: 600; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        
+        /* Zone de l'aperçu du dossier */
+        #folderPreview { display: none; margin-top: 20px; border-radius: 15px; overflow: hidden; border: 1px solid #475569; background: #fff; color: #334155; animation: fadeIn 0.4s ease; }
+        .folder-header { background: #f1f5f9; padding: 10px; font-size: 0.75rem; font-weight: bold; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
+        .document-view { padding: 30px 20px; text-align: center; }
+        .doc-mockup { border: 2px solid #e2e8f0; padding: 20px; display: inline-block; box-shadow: 0 5px 15px rgba(0,0,0,0.1); background: white; }
 
-        /* Boutons */
-        .btn-download { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; display: block; margin-top: 20px; transition: 0.3s; text-align: center; cursor: pointer; border: none; width: 100%; font-size: 0.9rem; }
-        .btn-download:hover { background: #059669; transform: scale(1.02); }
-        .btn-back { background: none; border: none; color: #64748b; text-decoration: underline; font-size: 0.75rem; margin-top: 15px; cursor: pointer; }
-
-        .footer { margin-top: 30px; font-size: 0.65rem; color: #475569; text-align: center; border-top: 1px solid #1e293b; padding-top: 15px; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-secondary { background: #334155; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.8rem; }
+        
+        .footer { margin-top: 30px; font-size: 0.65rem; color: #475569; text-align: center; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-logo">
+    <div class="header">
         <div class="brand">LGT <span>HUB</span></div>
-        <div class="subtitle">Certification Blockchain • ISC Lubumbashi</div>
+        <div class="subtitle">Blockchain Document Registry</div>
     </div>
 
     <div id="searchSection">
-        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">Veuillez saisir le numéro de matricule pour accéder au document certifié.</p>
-        <input type="text" id="matInput" class="search-input" placeholder="Ex: ISC-2026-001">
-        <button class="btn-search" onclick="validerRecherche()">VÉRIFIER L'AUTHENTICITÉ</button>
+        <input type="text" id="matInput" class="search-input" placeholder="Entrez le matricule (Ex: ISC-2026-001)">
+        <button class="btn-main" onclick="verifierSysteme()">VÉRIFIER LE DOSSIER</button>
     </div>
 
     <div id="resultSection">
-        <div class="status-badge">✓ DIPLÔME AUTHENTIFIÉ</div>
+        <div class="status">✅ CERTIFICATION VALIDÉE</div>
         
         <div class="info-card">
-            <div class="label">Titulaire du document :</div>
+            <div class="label">Propriétaire du Dossier</div>
             <div class="value" id="dispName">...</div>
             
-            <div class="label">Numéro de Matricule :</div>
+            <div class="label">ID Académique</div>
             <div class="value" id="dispMat">...</div>
             
-            <div class="label">Preuve d'ancrage (Transaction Hash) :</div>
-            <div class="hash-display" id="dispHash">...</div>
+            <div class="label">Signature Cryptographique (Hash)</div>
+            <div style="font-family: monospace; font-size: 0.6rem; color: var(--accent); word-break: break-all;" id="dispHash">...</div>
         </div>
 
-        <button class="btn-download" id="downloadBtn">📥 TÉLÉCHARGER LE DOCUMENT SÉCURISÉ</button>
+        <div class="btn-group">
+            <button class="btn-main" style="background: var(--primary);" onclick="afficherDossier()">👁️ VOIR CONTENU</button>
+            <button class="btn-secondary" onclick="alert('Connexion IPFS sécurisée... Téléchargement en cours.')">📥 EXPORTER</button>
+        </div>
+
+        <div id="folderPreview">
+            <div class="folder-header">
+                <span>Dossier_Etudiant.pdf</span>
+                <span style="color: #64748b;">Aperçu Sécurisé</span>
+            </div>
+            <div class="document-view">
+                <div class="doc-mockup">
+                    <div style="color: #1e293b; font-weight: 900; font-size: 0.9rem;">ISC LUBUMBASHI</div>
+                    <hr style="border: 0.5px solid #eee;">
+                    <div style="font-size: 0.7rem; margin: 15px 0;">Ceci est un aperçu certifié par la Blockchain.</div>
+                    <div id="docStudentName" style="font-weight: bold; color: var(--accent); text-transform: uppercase; font-size: 0.8rem;">...</div>
+                    <div style="font-size: 0.6rem; color: #94a3b8; margin-top: 10px;">Diplôme de Fin de Cycle</div>
+                    <div style="margin-top: 20px; font-size: 1.5rem;">🎓</div>
+                </div>
+            </div>
+        </div>
         
-        <button class="btn-back" onclick="location.reload()">Effectuer une autre vérification</button>
+        <div style="text-align: center;">
+            <button style="background:none; border:none; color:#64748b; text-decoration:underline; font-size:0.7rem; margin-top:20px; cursor:pointer;" onclick="location.reload()">Nouvelle recherche</button>
+        </div>
     </div>
 
     <div class="footer">
-        © 2026 LUS GRAPHIQUE TECH - Tous droits réservés.<br>
-        Propulsé par Ethereum Sepolia Network.
+        Système Officiel LUS GRAPHIQUE TECH<br>
+        Certifié sur le réseau Ethereum Sepolia (ID: 11155111)
     </div>
 </div>
 
 <script>
-    // Configuration de démonstration pour ton TFC
     const DATA_TEST = {
         "ISC-2026-001": {
             nom: "KALENDA LUSUMBA ICAR",
-            hash: "0x2ec45b356744f16a029e0e7caeb74cfb1d24ed90c833d31749110070db058cad",
-            ipfs: "https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco" // Lien IPFS fictif
+            hash: "0x2ec45b356744f16a029e0e7caeb74cfb1d24ed90c833d31749110070db058cad"
         }
     };
 
-    window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        if(params.has('mat')) chargerResultat(params.get('nom'), params.get('mat'), params.get('hash'));
-    };
-
-    function validerRecherche() {
+    function verifierSysteme() {
         const val = document.getElementById('matInput').value.trim().toUpperCase();
         if(DATA_TEST[val]) {
             const d = DATA_TEST[val];
-            chargerResultat(d.nom, val, d.hash);
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('dispName').innerText = d.nom;
+            document.getElementById('dispMat').innerText = val;
+            document.getElementById('dispHash').innerText = d.hash;
+            document.getElementById('docStudentName').innerText = d.nom;
         } else {
-            alert("Erreur : Ce matricule n'existe pas dans le registre Blockchain.");
+            alert("Aucun dossier blockchain trouvé pour ce matricule.");
         }
     }
 
-    function chargerResultat(nom, mat, hash) {
-        document.getElementById('searchSection').style.display = 'none';
-        document.getElementById('resultSection').style.display = 'block';
-        document.getElementById('dispName').innerText = nom;
-        document.getElementById('dispMat').innerText = mat;
-        document.getElementById('dispHash').innerText = hash;
-
-        // On prépare le bouton de téléchargement
-        document.getElementById('downloadBtn').onclick = function() {
-            alert("🔒 Connexion sécurisée au nœud IPFS...\n\nLe document a été vérifié sur la Blockchain Ethereum. Le téléchargement va débuter.");
-            // Ici, tu peux mettre un vrai lien vers un PDF si tu en as un
-            // window.open(DATA_TEST[mat].ipfs, '_blank'); 
-        };
+    function afficherDossier() {
+        const preview = document.getElementById('folderPreview');
+        preview.style.display = "block";
+        preview.scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 
