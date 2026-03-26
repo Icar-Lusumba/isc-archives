@@ -30,7 +30,7 @@
 
     <div id="result">
         <p style="margin-top:0;"><strong>Statut :</strong> <span style="color: var(--success);">✅ CERTIFIÉ</span></p>
-        <p><strong>Étudiant :</strong> <span id="resName">CALCUL EN COURS...</span></p>
+        <p><strong>Étudiant :</strong> <span id="resName">VÉRIFIÉ DANS LE REGISTRE</span></p>
         <p><strong>Hash (Preuve) :</strong> <br><small id="resHash" style="word-break: break-all; color: #60a5fa; font-family: monospace;"></small></p>
         <button id="viewBtn" class="btn btn-view" onclick="montrerPDF()">👁️ VOIR LE DOCUMENT PDF</button>
     </div>
@@ -39,7 +39,7 @@
 </div>
 
 <script>
-    // ADRESSE MISE À JOUR PAR ICAR
+    // ADRESSE DU CONTRAT DÉPLOYÉ PAR ICAR
     const contractAddress = "0xF031D80aB69cdDaAFD7cb6Ac53e35164c70D18ce";
     
     const abi = [{"inputs":[{"internalType":"string","name":"_matricule","type":"string"}],"name":"verifierDiplome","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
@@ -51,20 +51,18 @@
         if(!mat) { alert("Entre un matricule !"); return; }
 
         try {
-            btn.innerText = "CONNEXION SEPOLIA...";
+            btn.innerText = "CONNEXION BLOCKCHAIN...";
             btn.disabled = true;
 
-            // Utilisation du tunnel ultra-stable 1RPC
-            const provider = new ethers.JsonRpcProvider("https://1rpc.io/sepolia");
+            // NOUVEAU LIEN RPC ULTRA-ROBUSTE (PUBLICNODE)
+            const provider = new ethers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
             const contract = new ethers.Contract(contractAddress, abi, provider);
             
             const res = await contract.verifierDiplome(mat);
             
-            // res[2] est le booléen "estValide"
             if (res[2] === true) {
                 document.getElementById('result').style.display = 'block';
-                document.getElementById('resName').innerText = "VÉRIFIÉ DANS LE REGISTRE";
-                document.getElementById('resHash').innerText = res[0]; // C'est le hashDocument
+                document.getElementById('resHash').innerText = res[0];
                 document.getElementById('viewBtn').style.display = 'block';
                 btn.innerText = "RÉSULTAT TROUVÉ";
             } else {
@@ -74,7 +72,7 @@
             }
         } catch (e) {
             console.error(e);
-            alert("Erreur de connexion au réseau. Réessaie dans 10 secondes.");
+            alert("Erreur de connexion. Réessaie avec tes données mobiles (4G) pour éviter les blocages Wi-Fi.");
             btn.innerText = "VÉRIFIER LE DOSSIER";
             btn.disabled = false;
         }
