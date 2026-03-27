@@ -4,30 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LGT HUB | VÉRIFICATION</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --accent: #3b82f6; --text: #f1f5f9; --success: #10b981; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
-        .card { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border: 1px solid #334155; }
+        .card { background: var(--card); padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #334155; }
         input { width: 100%; padding: 14px; margin: 15px 0; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 16px; }
-        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; background: var(--accent); color: white; }
-        #result { display: none; margin-top: 20px; text-align: left; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid var(--accent); }
-        .hash-box { word-break: break-all; color: #60a5fa; font-family: monospace; font-size: 0.8rem; margin-top: 10px; display: block; }
+        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; background: var(--accent); color: white; }
+        #result { display: none; margin-top: 20px; text-align: left; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid var(--success); }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2 style="color: var(--accent); margin-bottom: 5px;">LGT HUB</h2>
-    <p style="color: #94a3b8; margin-bottom: 20px;">Certification Blockchain ISC</p>
-    
-    <input type="text" id="matInput" placeholder="Entrez le matricule (ex: ISC-2026-001)">
-    <button class="btn" id="checkBtn" onclick="verifier()">VÉRIFIER LE DOSSIER</button>
+    <h2 style="color: var(--accent);">LGT HUB</h2>
+    <p style="color: #94a3b8;">Certification Blockchain</p>
+    <input type="text" id="matInput" placeholder="Matricule (ex: ISC-2026-001)">
+    <button class="btn" id="checkBtn" onclick="verifier()">RECHERCHER</button>
 
     <div id="result">
-        <p style="margin: 0; color: var(--success); font-weight: bold;">✅ DOSSIER CERTIFIÉ</p>
-        <span class="hash-box" id="resHash"></span>
-        <button class="btn" style="background: var(--success); margin-top: 15px;" onclick="window.open('Dossier_Etudiant.pdf')">👁️ VOIR LE PDF</button>
+        <p style="color: var(--success); font-weight: bold; margin: 0;">✅ DOSSIER TROUVÉ</p>
+        <p id="resHash" style="font-size: 0.7rem; word-break: break-all; color: #60a5fa;"></p>
+        <button class="btn" style="background: var(--success); margin-top: 10px;" onclick="window.open('Dossier_Etudiant.pdf')">OUVRIR LE PDF</button>
     </div>
 </div>
 
@@ -38,35 +36,34 @@
         const addr = "0xF031D80aB69cdDaAFD7cb6Ac53e35164c70D18ce";
         const abi = [{"inputs":[{"internalType":"string","name":"_matricule","type":"string"}],"name":"verifierDiplome","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 
-        if(!mat) return alert("Indique un matricule !");
+        if(!mat) return alert("Matricule vide");
 
         try {
-            btn.innerText = "RECHERCHE...";
+            btn.innerText = "CONNEXION...";
             btn.disabled = true;
 
-            // Utilisation d'un RPC très rapide pour l'Afrique (Ankr)
-            const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_sepolia");
+            // LIEN SECOURS 1 : CLOUDFLARE (Très rapide et rarement bloqué)
+            const provider = new ethers.providers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
             const contract = new ethers.Contract(addr, abi, provider);
             
             const res = await contract.verifierDiplome(mat);
             
-            if (res[2] === true) {
+            if (res[2]) {
                 document.getElementById('result').style.display = 'block';
-                document.getElementById('resHash').innerText = "Preuve Blockchain : " + res[0];
-                btn.innerText = "VÉRIFIÉ !";
+                document.getElementById('resHash').innerText = "Hash: " + res[0];
+                btn.innerText = "TROUVÉ";
             } else {
-                alert("Matricule non trouvé dans la blockchain.");
-                btn.innerText = "VÉRIFIER LE DOSSIER";
+                alert("Dossier inconnu dans la blockchain.");
                 btn.disabled = false;
+                btn.innerText = "RECHERCHER";
             }
         } catch (e) {
+            alert("Problème réseau. Essaye avec ton téléphone en 4G (sans Wi-Fi).");
             console.error(e);
-            alert("Erreur réseau. Active tes données mobiles ou essaie en navigation privée.");
-            btn.innerText = "VÉRIFIER LE DOSSIER";
             btn.disabled = false;
+            btn.innerText = "RECHERCHER";
         }
     }
 </script>
-
 </body>
 </html>
