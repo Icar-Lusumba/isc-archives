@@ -3,85 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB | PORTAIL DE VÉRIFICATION</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/index.umd.min.js"></script>
+    <title>LGT HUB | VÉRIFICATION</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --accent: #3b82f6; --text: #f1f5f9; --success: #10b981; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
-        .card { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 450px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-check { background: var(--accent); color: white; }
-        .btn-view { background: var(--success); color: white; margin-top: 15px; display: none; }
-        #result { display: none; margin-top: 20px; text-align: left; background: #0f172a; padding: 15px; border-radius: 10px; border: 1px solid #334155; }
-        iframe { display: none; width: 100%; height: 450px; border-radius: 10px; border: 2px solid var(--accent); margin-top: 15px; background: white; }
+        .card { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border: 1px solid #334155; }
+        input { width: 100%; padding: 14px; margin: 15px 0; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 16px; }
+        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; background: var(--accent); color: white; }
+        #result { display: none; margin-top: 20px; text-align: left; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid var(--accent); }
+        .hash-box { word-break: break-all; color: #60a5fa; font-family: monospace; font-size: 0.8rem; margin-top: 10px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2 style="color: var(--accent); margin-bottom: 5px;">LGT HUB</h2>
-    <p style="color: #94a3b8; margin-top: 0; font-size: 0.9rem;">Système de Certification Blockchain</p>
+    <p style="color: #94a3b8; margin-bottom: 20px;">Certification Blockchain ISC</p>
     
-    <div id="searchBox">
-        <input type="text" id="matInput" placeholder="Entrez le matricule (ex: ISC-2026-001)">
-        <button class="btn btn-check" onclick="verifier()">VÉRIFIER LE DOSSIER</button>
-    </div>
+    <input type="text" id="matInput" placeholder="Entrez le matricule (ex: ISC-2026-001)">
+    <button class="btn" id="checkBtn" onclick="verifier()">VÉRIFIER LE DOSSIER</button>
 
     <div id="result">
-        <p style="margin-top:0;"><strong>Statut :</strong> <span style="color: var(--success);">✅ CERTIFIÉ</span></p>
-        <p><strong>Étudiant :</strong> <span id="resName">VÉRIFIÉ DANS LE REGISTRE</span></p>
-        <p><strong>Hash (Preuve) :</strong> <br><small id="resHash" style="word-break: break-all; color: #60a5fa; font-family: monospace;"></small></p>
-        <button id="viewBtn" class="btn btn-view" onclick="montrerPDF()">👁️ VOIR LE DOCUMENT PDF</button>
+        <p style="margin: 0; color: var(--success); font-weight: bold;">✅ DOSSIER CERTIFIÉ</p>
+        <span class="hash-box" id="resHash"></span>
+        <button class="btn" style="background: var(--success); margin-top: 15px;" onclick="window.open('Dossier_Etudiant.pdf')">👁️ VOIR LE PDF</button>
     </div>
-
-    <iframe id="pdfPreview" src="Dossier_Etudiant.pdf"></iframe>
 </div>
 
 <script>
-    // ADRESSE DU CONTRAT DÉPLOYÉ PAR ICAR
-    const contractAddress = "0xF031D80aB69cdDaAFD7cb6Ac53e35164c70D18ce";
-    
-    const abi = [{"inputs":[{"internalType":"string","name":"_matricule","type":"string"}],"name":"verifierDiplome","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
-
     async function verifier() {
         const mat = document.getElementById('matInput').value.trim();
-        const btn = document.querySelector('.btn-check');
-        
-        if(!mat) { alert("Entre un matricule !"); return; }
+        const btn = document.getElementById('checkBtn');
+        const addr = "0xF031D80aB69cdDaAFD7cb6Ac53e35164c70D18ce";
+        const abi = [{"inputs":[{"internalType":"string","name":"_matricule","type":"string"}],"name":"verifierDiplome","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
+
+        if(!mat) return alert("Indique un matricule !");
 
         try {
-            btn.innerText = "CONNEXION BLOCKCHAIN...";
+            btn.innerText = "RECHERCHE...";
             btn.disabled = true;
 
-            // NOUVEAU LIEN RPC ULTRA-ROBUSTE (PUBLICNODE)
-            const provider = new ethers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
-            const contract = new ethers.Contract(contractAddress, abi, provider);
+            // Utilisation d'un RPC très rapide pour l'Afrique (Ankr)
+            const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_sepolia");
+            const contract = new ethers.Contract(addr, abi, provider);
             
             const res = await contract.verifierDiplome(mat);
             
             if (res[2] === true) {
                 document.getElementById('result').style.display = 'block';
-                document.getElementById('resHash').innerText = res[0];
-                document.getElementById('viewBtn').style.display = 'block';
-                btn.innerText = "RÉSULTAT TROUVÉ";
+                document.getElementById('resHash').innerText = "Preuve Blockchain : " + res[0];
+                btn.innerText = "VÉRIFIÉ !";
             } else {
-                alert("Ce matricule n'est pas enregistré dans la Blockchain.");
+                alert("Matricule non trouvé dans la blockchain.");
                 btn.innerText = "VÉRIFIER LE DOSSIER";
                 btn.disabled = false;
             }
         } catch (e) {
             console.error(e);
-            alert("Erreur de connexion. Réessaie avec tes données mobiles (4G) pour éviter les blocages Wi-Fi.");
+            alert("Erreur réseau. Active tes données mobiles ou essaie en navigation privée.");
             btn.innerText = "VÉRIFIER LE DOSSIER";
             btn.disabled = false;
         }
-    }
-
-    function montrerPDF() {
-        const frame = document.getElementById('pdfPreview');
-        frame.style.display = 'block';
-        frame.scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 
