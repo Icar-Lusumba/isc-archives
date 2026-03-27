@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB | VÉRIFICATION</title>
+    <title>LGT HUB | VÉRIFICATION FINALE</title>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --accent: #3b82f6; --text: #f1f5f9; --success: #10b981; }
@@ -15,17 +15,15 @@
     </style>
 </head>
 <body>
-
 <div class="card">
     <h2 style="color: var(--accent);">LGT HUB</h2>
-    <p style="color: #94a3b8;">Certification Blockchain</p>
+    <p style="color: #94a3b8;">Portail Officiel de Certification</p>
     <input type="text" id="matInput" placeholder="Matricule (ex: ISC-2026-001)">
-    <button class="btn" id="checkBtn" onclick="verifier()">RECHERCHER</button>
-
+    <button class="btn" id="checkBtn" onclick="verifier()">VÉRIFIER LE DOSSIER</button>
     <div id="result">
-        <p style="color: var(--success); font-weight: bold; margin: 0;">✅ DOSSIER TROUVÉ</p>
+        <p style="color: var(--success); font-weight: bold; margin: 0;">✅ DOSSIER CERTIFIÉ</p>
         <p id="resHash" style="font-size: 0.7rem; word-break: break-all; color: #60a5fa;"></p>
-        <button class="btn" style="background: var(--success); margin-top: 10px;" onclick="window.open('Dossier_Etudiant.pdf')">OUVRIR LE PDF</button>
+        <button class="btn" style="background: var(--success); margin-top: 10px;" onclick="window.open('Dossier_Etudiant.pdf')">VOIR LE DOCUMENT</button>
     </div>
 </div>
 
@@ -36,33 +34,37 @@
         const addr = "0xF031D80aB69cdDaAFD7cb6Ac53e35164c70D18ce";
         const abi = [{"inputs":[{"internalType":"string","name":"_matricule","type":"string"}],"name":"verifierDiplome","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 
-        if(!mat) return alert("Matricule vide");
+        if(!mat) return alert("Matricule requis");
+        btn.innerText = "CONNEXION BLOCKCHAIN...";
+        btn.disabled = true;
 
-        try {
-            btn.innerText = "CONNEXION...";
-            btn.disabled = true;
+        // LISTE DE SECOURS DES LIENS (RPC)
+        const rpcs = [
+            "https://ethereum-sepolia-rpc.publicnode.com",
+            "https://rpc.ankr.com/eth_sepolia",
+            "https://1rpc.io/sepolia"
+        ];
 
-            // LIEN SECOURS 1 : CLOUDFLARE (Très rapide et rarement bloqué)
-            const provider = new ethers.providers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
-            const contract = new ethers.Contract(addr, abi, provider);
-            
-            const res = await contract.verifierDiplome(mat);
-            
-            if (res[2]) {
-                document.getElementById('result').style.display = 'block';
-                document.getElementById('resHash').innerText = "Hash: " + res[0];
-                btn.innerText = "TROUVÉ";
-            } else {
-                alert("Dossier inconnu dans la blockchain.");
-                btn.disabled = false;
-                btn.innerText = "RECHERCHER";
+        for (let rpc of rpcs) {
+            try {
+                const provider = new ethers.providers.JsonRpcProvider(rpc);
+                const contract = new ethers.Contract(addr, abi, provider);
+                const res = await contract.verifierDiplome(mat);
+                
+                if (res[2]) {
+                    document.getElementById('result').style.display = 'block';
+                    document.getElementById('resHash').innerText = "Preuve (Hash): " + res[0];
+                    btn.innerText = "TROUVÉ";
+                    return;
+                }
+            } catch (e) {
+                console.log("Lien " + rpc + " a échoué, essai du suivant...");
             }
-        } catch (e) {
-            alert("Problème réseau. Essaye avec ton téléphone en 4G (sans Wi-Fi).");
-            console.error(e);
-            btn.disabled = false;
-            btn.innerText = "RECHERCHER";
         }
+        
+        alert("Impossible de joindre la blockchain. Essaie de changer de navigateur ou d'utiliser un VPN.");
+        btn.disabled = false;
+        btn.innerText = "RECHERCHER";
     }
 </script>
 </body>
