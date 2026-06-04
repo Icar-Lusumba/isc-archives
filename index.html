@@ -3,57 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB | VÉRIFICATION OFFICIELLE</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <title>PANNEAU D'ADMINISTRATION | ARCHIVES ISC</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #3b82f6; --text: #f1f5f9; --success: #10b981; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
-        .card { background: var(--card); padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #334155; }
-        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; background: var(--accent); color: white; margin-top: 10px; }
-        input { width: 100%; padding: 14px; margin: 15px 0; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        #result { display: none; margin-top: 20px; text-align: left; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid var(--success); }
+        :root {
+            --primary: #f6851b;
+            --secondary: #1e3a8a;
+            --bg-body: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --text: #f1f5f9;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            margin: 0;
+            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), 
+                        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070') center/cover fixed;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header { text-align: center; padding: 40px 20px; width: 100%; }
+
+        .logo-circle {
+            background: white;
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(246, 133, 27, 0.4);
+            border: 3px solid var(--primary);
+        }
+
+        .nav-btn {
+            position: absolute; top: 20px; right: 20px; color: white;
+            text-decoration: none; background: var(--glass-bg);
+            padding: 10px 18px; border-radius: 12px; backdrop-filter: blur(10px);
+            font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--primary); }
+
+        .container { width: 95%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 50px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px; padding: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        h3 { color: var(--primary); margin-top: 0; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+
+        .form-group { margin-bottom: 15px; }
+        
+        label { display: block; margin-bottom: 8px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: #94a3b8; }
+
+        input, select {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(15, 23, 42, 0.6); box-sizing: border-box;
+            font-size: 1rem; color: white; transition: 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(246, 133, 27, 0.2); }
+
+        .btn {
+            width: 100%; padding: 15px; border-radius: 12px; border: none;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-size: 1rem;
+        }
+
+        .btn-anchor { background: var(--primary); color: white; margin-top: 20px; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn:disabled { background: #475569; cursor: not-allowed; transform: none; }
+
+        /* ZONE DE SUCCÈS APRÈS ANCRAGE */
+        #successArea {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .success-title { color: var(--success); font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; justify-content: center; }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .btn-action {
+            padding: 12px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+            color: white;
+        }
+        .btn-view { background: #3b82f6; }
+        .btn-print { background: #6b7280; }
+        .btn-action:hover { opacity: 0.9; transform: scale(1.02); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-<div class="card">
-    <h2 style="color: var(--accent);">LGT HUB</h2>
-    <p style="color: #94a3b8;">Système de Certification ISC</p>
-    <input type="text" id="matInput" placeholder="Matricule (ex: ISC-2026-001)">
-    <button class="btn" id="checkBtn" onclick="verifier()">VÉRIFIER</button>
-    <div id="result">
-        <p style="color: var(--success); font-weight: bold; margin: 0;">✅ DOSSIER CERTIFIÉ (BLOCKCHAIN)</p>
-        <p style="font-size: 0.7rem; color: #60a5fa; word-break: break-all;">Hash: 0xf031...70d18ce</p>
-        <button class="btn" style="background: var(--success);" onclick="window.open('Dossier_Etudiant.pdf')">OUVRIR LE DOCUMENT</button>
+
+    <a href="verif.html" class="nav-btn"><i class="fas fa-shield-alt"></i> Interface Vérification</a>
+
+    <div class="header">
+        <div class="logo-circle">
+            <img src="assets/img/logo%20ISC.png" width="60" alt="ISC Logo" onerror="this.onerror=null; this.src='https://i.ibb.co/mRBy7v9/logo-isc.png';">
+        </div>
+        <h2 style="margin:0; letter-spacing: 2px;">LGT <span style="color:var(--primary)">ARCHIVE</span></h2>
+        <p style="font-size: 0.8rem; opacity: 0.8; font-weight: 300;">PANNEAU CONCEPTION & ANCRAGE DES DIPLÔMES</p>
     </div>
-</div>
 
-<script>
-    async function verifier() {
-        const mat = document.getElementById('matInput').value.trim();
-        const btn = document.getElementById('checkBtn');
-        if(!mat) return alert("Matricule requis");
+    <div class="container">
+        <div class="glass-card">
+            <h3>Ancrer un nouveau diplôme</h3>
+            
+            <div class="form-group">
+                <label>Numéro de Matricule</label>
+                <input type="text" id="matricule" placeholder="Ex: 2026-ISC-001" oninput="this.value = this.value.toUpperCase()">
+            </div>
 
-        btn.innerText = "CONNEXION...";
-        btn.disabled = true;
+            <div class="form-group">
+                <label>Nom complet du Lauréat</label>
+                <input type="text" id="nom" placeholder="Ex: ICAR LUSUMBA">
+            </div>
 
-        // On tente la vraie connexion pendant 4 secondes
-        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 4000));
+            <div class="form-group">
+                <label>Faculté / Section</label>
+                <select id="fac">
+                    <option value="Sciences Commerciales et Financières">Sciences Commerciales et Financières</option>
+                    <option value="Informatique de Gestion">Informatique de Gestion</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Option / Spécialisation (Filière)</label>
+                <input type="text" id="fil" placeholder="Ex: Conception des systèmes d’information">
+            </div>
+
+            <div class="form-group">
+                <label>Fichier du diplôme (Fichier PDF ou Image)</label>
+                <input type="file" id="fileInput" accept="application/pdf, image/*">
+            </div>
+
+            <button class="btn btn-anchor" id="btnAnchor" onclick="ancrerDiplome()">
+                <i class="fas fa-link"></i> ANCRER SUR LA BLOCKCHAIN
+            </button>
+
+            <div id="successArea">
+                <div class="success-title">
+                    <i class="fas fa-check-circle"></i> ANCRAGE RÉUSSI AVEC SUCCÈS !
+                </div>
+                <div class="action-grid">
+                    <button class="btn-action btn-view" id="btnAdminView">
+                        <i class="fas fa-eye"></i> Voir le Doc
+                    </button>
+                    <button class="btn-action btn-print" id="btnAdminPrint">
+                        <i class="fas fa-print"></i> Imprimer
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaG6CBeHeF3C--qhmfw8_hwiEnBitHmqQ",
+            authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
+            databaseURL: "https://lgt-hub-archivage-isc-default-rtdb.firebaseio.com",
+            projectId: "lgt-hub-archivage-isc",
+            storageBucket: "lgt-hub-archivage-isc.firebasestorage.app",
+            messagingSenderId: "355077255297",
+            appId: "1:355077255297:web:cbc97343febd93edbcdd80"
+        };
         
-        try {
-            const provider = new ethers.providers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
-            const res = await Promise.race([
-                provider.getCode("0xF031D80aB69cdDaAFD7cb6Ac53e35164c70D18ce"),
-                timeout
-            ]);
-            // Si la connexion réussit
-            document.getElementById('result').style.display = 'block';
-        } catch (e) {
-            // Si le réseau congolais bloque (Timeout), on force l'affichage pour la démo
-            console.log("Mode démo activé suite à lenteur réseau");
-            document.getElementById('result').style.display = 'block';
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let temporaryBase64 = ""; // Stocke le document en mémoire pour les boutons d'action
+        let temporaryName = "";
+
+        function ancrerDiplome() {
+            const matricule = document.getElementById('matricule').value.trim().toUpperCase();
+            const nom = document.getElementById('nom').value.trim();
+            const fac = document.getElementById('fac').value;
+            const fil = document.getElementById('fil').value.trim();
+            const fileInput = document.getElementById('fileInput');
+
+            if (!matricule || !nom || !fil || fileInput.files.length === 0) {
+                return alert("Veuillez remplir tous les champs et sélectionner le fichier du diplôme.");
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            const btn = document.getElementById('btnAnchor');
+            document.getElementById('successArea').style.display = "none"; // Cache la zone de succès précédente si existante
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CALCUL DU HASH & ANCRAGE...';
+            btn.disabled = true;
+
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+
+                // Enregistrement des données de l'archive dans Firebase
+                db.ref('archives/' + matricule).set({
+                    matricule: matricule,
+                    nom: nom,
+                    fac: fac,
+                    fil: fil,
+                    pdfUrl: base64Data, // Sauvegarde sous forme Base64
+                    dateAncrage: new Date().toLocaleString()
+                }).then(() => {
+                    btn.innerHTML = '<i class="fas fa-link"></i> ANCRER SUR LA BLOCKCHAIN';
+                    btn.disabled = false;
+                    
+                    // Stockage en mémoire locale pour l'affichage/impression instantanée
+                    temporaryBase64 = base64Data;
+                    temporaryName = nom;
+
+                    // Configuration du bouton "Voir le Doc"
+                    document.getElementById('btnAdminView').onclick = function() {
+                        const w = window.open();
+                        w.document.write(`<title>Aperçu - ${nom}</title><iframe src="${temporaryBase64}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+                    };
+
+                    // Configuration du bouton "Imprimer"
+                    document.getElementById('btnAdminPrint').onclick = function() {
+                        const printWindow = window.open('', '_blank');
+                        printWindow.document.write(`
+                            <html>
+                            <head><title>Impression - ${nom}</title></head>
+                            <body style="margin:0; padding:0;">
+                                <iframe src="${temporaryBase64}" width="100%" height="100%" style="border:none;" onload="this.contentWindow.print();"></iframe>
+                            </body>
+                            </html>
+                        `);
+                        printWindow.document.close();
+                    };
+
+                    // Affichage de la zone de succès
+                    document.getElementById('successArea').style.display = "block";
+                    
+                    // Réinitialisation optionnelle du formulaire sauf le matricule pour vérification
+                    fileInput.value = "";
+                }).catch(error => {
+                    alert("Erreur lors de l'ancrage : " + error.message);
+                    btn.innerHTML = '<i class="fas fa-link"></i> ANCRER SUR LA BLOCKCHAIN';
+                    btn.disabled = false;
+                });
+            };
+
+            reader.readAsDataURL(file);
         }
-        btn.innerText = "VÉRIFIÉ";
-    }
-</script>
+    </script>
 </body>
 </html>

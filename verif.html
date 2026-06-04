@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VÉRIFICATION OFFICIELLE | LGT HUB</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #f6851b;
+            --secondary: #1e3a8a;
+            --bg-body: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --text: #f1f5f9;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            margin: 0;
+            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), 
+                        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070') center/cover fixed;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header { text-align: center; padding: 40px 20px; width: 100%; }
+
+        .logo-circle {
+            background: white;
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(246, 133, 27, 0.4);
+            border: 3px solid var(--primary);
+        }
+
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; color: white;
+            text-decoration: none; background: var(--glass-bg);
+            padding: 10px 18px; border-radius: 12px; backdrop-filter: blur(10px);
+            font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+        }
+        .back-btn:hover { background: var(--primary); }
+
+        .container { width: 95%; max-width: 450px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 50px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px; padding: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h3 { color: var(--primary); margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; margin: 15px 0; border: 2px solid var(--primary); display: none; }
+
+        input {
+            width: 100%; padding: 16px; border-radius: 12px; border: none;
+            background: white; margin-bottom: 15px; box-sizing: border-box;
+            font-size: 1.1rem; text-align: center; font-weight: bold; color: var(--secondary);
+        }
+
+        .btn {
+            width: 100%; padding: 15px; border-radius: 12px; border: none;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .btn-verify { background: var(--primary); color: white; margin-bottom: 10px; font-size: 1rem; }
+        .btn-scan { background: var(--secondary); color: white; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        /* Styles pour la zone d'action des documents */
+        .doc-actions {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn-action {
+            padding: 12px;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-view { background: #3b82f6; color: white; }
+        .btn-download { background: #10b981; color: white; }
+        .btn-print { background: #6b7280; color: white; }
+        .btn-action:hover { opacity: 0.9; transform: scale(1.01); }
+
+        #resultArea { display: none; animation: fadeIn 0.5s ease-out; text-align: left; border-top: 4px solid var(--success); }
+
+        .result-item { margin-bottom: 12px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .result-label { font-size: 0.7rem; color: var(--primary); font-weight: 800; text-transform: uppercase; }
+        .result-value { font-size: 1rem; color: white; display: block; margin-top: 4px; }
+
+        .badge-verified {
+            background: var(--success); color: white; padding: 8px 15px;
+            border-radius: 20px; font-size: 0.8rem; display: inline-flex;
+            align-items: center; gap: 8px; margin-bottom: 20px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Retour au Hub</a>
+
+    <div class="header">
+        <div class="logo-circle">
+            <img src="assets/img/logo%20ISC.png" width="60" alt="ISC Logo" onerror="this.onerror=null; this.src='https://i.ibb.co/mRBy7v9/logo-isc.png';">
+        </div>
+        <h2 style="margin:0; letter-spacing: 2px;">LGT <span style="color:var(--primary)">VERIFY</span></h2>
+        <p style="font-size: 0.8rem; opacity: 0.8; font-weight: 300;">ISC LUBUMBASHI - SYSTÈME BLOCKCHAIN</p>
+    </div>
+
+    <div class="container">
+        <div class="glass-card">
+            <h3>Authentification</h3>
+            <div id="reader"></div>
+            <button class="btn btn-scan" id="btnScan" onclick="toggleScan()">
+                <i class="fas fa-qrcode"></i> Scanner le diplôme
+            </button>
+            <div style="margin: 20px 0; opacity: 0.3; font-size: 0.7rem; letter-spacing: 2px;">OU SAISIE MANUELLE</div>
+            <input type="text" id="mat" placeholder="NUMÉRO DE MATRICULE">
+            <button class="btn btn-verify" id="btnMainVerify" onclick="verifier()">
+                <i class="fas fa-shield-alt"></i> VÉRIFIER MAINTENANT
+            </button>
+        </div>
+
+        <div id="resultArea" class="glass-card">
+            <div class="badge-verified"><i class="fas fa-check-circle"></i> DOCUMENT CERTIFIÉ CONFORME</div>
+            <div class="result-item"><span class="result-label">Nom du Lauréat</span><span id="resNom" class="result-value">-</span></div>
+            <div class="result-item"><span class="result-label">Mention & Faculté</span><span id="resFac" class="result-value">-</span></div>
+            
+            <div class="doc-actions">
+                <button class="btn-action btn-view" id="btnVisualiser">
+                    <i class="fas fa-eye"></i> Voir le document
+                </button>
+                <button class="btn-action btn-download" id="btnTelecharger">
+                    <i class="fas fa-download"></i> Télécharger le PDF
+                </button>
+                <button class="btn-action btn-print" id="btnImprimer">
+                    <i class="fas fa-print"></i> Imprimer le diplôme
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaG6CBeHeF3C--qhmfw8_hwiEnBitHmqQ",
+            authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
+            databaseURL: "https://lgt-hub-archivage-isc-default-rtdb.firebaseio.com",
+            projectId: "lgt-hub-archivage-isc",
+            storageBucket: "lgt-hub-archivage-isc.firebasestorage.app",
+            messagingSenderId: "355077255297",
+            appId: "1:355077255297:web:cbc97343febd93edbcdd80"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let html5QrCode;
+        let currentPdfData = ""; // Stockage temporaire du Base64 du PDF trouvé
+        let currentNomLaurat = ""; // Stockage du nom pour nommer le fichier au téléchargement
+
+        window.addEventListener('beforeunload', () => {
+            if (html5QrCode && typeof html5QrCode.stop === 'function') {
+                html5QrCode.stop().catch(err => console.log(err));
+            }
+        });
+
+        function toggleScan() {
+            const readerDiv = document.getElementById('reader');
+            if (readerDiv.style.display === 'none' || readerDiv.style.display === '') {
+                readerDiv.style.display = 'block';
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+                    if(decodedText.includes('id=')) {
+                        const url = new URL(decodedText);
+                        document.getElementById('mat').value = url.searchParams.get("id");
+                    } else { document.getElementById('mat').value = decodedText; }
+                    stopScan();
+                    verifier();
+                }).catch(err => alert("Erreur Caméra : " + err));
+                document.getElementById('btnScan').innerHTML = '<i class="fas fa-times"></i> Fermer la caméra';
+            } else { stopScan(); }
+        }
+
+        function stopScan() {
+            if(html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('reader').style.display = 'none';
+                    document.getElementById('btnScan').innerHTML = '<i class="fas fa-qrcode"></i> Scanner le diplôme';
+                }).catch(err => console.log(err));
+            }
+        }
+
+        function verifier() {
+            const matricule = document.getElementById('mat').value.trim().toUpperCase();
+            if(!matricule) return alert("Veuillez saisir un matricule valide.");
+            const btn = document.getElementById('btnMainVerify');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> INTERROGATION BLOCKCHAIN...';
+            btn.disabled = true;
+
+            db.ref('archives/' + matricule).once('value').then((snapshot) => {
+                btn.innerHTML = '<i class="fas fa-shield-alt"></i> VÉRIFIER MAINTENANT';
+                btn.disabled = false;
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    document.getElementById('resNom').innerText = data.nom;
+                    document.getElementById('resFac').innerText = data.fac + " | " + (data.fil || "");
+                    
+                    // Sauvegarde des données en mémoire
+                    currentPdfData = data.pdfUrl;
+                    currentNomLaurat = data.nom.replace(/[/\\?%*:|"<>]/g, '-'); // Sécurise le nom du fichier
+
+                    // Action 1 : Visualiser le document
+                    document.getElementById('btnVisualiser').onclick = function() {
+                        const w = window.open();
+                        w.document.write(`<title>Visualisation - ${data.nom}</title><iframe src="${currentPdfData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+                    };
+
+                    // Action 2 : Télécharger le PDF proprement
+                    document.getElementById('btnTelecharger').onclick = function() {
+                        const link = document.createElement('a');
+                        link.href = currentPdfData;
+                        link.download = `Diplome_${currentNomLaurat}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    };
+
+                    // Action 3 : Imprimer le document directement
+                    document.getElementById('btnImprimer').onclick = function() {
+                        const printWindow = window.open('', '_blank');
+                        printWindow.document.write(`
+                            <html>
+                            <head><title>Impression - ${data.nom}</title></head>
+                            <body style="margin:0; padding:0;">
+                                <iframe src="${currentPdfData}" width="100%" height="100%" style="border:none;" onload="this.contentWindow.print();"></iframe>
+                            </body>
+                            </html>
+                        `);
+                        printWindow.document.close();
+                    };
+                    
+                    document.getElementById('resultArea').style.display = "block";
+                    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    document.getElementById('resultArea').style.display = "none";
+                    alert("❌ ALERTE : Ce matricule n'existe pas dans la base de données sécurisée de l'ISC.");
+                }
+            }).catch(error => { 
+                alert("Erreur de connexion : " + error.message); 
+                btn.innerHTML = '<i class="fas fa-shield-alt"></i> VÉRIFIER MAINTENANT';
+                btn.disabled = false; 
+            });
+        }
+
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            if(params.get('id')) {
+                document.getElementById('mat').value = params.get('id');
+                verifier();
+            }
+        };
+    </script>
+</body>
+</html>
