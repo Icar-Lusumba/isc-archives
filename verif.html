@@ -8,9 +8,9 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
-            /* Mode Clair avec fond visible + masque blanc léger */
-            --bg-app: linear-gradient(rgba(244, 246, 249, 0.75), rgba(229, 234, 240, 0.85)), url('assets/img/OIP (1).webp');
-            --bg-container: rgba(255, 255, 255, 0.45); /* Plus transparent pour l'effet verre */
+            /* CORRECTION : Utilisation du nom d'image simplifié pour le mode clair */
+            --bg-app: linear-gradient(rgba(244, 246, 249, 0.75), rgba(229, 234, 240, 0.85)), url('assets/img/fond.webp');
+            --bg-container: rgba(255, 255, 255, 0.45); 
             --sidebar-bg: rgba(30, 41, 59, 0.8); 
             --sidebar-text: #94a3b8;
             --text-main: #0f172a;
@@ -22,10 +22,11 @@
             --card-success-border: #10b981;
         }
 
-        /* Mode sombre avec fond beaucoup plus visible (masque noir très réduit) */
+        /* Mode sombre avec fond bien visible */
         body.dark-mode {
-            --bg-app: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), url('assets/img/OIP (1).webp');
-            --bg-container: rgba(22, 28, 45, 0.55); /* Translucide pour voir à travers */
+            /* CORRECTION : Utilisation du nom d'image simplifié pour le mode sombre */
+            --bg-app: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), url('assets/img/fond.webp');
+            --bg-container: rgba(22, 28, 45, 0.55); 
             --sidebar-bg: rgba(15, 19, 34, 0.75);
             --sidebar-text: #a0aec0;
             --text-main: #ffffff;
@@ -57,7 +58,7 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* Effet Verre Flouté (Glassmorphism) appliqué sur les conteneurs */
+        /* Effet Verre Flouté (Glassmorphism) */
         .col-left { 
             width: 280px; 
             min-width: 280px;
@@ -127,7 +128,6 @@
             filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.2));
         }
         
-        /* Bloc Central en effet verre flou */
         .panel-block { 
             width: 100%; 
             max-width: 650px; 
@@ -240,7 +240,7 @@
     </div>
 
     <div class="col-center">
-        <img src="assets/img/logo ISC.png" class="isc-header-logo" alt="Logo ISC">
+        <img src="assets/img/logo-isc.png" class="isc-header-logo" alt="Logo ISC">
         
         <div class="panel-block">
             <div class="main-title">Vérification de Diplômes</div>
