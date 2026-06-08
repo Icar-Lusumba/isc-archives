@@ -6,6 +6,10 @@
     <title>LGT HUB - Portail de Vérification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-app: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -21,196 +25,43 @@
             --card-success-border: #10b981;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-        }
-        
-        body { 
-            background: var(--bg-app);
-            color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: row;
-            overflow-x: hidden;
-        }
-
-        .col-left { 
-            width: 280px; 
-            min-width: 280px;
-            background: var(--sidebar-bg); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 30px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 30px; 
-            border-right: 1px solid var(--border-color); 
-        }
-        
-        .col-center { 
-            flex: 1; 
-            padding: 40px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 25px; 
-            align-items: center; 
-            justify-content: flex-start;
-            overflow-y: auto; 
-        }
-        
-        .col-right { 
-            width: 300px; 
-            min-width: 300px;
-            background: var(--sidebar-bg); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px); 
-            padding: 30px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 25px; 
-            border-left: 1px solid var(--border-color); 
-            box-shadow: var(--glass-shadow);
-        }
-
-        .brand-box { 
-            border: 1px solid var(--accent-orange); 
-            border-radius: 12px; 
-            padding: 15px; 
-            text-align: center; 
-            background: rgba(0, 0, 0, 0.4); 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg-app); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: row; overflow-x: hidden; }
+        .col-left { width: 280px; min-width: 280px; background: var(--sidebar-bg); backdrop-filter: blur(12px); padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--border-color); }
+        .col-center { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 25px; align-items: center; justify-content: flex-start; overflow-y: auto; }
+        .col-right { width: 300px; min-width: 300px; background: var(--sidebar-bg); backdrop-filter: blur(12px); padding: 30px 20px; display: flex; flex-direction: column; gap: 25px; border-left: 1px solid var(--border-color); box-shadow: var(--glass-shadow); }
+        .brand-box { border: 1px solid var(--accent-orange); border-radius: 12px; padding: 15px; text-align: center; background: rgba(0, 0, 0, 0.4); }
         .brand-box h3 { color: #fff; font-size: 1.1rem; letter-spacing: 1px; }
         .brand-box p { color: var(--accent-orange); font-size: 0.7rem; font-weight: bold; margin-top: 2px; }
-
         .nav-menu { list-style: none; }
-        .nav-menu a { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 14px 16px; 
-            color: var(--sidebar-text); 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-weight: 600; 
-        }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 14px 16px; color: var(--sidebar-text); text-decoration: none; border-radius: 8px; font-weight: 600; }
         .nav-menu a.active { background: var(--accent-orange); color: white; }
-
-        .isc-logo-replacement {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-        .isc-logo-replacement i {
-            font-size: 3rem;
-            color: var(--accent-orange);
-        }
-        .isc-logo-replacement span {
-            font-weight: 800;
-            letter-spacing: 2px;
-            font-size: 1.2rem;
-        }
-        
-        .panel-block { 
-            width: 100%; 
-            max-width: 650px; 
-            background: var(--bg-container); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px); 
-            border-radius: 16px; 
-            padding: 35px; 
-            border: 1px solid var(--border-color); 
-            box-shadow: var(--glass-shadow); 
-        }
-        
+        .isc-logo-replacement { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px; color: #fff; }
+        .isc-logo-replacement i { font-size: 3rem; color: var(--accent-orange); }
+        .isc-logo-replacement span { font-weight: 800; letter-spacing: 2px; font-size: 1.2rem; }
+        .panel-block { width: 100%; max-width: 650px; background: var(--bg-container); backdrop-filter: blur(16px); border-radius: 16px; padding: 35px; border: 1px solid var(--border-color); box-shadow: var(--glass-shadow); }
         .main-title { text-align: center; text-transform: uppercase; font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; letter-spacing: 0.5px; }
-
         .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .form-group label { font-size: 0.8rem; font-weight: bold; color: var(--text-main); opacity: 0.8; text-transform: uppercase; }
-        
         .input-container { display: flex; gap: 12px; width: 100%; }
-        input { 
-            flex: 1; 
-            padding: 14px 18px; 
-            background: rgba(0, 0, 0, 0.25); 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            color: var(--text-main); 
-            font-size: 1rem; 
-            outline: none; 
-        }
+        input { flex: 1; padding: 14px 18px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; }
         input:focus { border-color: var(--accent-orange); }
-
-        .btn-verify { 
-            background: var(--accent-orange); color: white; border: none; padding: 15px; border-radius: 8px; 
-            font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; 
-            align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(255, 122, 0, 0.3);
-        }
-        
-        .btn-scan { 
-            background: #2563eb; color: white; border: none; width: 55px; height: 52px; 
-            border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; 
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-        }
-
-        #qr-reader-container {
-            display: none;
-            margin-bottom: 25px;
-            border: 2px dashed var(--accent-orange);
-            border-radius: 12px;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            padding: 15px;
-            text-align: center;
-        }
-
-        .btn-close-camera {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-        .verification-output-card { 
-            display: none; margin-top: 30px; padding: 25px; 
-            background: var(--card-success-bg); border: 1px solid var(--card-success-border); border-radius: 12px; 
-        }
-        
+        .btn-verify { background: var(--accent-orange); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(255, 122, 0, 0.3); }
+        .btn-scan { background: #2563eb; color: white; border: none; width: 55px; height: 52px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        #qr-reader-container { display: none; margin-bottom: 25px; border: 2px dashed var(--accent-orange); border-radius: 12px; overflow: hidden; background: rgba(0, 0, 0, 0.6); padding: 15px; text-align: center; }
+        .btn-close-camera { background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; font-size: 0.8rem; }
+        .verification-output-card { display: none; margin-top: 30px; padding: 25px; background: var(--card-success-bg); border: 1px solid var(--card-success-border); border-radius: 12px; }
         .card-output-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
         .status-badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-        
         .row-data { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
         .row-data span:first-child { color: var(--text-muted); }
-
         .output-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
         .btn-act { padding: 14px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; text-transform: uppercase; }
         .btn-act-view { background: #0ea5e9; }
         .btn-act-print { background: #64748b; }
-
         .error-alert-box { display: none; margin-top: 25px; padding: 15px; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; text-align: center; color: #ef4444; font-weight: 600; }
-
         .right-section-title { font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: var(--text-main); opacity: 0.7; letter-spacing: 1px; }
-
-        @media (max-width: 1024px) {
-            body { flex-direction: column; }
-            .col-left, .col-center, .col-right { width: 100%; min-width: 100%; border: none; }
-        }
+        @media (max-width: 1024px) { body { flex-direction: column; } .col-left, .col-center, .col-right { width: 100%; min-width: 100%; border: none; } }
     </style>
 </head>
 <body>
@@ -245,8 +96,8 @@
                 <div class="form-group">
                     <label>Identifiant ou Matricule de l'Étudiant</label>
                     <div class="input-container">
-                        <input type="text" id="queryMatricule" placeholder="Ex: 2026-ISC-001" required>
-                        <button type="button" class="btn-scan" onclick="startQRScanner()" title="Activer la Caméra">
+                        <input type="text" id="queryMatricule" placeholder="Ex: ISC-2026-002M" required>
+                        <button type="button" class="btn-scan" onclick="startQRScanner()">
                             <i class="fas fa-camera"></i>
                         </button>
                     </div>
@@ -259,7 +110,7 @@
                     <i class="fas fa-check-circle" style="color: #10b981; font-size: 2.2rem;"></i>
                     <div>
                         <div class="status-badge">Authentique ✓</div>
-                        <h4 style="margin-top: 4px; font-weight: 600;">Validation Blockchain Réussie</h4>
+                        <h4 style="margin-top: 4px; font-weight: 600;">Validation Réelle Réussie</h4>
                     </div>
                 </div>
 
@@ -267,7 +118,7 @@
                 <div class="row-data"><span>Matricule :</span><span id="outMatricule"></span></div>
                 <div class="row-data"><span>Faculté / Section :</span><span id="outFac"></span></div>
                 <div class="row-data"><span>Filière / Option :</span><span id="outFil"></span></div>
-                <div class="row-data"><span>Signature Numérique :</span><span id="outHash" style="font-family: monospace; font-size: 0.8rem; color: #10b981; word-break: break-all;"></span></div>
+                <div class="row-data"><span>Signature Blockchain / Hash :</span><span id="outHash" style="font-family: monospace; font-size: 0.8rem; color: #10b981; word-break: break-all;"></span></div>
                 <div class="row-data"><span>Date d'Ancrage :</span><span id="outTime"></span></div>
 
                 <div class="output-actions-grid">
@@ -277,7 +128,7 @@
             </div>
 
             <div class="error-alert-box" id="errorBox">
-                <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i> Aucun enregistrement trouvé !
+                <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i> Aucun enregistrement trouvé dans le registre !
             </div>
         </div>
     </div>
@@ -286,66 +137,121 @@
         <div>
             <div class="right-section-title">À propos du Portail</div>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
-                Ce système interroge directement les registres décentralisés pour confirmer la validité des diplômes émis.
+                Ce système interroge en temps réel les registres décentralisés de l'ISC Lubumbashi pour valider l'authenticité des pièces d'études.
             </p>
         </div>
     </div>
 
     <script>
-        // 1. Base de données locale de simulation pour la soutenance
-        const databaseSimulation = {
-            "2026-ISC-001": {
-                name: "Kalenda Lusumba Icar",
-                matricule: "2026-ISC-001",
-                fac: "Informatique de Gestion",
-                fil: "CSI (Conception des Systèmes d'Information)",
-                hash: "0xa3cd99e8b725efca718a38c234b99ef71bc82a4d31fe1192a001fedcb36aa22",
-                timestamp: "17 mai 2026 18:43:56",
-                pdf: "Docs/ISC-2026-001M.pdf"
-            },
-            "ISC-2026-002M": {
-                name: "Mwanza Kabongo Jonathan",
-                matricule: "ISC-2026-002M",
-                fac: "Informatique de Gestion",
-                fil: "CSI (Conception des Systèmes d'Information)",
-                hash: "0x7f8b4a23c8d1e9f0b5a6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
-                timestamp: "08 juin 2026 09:12:04",
-                pdf: "Docs/ISC-2026-002M.pdf"
-            }
+        // ==========================================
+        // 1. CONFIGURATION DE TON FIREBASE CENTRAL
+        // ==========================================
+        // Remplace ces informations par les clés exactes de ton projet Firebase
+        const firebaseConfig = {
+            apiKey: "TON_API_KEY",
+            authDomain: "TON_PROJECT.firebaseapp.com",
+            databaseURL: "https://TON_PROJECT-default-rtdb.firebaseio.com",
+            projectId: "TON_PROJECT",
+            storageBucket: "TON_PROJECT.appspot.com",
+            messagingSenderId: "TON_SENDER_ID",
+            appId: "TON_APP_ID"
         };
+
+        // Initialisation de Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
 
         let html5QrcodeScanner = null;
 
-        // 2. Vérification automatique au chargement (si appelé depuis l'URL admin ?id=...)
+        // Vérification automatique si transmission par paramètre d'URL (?id=...)
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const idParam = urlParams.get('id');
-            
             if (idParam) {
                 document.getElementById('queryMatricule').value = idParam;
-                processVerification(idParam);
+                processRealVerification(idParam);
             }
         });
 
+        function triggerVerification(e) {
+            e.preventDefault();
+            const mat = document.getElementById('queryMatricule').value.trim();
+            processRealVerification(mat);
+        }
+
+        // ==========================================
+        // 2. LOGIQUE DE VÉRIFICATION EN TEMPS RÉEL
+        // ==========================================
+        function processRealVerification(matriculeKey) {
+            const card = document.getElementById('outputCard');
+            const err = document.getElementById('errorBox');
+            
+            // On nettoie l'affichage avant la recherche
+            card.style.display = "none";
+            err.style.display = "none";
+
+            // Remplace 'diplomes' par le nom du nœud exact utilisé dans ton administration
+            database.ref('diplomes/' + matriculeKey).once('value')
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    const record = snapshot.val();
+                    showData(record);
+                } else {
+                    err.style.display = "block";
+                }
+            })
+            .catch((error) => {
+                console.error("Erreur Firebase : ", error);
+                alert("Erreur de connexion avec le registre central.");
+            });
+        }
+
+        function showData(record) {
+            // Remplissage dynamique avec les VRAIES variables issues de Firebase
+            // Assure-toi que les noms (nomEtudiant, faculte, etc.) correspondent à ta structure Firebase admin
+            document.getElementById('outName').innerText = record.nomEtudiant || record.name || "Inconnu";
+            document.getElementById('outMatricule').innerText = record.matricule || record.id || "";
+            document.getElementById('outFac').innerText = record.faculte || record.fac || "";
+            document.getElementById('outFil').innerText = record.filiere || record.fil || "";
+            document.getElementById('outHash').innerText = record.blockchainHash || record.hash || "Ancrage local sans hash";
+            document.getElementById('outTime').innerText = record.dateAncrage || record.timestamp || "Récemment";
+            
+            document.getElementById('outputCard').style.display = "block";
+
+            // Gestion dynamique du bouton "Voir Document" pour éviter l'erreur 404
+            document.getElementById('btnVerifOpen').onclick = function() {
+                if (record.fileUrl || record.pdfUrl) {
+                    // Si tu stockes l'URL complète (Firebase Storage ou IPFS)
+                    window.open(record.fileUrl || record.pdfUrl, '_blank');
+                } else {
+                    // Si tu utilises le stockage local dans le dossier de ton projet
+                    window.open('Docs/' + (record.matricule || record.id) + '.pdf', '_blank');
+                }
+            };
+            
+            document.getElementById('btnVerifPrint').onclick = function() { window.print(); };
+        }
+
+        // ==========================================
+        // 3. CODE DU SCANNER CAMÉRA QR
+        // ==========================================
         function startQRScanner() {
             const container = document.getElementById('qr-reader-container');
             container.style.display = 'block';
-
-            if (!html5QrcodeScanner) {
-                html5QrcodeScanner = new Html5Qrcode("my-qr-reader");
-            }
-
+            if (!html5QrcodeScanner) { html5QrcodeScanner = new Html5Qrcode("my-qr-reader"); }
             html5QrcodeScanner.start(
                 { facingMode: "environment" }, 
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
                     document.getElementById('queryMatricule').value = decodedText;
                     stopQRScanner();
-                    processVerification(decodedText);
+                    processRealVerification(decodedText);
                 },
                 (errorMessage) => { }
             ).catch(err => {
-                alert("Erreur d'accès à la caméra ou permission refusée.");
+                alert("Permission caméra refusée.");
                 container.style.display = 'none';
             });
         }
@@ -353,55 +259,8 @@
         function stopQRScanner() {
             const container = document.getElementById('qr-reader-container');
             if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-                html5QrcodeScanner.stop().then(() => {
-                    container.style.display = 'none';
-                }).catch(err => {
-                    console.error("Erreur arrêt caméra : ", err);
-                    container.style.display = 'none';
-                });
-            } else {
-                container.style.display = 'none';
-            }
-        }
-
-        function triggerVerification(e) {
-            e.preventDefault();
-            const mat = document.getElementById('queryMatricule').value.trim();
-            processVerification(mat);
-        }
-
-        // 3. Logique de traitement dynamique
-        function processVerification(matriculeKey) {
-            const card = document.getElementById('outputCard');
-            const err = document.getElementById('errorBox');
-
-            // Recherche correspondante dans notre base dynamique
-            if (databaseSimulation[matriculeKey]) {
-                showData(databaseSimulation[matriculeKey]);
-            } else {
-                card.style.display = "none";
-                err.style.display = "block";
-            }
-        }
-
-        function showData(record) {
-            document.getElementById('errorBox').style.display = "none";
-            document.getElementById('outName').innerText = record.name;
-            document.getElementById('outMatricule').innerText = record.matricule;
-            document.getElementById('outFac').innerText = record.fac;
-            document.getElementById('outFil').innerText = record.fil;
-            document.getElementById('outHash').innerText = record.hash;
-            document.getElementById('outTime').innerText = record.timestamp;
-            document.getElementById('outputCard').style.display = "block";
-
-            // Redirection dynamique vers le bon PDF stocké dans ton dossier Docs/
-            document.getElementById('btnVerifOpen').onclick = function() {
-                window.open(record.pdf, '_blank');
-            };
-            
-            document.getElementById('btnVerifPrint').onclick = function() {
-                window.print();
-            };
+                html5QrcodeScanner.stop().then(() => { container.style.display = 'none'; });
+            } else { container.style.display = 'none'; }
         }
     </script>
 </body>
