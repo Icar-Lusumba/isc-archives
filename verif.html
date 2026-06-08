@@ -102,7 +102,7 @@
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="btn-verify"><i class="fas fa-search"></i> Lancer la recherche</button>
+                <button type="submit" id="submitBtn" class="btn-verify"><i class="fas fa-search"></i> Lancer la recherche</button>
             </form>
 
             <div class="verification-output-card" id="outputCard">
@@ -144,7 +144,7 @@
 
     <script>
         // ===================================================
-        // CONFIGURATION CONFIGURATION LIVE SANS SIMULATION
+        // CONFIGURATION LIVE STRICTE SANS SIMULATION
         // ===================================================
         const firebaseConfig = {
             apiKey: "METS_TON_API_KEY_ICI",
@@ -156,15 +156,35 @@
             appId: "TON_APP_ID"
         };
 
-        // Initialisation standard stricte
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        let database = null;
+        let isFirebaseReady = false;
+
+        // PROTECTION ANTI-CRASH : Initialisation sécurisée isolée
+        try {
+            if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "METS_TON_API_KEY_ICI") {
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                isFirebaseReady = true;
+                console.log("Firebase connecté avec succès au registre distant.");
+            } else {
+                console.warn("Firebase non configuré. Remplir 'firebaseConfig' pour activer les requêtes en temps réel.");
+            }
+        } catch (error) {
+            console.error("Erreur d'initialisation Firebase capturée de façon sécurisée :", error);
+        }
 
         let html5QrcodeScanner = null;
 
+        // Fonction d'interception du formulaire - TOUJOURS ACTIVE
         function triggerVerification(e) {
             e.preventDefault();
             const mat = document.getElementById('queryMatricule').value.trim();
+            
+            if (!isFirebaseReady || !database) {
+                alert("Action impossible : Les identifiants Firebase de votre base de données Realtime ne sont pas encore configurés dans le script.");
+                return;
+            }
+            
             processRealVerification(mat);
         }
 
@@ -174,11 +194,14 @@
         function processRealVerification(matriculeKey) {
             const card = document.getElementById('outputCard');
             const err = document.getElementById('errorBox');
+            const btn = document.getElementById('submitBtn');
             
             card.style.display = "none";
             err.style.display = "none";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche en cours...';
+            btn.disabled = true;
 
-            // Requête directe à l'arbre Firebase complet
+            // Requête directe en temps réel à l'arbre de données distant
             database.ref().once('value')
             .then((snapshot) => {
                 let dataFound = null;
@@ -186,15 +209,15 @@
                 if (snapshot.exists()) {
                     const allData = snapshot.val();
                     
-                    // 1. Recherche directe à la racine par clé de matricule
+                    // 1. Recherche directe par clé à la racine
                     if (allData[matriculeKey]) {
                         dataFound = allData[matriculeKey];
                     } 
-                    // 2. Recherche sous le nœud enfant standard 'diplomes'
+                    // 2. Recherche sous la collection enfant 'diplomes'
                     else if (allData.diplomes && allData.diplomes[matriculeKey]) {
                         dataFound = allData.diplomes[matriculeKey];
                     } 
-                    // 3. Recherche récursive par boucle si structuré sous des IDs générés dynamiquement (push)
+                    // 3. Recherche récursive par boucles profondes
                     else {
                         for (let key in allData) {
                             if (typeof allData[key] === 'object' && allData[key] !== null) {
@@ -202,7 +225,6 @@
                                     dataFound = allData[key][matriculeKey];
                                     break;
                                 }
-                                // Si les données sont directement poussées à l'intérieur de sous-collections anonymes
                                 for (let subKey in allData[key]) {
                                     if (allData[key][subKey] && (allData[key][subKey].matricule === matriculeKey || subKey === matriculeKey)) {
                                         dataFound = allData[key][subKey];
@@ -214,7 +236,10 @@
                     }
                 }
 
-                // Affichage direct du résultat ou erreur brute
+                // Libération du bouton de recherche
+                btn.removeAttribute('disabled');
+                btn.innerHTML = '<i class="fas fa-search"></i> Lancer la recherche';
+
                 if (dataFound) {
                     showData(dataFound, matriculeKey);
                 } else {
@@ -222,13 +247,14 @@
                 }
             })
             .catch((error) => {
-                console.error("Erreur de connexion Realtime Database :", error);
+                console.error("Erreur d'accès à la base de données :", error);
+                btn.removeAttribute('disabled');
+                btn.innerHTML = '<i class="fas fa-search"></i> Lancer la recherche';
                 err.style.display = "block";
             });
         }
 
         function showData(record, backupMatricule) {
-            // Mappe dynamiquement les clés selon la structure de ta BDD (français ou anglais)
             document.getElementById('outName').innerText = record.nomEtudiant || record.name || "Inconnu";
             document.getElementById('outMatricule').innerText = record.matricule || backupMatricule;
             document.getElementById('outFac').innerText = record.faculte || record.fac || "Non spécifiée";
@@ -238,7 +264,6 @@
             
             document.getElementById('outputCard').style.display = "block";
 
-            // Configuration du bouton de visualisation du document
             document.getElementById('btnVerifOpen').onclick = function() {
                 let docUrl = record.fileUrl || record.pdfUrl;
                 if (docUrl) { 
@@ -268,7 +293,7 @@
                 },
                 (errorMessage) => { }
             ).catch(err => {
-                alert("Permission caméra refusée.");
+                alert("Permission caméra refusée ou indisponible.");
                 container.style.display = 'none';
             });
         }
