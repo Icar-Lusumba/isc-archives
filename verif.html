@@ -161,3 +161,118 @@
         }
         const database = firebase.database();
         let html5QrcodeScanner = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idParam = urlParams.get('id');
+            if (idParam) {
+                document.getElementById('queryMatricule').value = idParam;
+                processRealVerification(idParam);
+            }
+        });
+
+        function triggerVerification(e) {
+            e.preventDefault();
+            const mat = document.getElementById('queryMatricule').value.trim();
+            processRealVerification(mat);
+        }
+
+        // ==========================================
+        // 2. LOGIQUE DE RECHERCHE EN TEMPS RÉEL
+        // ==========================================
+        function processRealVerification(matriculeKey) {
+            const card = document.getElementById('outputCard');
+            const err = document.getElementById('errorBox');
+            
+            card.style.display = "none";
+            err.style.display = "none";
+
+            // RECHERCHE DIRECTE OU GLOBALE (Pour s'assurer de trouver la clé)
+            database.ref().once('value')
+            .then((snapshot) => {
+                let dataFound = null;
+
+                if (snapshot.exists()) {
+                    const allData = snapshot.val();
+                    
+                    // 1. Test si stocké sous la racine directement ou dans un sous-dossier commun
+                    if (allData[matriculeKey]) dataFound = allData[matriculeKey];
+                    else if (allData.diplomes && allData.diplomes[matriculeKey]) dataFound = allData.diplomes[matriculeKey];
+                    else if (allData.records && allData.records[matriculeKey]) dataFound = allData.records[matriculeKey];
+                    else {
+                        // 2. Parcours global automatique si la structure est imbriquée
+                        for (let key in allData) {
+                            if (typeof allData[key] === 'object' && allData[key] !== null) {
+                                if (allData[key][matriculeKey]) {
+                                    dataFound = allData[key][matriculeKey];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (dataFound) {
+                    showData(dataFound, matriculeKey);
+                } else {
+                    err.style.display = "block";
+                }
+            })
+            .catch((error) => {
+                console.error("Erreur Firebase : ", error);
+                err.innerText = "Erreur de communication avec la base de données.";
+                err.style.display = "block";
+            });
+        }
+
+        function showData(record, backupMatricule) {
+            // Mappe précisément tes variables d'ancrage d'administration
+            document.getElementById('outName').innerText = record.nomEtudiant || record.name || record.studentName || "Inconnu";
+            document.getElementById('outMatricule').innerText = record.matricule || record.id || backupMatricule;
+            document.getElementById('outFac').innerText = record.faculte || record.fac || record.section || "Non spécifiée";
+            document.getElementById('outFil').innerText = record.filiere || record.fil || record.option || "Non spécifiée";
+            document.getElementById('outHash').innerText = record.blockchainHash || record.hash || record.txHash || "Ancrage local sécurisé";
+            document.getElementById('outTime').innerText = record.dateAncrage || record.timestamp || "Récemment synchrone";
+            
+            document.getElementById('outputCard').style.display = "block";
+
+            document.getElementById('btnVerifOpen').onclick = function() {
+                let docUrl = record.fileUrl || record.pdfUrl || record.documentUrl;
+                if (docUrl) {
+                    window.open(docUrl, '_blank');
+                } else {
+                    window.open('Docs/' + (record.matricule || backupMatricule) + '.pdf', '_blank');
+                }
+            };
+            
+            document.getElementById('btnVerifPrint').onclick = function() { window.print(); };
+        }
+
+        function startQRScanner() {
+            const container = document.getElementById('qr-reader-container');
+            container.style.display = 'block';
+            if (!html5QrcodeScanner) { html5QrcodeScanner = new Html5Qrcode("my-qr-reader"); }
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    document.getElementById('queryMatricule').value = decodedText;
+                    stopQRScanner();
+                    processRealVerification(decodedText);
+                },
+                (errorMessage) => { }
+            ).catch(err => {
+                alert("Permission caméra refusée.");
+                container.style.display = 'none';
+            });
+        }
+
+        function stopQRScanner() {
+            const container = document.getElementById('qr-reader-container');
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                html5QrcodeScanner.stop().then(() => { container.style.display = 'none'; });
+            } else { container.style.display = 'none'; }
+        }
+    </script>
+</body>
+</html>
