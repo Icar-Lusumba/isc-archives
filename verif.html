@@ -98,7 +98,6 @@
         }
         .nav-menu a.active { background: var(--accent-orange); color: white; }
 
-        /* Remplacement du logo image par un logo icône + texte stylisé */
         .isc-logo-replacement {
             display: flex;
             flex-direction: column;
@@ -293,7 +292,40 @@
     </div>
 
     <script>
+        // 1. Base de données locale de simulation pour la soutenance
+        const databaseSimulation = {
+            "2026-ISC-001": {
+                name: "Kalenda Lusumba Icar",
+                matricule: "2026-ISC-001",
+                fac: "Informatique de Gestion",
+                fil: "CSI (Conception des Systèmes d'Information)",
+                hash: "0xa3cd99e8b725efca718a38c234b99ef71bc82a4d31fe1192a001fedcb36aa22",
+                timestamp: "17 mai 2026 18:43:56",
+                pdf: "Docs/ISC-2026-001M.pdf"
+            },
+            "ISC-2026-002M": {
+                name: "Mwanza Kabongo Jonathan",
+                matricule: "ISC-2026-002M",
+                fac: "Informatique de Gestion",
+                fil: "CSI (Conception des Systèmes d'Information)",
+                hash: "0x7f8b4a23c8d1e9f0b5a6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
+                timestamp: "08 juin 2026 09:12:04",
+                pdf: "Docs/ISC-2026-002M.pdf"
+            }
+        };
+
         let html5QrcodeScanner = null;
+
+        // 2. Vérification automatique au chargement (si appelé depuis l'URL admin ?id=...)
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idParam = urlParams.get('id');
+            
+            if (idParam) {
+                document.getElementById('queryMatricule').value = idParam;
+                processVerification(idParam);
+            }
+        });
 
         function startQRScanner() {
             const container = document.getElementById('qr-reader-container');
@@ -309,7 +341,7 @@
                 (decodedText) => {
                     document.getElementById('queryMatricule').value = decodedText;
                     stopQRScanner();
-                    document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+                    processVerification(decodedText);
                 },
                 (errorMessage) => { }
             ).catch(err => {
@@ -335,18 +367,17 @@
         function triggerVerification(e) {
             e.preventDefault();
             const mat = document.getElementById('queryMatricule').value.trim();
+            processVerification(mat);
+        }
+
+        // 3. Logique de traitement dynamique
+        function processVerification(matriculeKey) {
             const card = document.getElementById('outputCard');
             const err = document.getElementById('errorBox');
 
-            if(mat === "2026-ISC-001") {
-                showData({
-                    name: "Icar LUSUMBA",
-                    matricule: "2026-ISC-001",
-                    fac: "Informatique de Gestion, Sciences Commerciales",
-                    fil: "CSI (Conception des Systèmes)",
-                    hash: "0xa3cd99e8b725efca718a38c234b99ef71",
-                    timestamp: "17 mai 2026 18:43:56"
-                });
+            // Recherche correspondante dans notre base dynamique
+            if (databaseSimulation[matriculeKey]) {
+                showData(databaseSimulation[matriculeKey]);
             } else {
                 card.style.display = "none";
                 err.style.display = "block";
@@ -363,8 +394,9 @@
             document.getElementById('outTime').innerText = record.timestamp;
             document.getElementById('outputCard').style.display = "block";
 
+            // Redirection dynamique vers le bon PDF stocké dans ton dossier Docs/
             document.getElementById('btnVerifOpen').onclick = function() {
-                window.open('Docs/ISC-2026-001M.pdf', '_blank');
+                window.open(record.pdf, '_blank');
             };
             
             document.getElementById('btnVerifPrint').onclick = function() {
