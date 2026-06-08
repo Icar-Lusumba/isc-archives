@@ -137,131 +137,27 @@
         <div>
             <div class="right-section-title">À propos du Portail</div>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
-                Ce système interroge en temps réel les registres décentralisés de l'ISC Lubumbashi pour valider l'authenticité des pièces d'études.
+                Ce système interroge en temps réel les registres décentralisés pour valider l'authenticité des pièces d'études.
             </p>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 1. CONFIGURATION DE TON FIREBASE CENTRAL
-        // ==========================================
-        // Remplace ces informations par les clés exactes de ton projet Firebase
+        // =========================================================
+        // 1. CONFIGURATION FIREBASE (REMPLACE PAR TES PROPRES CLÉS)
+        // =========================================================
         const firebaseConfig = {
-            apiKey: "TON_API_KEY",
-            authDomain: "TON_PROJECT.firebaseapp.com",
-            databaseURL: "https://TON_PROJECT-default-rtdb.firebaseio.com",
-            projectId: "TON_PROJECT",
-            storageBucket: "TON_PROJECT.appspot.com",
+            apiKey: "METS_TON_API_KEY_ICI",
+            authDomain: "TON_PROJET.firebaseapp.com",
+            databaseURL: "https://TON_PROJET-default-rtdb.firebaseio.com",
+            projectId: "TON_PROJET",
+            storageBucket: "TON_PROJET.appspot.com",
             messagingSenderId: "TON_SENDER_ID",
             appId: "TON_APP_ID"
         };
 
-        // Initialisation de Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const database = firebase.database();
-
         let html5QrcodeScanner = null;
-
-        // Vérification automatique si transmission par paramètre d'URL (?id=...)
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const idParam = urlParams.get('id');
-            if (idParam) {
-                document.getElementById('queryMatricule').value = idParam;
-                processRealVerification(idParam);
-            }
-        });
-
-        function triggerVerification(e) {
-            e.preventDefault();
-            const mat = document.getElementById('queryMatricule').value.trim();
-            processRealVerification(mat);
-        }
-
-        // ==========================================
-        // 2. LOGIQUE DE VÉRIFICATION EN TEMPS RÉEL
-        // ==========================================
-        function processRealVerification(matriculeKey) {
-            const card = document.getElementById('outputCard');
-            const err = document.getElementById('errorBox');
-            
-            // On nettoie l'affichage avant la recherche
-            card.style.display = "none";
-            err.style.display = "none";
-
-            // Remplace 'diplomes' par le nom du nœud exact utilisé dans ton administration
-            database.ref('diplomes/' + matriculeKey).once('value')
-            .then((snapshot) => {
-                if (snapshot.exists()) {
-                    const record = snapshot.val();
-                    showData(record);
-                } else {
-                    err.style.display = "block";
-                }
-            })
-            .catch((error) => {
-                console.error("Erreur Firebase : ", error);
-                alert("Erreur de connexion avec le registre central.");
-            });
-        }
-
-        function showData(record) {
-            // Remplissage dynamique avec les VRAIES variables issues de Firebase
-            // Assure-toi que les noms (nomEtudiant, faculte, etc.) correspondent à ta structure Firebase admin
-            document.getElementById('outName').innerText = record.nomEtudiant || record.name || "Inconnu";
-            document.getElementById('outMatricule').innerText = record.matricule || record.id || "";
-            document.getElementById('outFac').innerText = record.faculte || record.fac || "";
-            document.getElementById('outFil').innerText = record.filiere || record.fil || "";
-            document.getElementById('outHash').innerText = record.blockchainHash || record.hash || "Ancrage local sans hash";
-            document.getElementById('outTime').innerText = record.dateAncrage || record.timestamp || "Récemment";
-            
-            document.getElementById('outputCard').style.display = "block";
-
-            // Gestion dynamique du bouton "Voir Document" pour éviter l'erreur 404
-            document.getElementById('btnVerifOpen').onclick = function() {
-                if (record.fileUrl || record.pdfUrl) {
-                    // Si tu stockes l'URL complète (Firebase Storage ou IPFS)
-                    window.open(record.fileUrl || record.pdfUrl, '_blank');
-                } else {
-                    // Si tu utilises le stockage local dans le dossier de ton projet
-                    window.open('Docs/' + (record.matricule || record.id) + '.pdf', '_blank');
-                }
-            };
-            
-            document.getElementById('btnVerifPrint').onclick = function() { window.print(); };
-        }
-
-        // ==========================================
-        // 3. CODE DU SCANNER CAMÉRA QR
-        // ==========================================
-        function startQRScanner() {
-            const container = document.getElementById('qr-reader-container');
-            container.style.display = 'block';
-            if (!html5QrcodeScanner) { html5QrcodeScanner = new Html5Qrcode("my-qr-reader"); }
-            html5QrcodeScanner.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                (decodedText) => {
-                    document.getElementById('queryMatricule').value = decodedText;
-                    stopQRScanner();
-                    processRealVerification(decodedText);
-                },
-                (errorMessage) => { }
-            ).catch(err => {
-                alert("Permission caméra refusée.");
-                container.style.display = 'none';
-            });
-        }
-
-        function stopQRScanner() {
-            const container = document.getElementById('qr-reader-container');
-            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-                html5QrcodeScanner.stop().then(() => { container.style.display = 'none'; });
-            } else { container.style.display = 'none'; }
-        }
-    </script>
-</body>
-</html>
