@@ -144,16 +144,16 @@
 
     <script>
         // ===================================================
-        // CONFIGURATION LIVE STRICTE SANS SIMULATION
+        // CONFIGURATION LIVE STRICTE - LGT-HUB-Archivage-ISC
         // ===================================================
         const firebaseConfig = {
-            apiKey: "METS_TON_API_KEY_ICI",
-            authDomain: "TON_PROJET.firebaseapp.com",
-            databaseURL: "https://TON_PROJET-default-rtdb.firebaseio.com",
-            projectId: "TON_PROJET",
-            storageBucket: "TON_PROJET.appspot.com",
-            messagingSenderId: "TON_SENDER_ID",
-            appId: "TON_APP_ID"
+            apiKey: "AIzaSyCAGCe0bF3C-_qhefHb_hwiENbitHmQQ",
+            authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
+            databaseURL: "https://lgt-hub-archivage-isc-default-rtdb.firebaseio.com",
+            projectId: "lgt-hub-archivage-isc",
+            storageBucket: "lgt-hub-archivage-isc.firebasestorage.app",
+            messagingSenderId: "355077255297",
+            appId: "1:355077255297:web:cbc97343febd93edbcdd80"
         };
 
         let database = null;
@@ -167,7 +167,7 @@
                 isFirebaseReady = true;
                 console.log("Firebase connecté avec succès au registre distant.");
             } else {
-                console.warn("Firebase non configuré. Remplir 'firebaseConfig' pour activer les requêtes en temps réel.");
+                console.warn("Firebase non configuré.");
             }
         } catch (error) {
             console.error("Erreur d'initialisation Firebase capturée de façon sécurisée :", error);
