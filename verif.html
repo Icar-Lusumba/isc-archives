@@ -8,8 +8,7 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
-            /* CORRECTION : Utilisation de l'extension .jpg exacte observée sur l'environnement */
-            --bg-app: linear-gradient(rgba(244, 246, 249, 0.75), rgba(229, 234, 240, 0.85)), url('assets/img/fond.jpg');
+            --bg-app: linear-gradient(rgba(244, 246, 249, 0.75), rgba(229, 234, 240, 0.85)), url('assets/img/fond.png');
             --bg-container: rgba(255, 255, 255, 0.45); 
             --sidebar-bg: rgba(30, 41, 59, 0.8); 
             --sidebar-text: #94a3b8;
@@ -22,10 +21,8 @@
             --card-success-border: #10b981;
         }
 
-        /* Mode sombre avec fond synchronisé */
         body.dark-mode {
-            /* CORRECTION : Remplacement de l'extension pour correspondre au serveur Linux distant */
-            --bg-app: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), url('assets/img/fond.jpg');
+            --bg-app: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), url('assets/img/fond.png');
             --bg-container: rgba(22, 28, 45, 0.55); 
             --sidebar-bg: rgba(15, 19, 34, 0.75);
             --sidebar-text: #a0aec0;
@@ -58,7 +55,6 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* Design structurel (Effet Glassmorphism) */
         .col-left { 
             width: 280px; 
             min-width: 280px;
