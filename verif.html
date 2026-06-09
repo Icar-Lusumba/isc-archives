@@ -454,6 +454,20 @@
         let currentActiveMatricule = "";
         let isAdminConnected = false;
 
+        // Variables Globales pour la Blockchain
+        let provider;
+        let signer;
+        let contractInstance = null;
+
+        // CONFIGURATION BLOCKCHAIN (Remplis ces deux variables avec tes données Remix)
+        const contractAddress = "METS_ICI_L_ADRESSE_DE_TON_CONTRAT_DEPLOUIE";
+        const contractABI = [
+            // METS ICI TON ABI FORMAT JSON ISSU DE REMIX
+            // Exemple standard attendu :
+            "function stockerDocument(string memory _id, string memory _nom, string memory _filiere, string memory _timestamp) public",
+            "function obtenirDocument(string memory _id) public view returns (string memory, string memory, string memory, bool)"
+        ];
+
         function startClock() {
             setInterval(() => {
                 const now = new Date();
@@ -464,6 +478,28 @@
             }, 1000);
         }
         startClock();
+
+        // Connexion à MetaMask via ethers.js
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    
+                    document.getElementById('walletAddr').innerText = `Connecté : ${address}`;
+                    document.getElementById('walletAddr').style.color = "var(--success)";
+                    
+                    // Initialisation du contrat intelligent
+                    contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
+                } catch (error) {
+                    alert("Erreur de connexion MetaMask : " + error.message);
+                }
+            } else {
+                alert("Veuillez installer MetaMask pour utiliser les fonctionnalités Blockchain !");
+            }
+        }
 
         db.ref('archives').on('value', snapshot => {
             let infoCount = 0, comCount = 0, secCount = 0;
@@ -509,13 +545,11 @@
             });
         }
 
-        // SUPPRESSION DEPUIS LE QR CODE ACTIF
         function supprimerDiplomeSelectionne() {
             if (!currentActiveMatricule) return alert("Aucun diplôme sélectionné à supprimer.");
             supprimerDirectement(currentActiveMatricule);
         }
 
-        // FONCTION DE SUPPRESSION BANCAIRE SECURISEE
         function supprimerDirectement(matricule) {
             if(!isAdminConnected) return alert("🛑 ACTION REFUSÉE : Vous devez d'abord vous authentifier en tant qu'administrateur à droite.");
             
@@ -524,7 +558,6 @@
                 db.ref('archives/' + matricule).remove()
                 .then(() => {
                     alert(`✅ Le diplôme lié au matricule ${matricule} a été retiré avec succès.`);
-                    // Réinitialisation de la vue centrale si c'était le document actif
                     if (currentActiveMatricule === matricule) {
                         currentActiveMatricule = "";
                         currentActiveDocUrl = "";
@@ -590,8 +623,10 @@
         }
         updateFiliere();
 
+        // EXECUTION DE L'ANCRAGE REEL DOUBLE : FIREBASE + SCRIPT SMART CONTRACT
         async function scellerMaintenant() {
             if(!isAdminConnected) return alert("🛑 ACCÈS ADM REFUSÉ : Veuillez valider votre profil d'administrateur à droite.");
+            if(!contractInstance) return alert("🛑 METAMASK REQUIS : Connectez votre portefeuille à droite avant d'ancrer le document dans la Blockchain.");
 
             const mat = document.getElementById('mat').value.trim().toUpperCase();
             const nom = document.getElementById('nom').value.trim();
@@ -602,8 +637,19 @@
             if(!mat || !nom || !fileDataUrl) return alert("Champs ou fichier source manquant.");
 
             try {
+                document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
+                
+                // 1. Appel et Validation Transaction de la Blockchain
+                // Adapte le nom de ta fonction Solidity si elle diffère de 'stockerDocument'
+                const timestampStr = Date.now().toString();
+                const tx = await contractInstance.stockerDocument(mat, nom, fil, timestampStr);
+                
+                // Attente de la confirmation du bloc blockchain
+                await tx.wait();
+
+                // 2. Sauvegarde simultanée dans la Base Firebase après confirmation
                 await db.ref('archives/' + mat).set({
-                    nom: nom, mat: mat, fac: fac, fil: fil, sexe: sexe, pdfUrl: fileDataUrl, timestamp: Date.now()
+                    nom: nom, mat: mat, fac: fac, fil: fil, sexe: sexe, pdfUrl: fileDataUrl, timestamp: timestampStr
                 });
 
                 currentActiveDocUrl = fileDataUrl;
@@ -621,8 +667,12 @@
                 document.getElementById('statusTag').innerHTML = "SCELLÉ SUCCÈS <i class='fas fa-check-circle' style='color:var(--success);'></i>";
                 document.getElementById('docActions').style.display = 'grid';
                 
-                alert("🔐 Ancrage sécurisé validé dans l'infrastructure.");
-            } catch (error) { alert("Erreur : " + error.message); }
+                alert("🔐 Ancrage immuable et décentralisé validé avec succès sur la Blockchain !");
+            } catch (error) { 
+                console.error(error);
+                document.getElementById('statusTag').innerText = "ERREUR D'ANCRAGE";
+                alert("Échec de l'ancrage Blockchain : " + error.message); 
+            }
         }
 
         function toggleRegistre() {
@@ -657,33 +707,19 @@
             document.getElementById('displayAdminName').innerText = name;
             document.getElementById('displayAdminEmail').innerText = email;
             document.getElementById('adminProfileActive').style.display = 'block';
-            document.getElementById('adminContainer').style.border = "2px solid var(--success)";
         }
 
         function previewImg(input) {
-            if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file) {
                 const reader = new FileReader();
-                reader.onload = e => {
+                reader.onload = function(e) {
                     document.getElementById('avatar').src = e.target.result;
                     document.getElementById('avatar').style.display = 'block';
                     document.getElementById('plus').style.display = 'none';
                 };
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
             }
-        }
-
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                    document.getElementById('walletAddr').innerText = accounts[0];
-                } catch(e) { alert("Metamask déconnecté."); }
-            } else { alert("Installez l'extension MetaMask."); }
-        }
-
-        function startScan() {
-            if(!isAdminConnected) return alert("🛑 Authentification requise pour activer la caméra.");
-            document.getElementById('reader').style.display = 'block';
         }
     </script>
 </body>
