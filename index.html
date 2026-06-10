@@ -16,127 +16,139 @@
 
     <style>
         :root {
-            /* Couleurs Verre Transparentes Floutées (Premium Dark) */
-            --glass-left: rgba(0, 180, 216, 0.12); /* Bleu cyan électrique subtil */
-            --glass-right: rgba(114, 9, 183, 0.12); /* Violet néon sophistiqué */
-            --glass-center: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            /* Couleurs Verre Transparentes Lumineuses (Basées sur l'interface vidéo) */
+            --glass-left: rgba(0, 180, 216, 0.15);       /* Cyan transparent */
+            --glass-left-border: rgba(0, 180, 216, 0.6); /* Bordure Néon Cyan */
+            
+            --glass-right: rgba(186, 12, 243, 0.15);     /* Violet/Magenta transparent */
+            --glass-right-border: rgba(186, 12, 243, 0.6);/* Bordure Néon Violet */
+            
+            --glass-center: rgba(30, 30, 40, 0.65);      /* Fond sombre central pour détacher le texte */
+            --glass-border: rgba(255, 255, 255, 0.15);
             
             --accent-orange: #ff7a00;
             --text-white: #ffffff;
             --danger: #ff4d4d;
             --success: #00ff88;
-            --bg-overlay: rgba(10, 11, 30, 0.75); /* Permet de voir le fond tout en restant lisible */
+            --bg-overlay: rgba(5, 8, 22, 0.45);          /* Opacité équilibrée pour voir magnifiquement le fond */
         }
 
-        /* Thème Clair Épuré */
         body.light-mode {
-            --glass-left: rgba(240, 248, 255, 0.75);
-            --glass-right: rgba(245, 243, 247, 0.75);
-            --glass-center: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass-left: rgba(240, 248, 255, 0.8);
+            --glass-right: rgba(255, 240, 255, 0.8);
+            --glass-center: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.15);
             --text-white: #121214;
-            --bg-overlay: rgba(255, 255, 255, 0.4);
+            --bg-overlay: rgba(255, 255, 255, 0.2);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; transition: all 0.3s ease; }
 
         body {
-            background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('img/fond.jpg') no-repeat center center fixed;
+            /* Utilisation de l'image exacte soumise */
+            background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('image_72747e.jpg') no-repeat center center fixed;
             background-size: cover;
             color: var(--text-white);
             height: 100vh;
             display: grid;
-            grid-template-columns: 300px 1fr 320px;
+            grid-template-columns: 310px 1fr 330px;
             overflow: hidden;
         }
 
-        /* Structure Glassmorphism */
+        /* Base Floutée Universelle */
         .glass { 
-            backdrop-filter: blur(20px) saturate(160%); 
-            -webkit-backdrop-filter: blur(20px) saturate(160%); 
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(25px) saturate(180%); 
+            -webkit-backdrop-filter: blur(25px) saturate(180%); 
         }
 
-        /* --- COLONNE GAUCHE --- */
-        .sidebar-left { background: var(--glass-left); padding: 25px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid var(--glass-border); }
-        .logo-header { display: flex; align-items: center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--glass-border); }
-        .logo-header img { height: 50px; filter: drop-shadow(0 0 8px rgba(0, 180, 216, 0.4)); }
+        /* --- COLONNE GAUCHE (STYLE CYAN LUMINEUX) --- */
+        .sidebar-left { 
+            background: var(--glass-left); 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+            border-right: 2px solid var(--glass-left-border);
+            box-shadow: 4px 0 25px rgba(0, 180, 216, 0.2);
+        }
+        .logo-header { display: flex; align-items: center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid rgba(0, 180, 216, 0.3); }
+        .logo-header img { height: 50px; filter: drop-shadow(0 0 10px rgba(0, 180, 216, 0.6)); }
         
         .btn-menu {
-            width: 100%; padding: 14px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.05);
+            width: 100%; padding: 14px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3);
             color: var(--text-white); text-align: left; cursor: pointer; font-weight: 700; font-size: 13px;
             display: flex; align-items: center; gap: 12px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .btn-menu:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
-        .btn-menu.active { background: linear-gradient(135deg, var(--accent-orange), #ff9e00); border: none; box-shadow: 0 4px 20px rgba(255, 122, 0, 0.4); color: #fff; }
+        .btn-menu:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .btn-menu.active { background: linear-gradient(135deg, #00b4d8, #0077b6); border: none; box-shadow: 0 4px 20px rgba(0, 180, 216, 0.5); color: #fff; }
 
-        #scanner-box { display: none; background: #000; border-radius: 14px; overflow: hidden; margin-top: 10px; border: 2px solid var(--accent-orange); box-shadow: 0 0 15px rgba(255,122,0,0.3); }
+        #scanner-box { display: none; background: #000; border-radius: 14px; overflow: hidden; margin-top: 10px; border: 2px solid #00b4d8; }
 
-        /* --- COLONNE CENTRALE --- */
+        /* --- COLONNE CENTRALE (LISIBLE ET PHÉNOMÉNALE) --- */
         .main-content { padding: 30px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
-        .center-logo { margin-bottom: 20px; filter: drop-shadow(0 4px 12px rgba(255,255,255,0.2)); }
+        .center-logo { margin-bottom: 20px; filter: drop-shadow(0 4px 15px rgba(255,255,255,0.3)); }
         
-        /* Compteurs Modernes */
+        /* Blocs Compteurs */
         .faculty-counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 850px; margin-bottom: 25px; }
-        .count-card { padding: 20px; border-radius: 18px; text-align: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
-        .count-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent-orange); }
-        .count-card h3 { font-size: 32px; font-weight: 800; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .count-card p { font-size: 11px; font-weight: 800; opacity: 0.7; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-orange); }
+        .count-card { padding: 20px; border-radius: 18px; text-align: center; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; }
+        .count-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #00b4d8; }
+        .count-card h3 { font-size: 34px; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+        .count-card p { font-size: 11px; font-weight: 800; opacity: 0.9; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; color: #00b4d8; }
 
-        /* Formulaire */
-        .scellage-form { width: 100%; max-width: 850px; padding: 30px; border-radius: 24px; background: var(--glass-center); box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .form-title { text-align: center; margin-bottom: 25px; font-weight: 900; letter-spacing: 1.5px; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.4); font-size: 22px; }
+        /* Structure Formulaire */
+        .scellage-form { width: 100%; max-width: 850px; padding: 32px; border-radius: 24px; background: var(--glass-center); border: 1px solid var(--glass-border); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+        .form-title { text-align: center; margin-bottom: 25px; font-weight: 900; letter-spacing: 1.5px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.6); font-size: 24px; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-        label { font-size: 11px; font-weight: 800; color: var(--accent-orange); text-transform: uppercase; letter-spacing: 0.5px; }
+        label { font-size: 11px; font-weight: 800; color: #00b4d8; text-transform: uppercase; letter-spacing: 0.5px; }
         input, select { 
-            padding: 14px; border-radius: 10px; border: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.4); color: #fff; outline: none; font-weight: 600; font-size: 14px;
+            padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0, 0, 0, 0.6); color: #fff; outline: none; font-weight: 600; font-size: 14px;
         }
-        input:focus, select:focus { border-color: var(--accent-orange); background: rgba(0, 0, 0, 0.6); }
+        input:focus, select:focus { border-color: #00b4d8; background: rgba(0, 0, 0, 0.8); box-shadow: 0 0 10px rgba(0,180,216,0.3); }
 
         .btn-anchor {
-            width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-orange), #ff9e00); border: none;
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #00b4d8, #7209b7); border: none;
             border-radius: 14px; color: white; font-weight: 900; cursor: pointer; font-size: 15px;
-            text-transform: uppercase; margin-top: 20px; letter-spacing: 1px; box-shadow: 0 4px 20px rgba(255,122,0,0.3);
+            text-transform: uppercase; margin-top: 20px; letter-spacing: 1px; box-shadow: 0 4px 20px rgba(114,9,183,0.4);
         }
-        .btn-anchor:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255,122,0,0.5); }
+        .btn-anchor:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0,180,216,0.6); }
 
-        /* --- COLONNE DROITE --- */
-        .sidebar-right { background: var(--glass-right); padding: 25px; display: flex; flex-direction: column; gap: 25px; border-left: 1px solid var(--glass-border); }
+        /* --- COLONNE DROITE (STYLE VIOLET NÉON) --- */
+        .sidebar-right { 
+            background: var(--glass-right); 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 25px; 
+            border-left: 2px solid var(--glass-right-border);
+            box-shadow: -4px 0 25px rgba(186, 12, 243, 0.2);
+        }
         
-        /* Avatar Profil */
-        .admin-profile { text-align: center; padding: 25px; border-radius: 22px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); }
-        
+        .admin-profile { text-align: center; padding: 25px; border-radius: 22px; background: rgba(0,0,0,0.4); border: 1px solid rgba(186, 12, 243, 0.3); }
         .avatar-container { position: relative; width: 115px; height: 115px; margin: 0 auto 18px; }
         .avatar-upload {
-            width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--accent-orange);
-            overflow: hidden; cursor: pointer; position: relative; box-shadow: 0 0 15px rgba(255,122,0,0.2);
+            width: 100%; height: 100%; border-radius: 50%; border: 3px solid #ba0cf3;
+            overflow: hidden; cursor: pointer; position: relative; box-shadow: 0 0 15px rgba(186,12,243,0.4);
         }
         .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-upload .hint {
-            position: absolute; bottom: 0; background: rgba(0,0,0,0.75); width: 100%; 
-            font-size: 9px; padding: 6px 0; color: #fff; font-weight: 800; letter-spacing: 0.5px;
-            text-transform: uppercase;
+            position: absolute; bottom: 0; background: rgba(0,0,0,0.8); width: 100%; 
+            font-size: 9px; padding: 6px 0; color: #fff; font-weight: 800; text-transform: uppercase;
         }
-        .avatar-upload:hover { border-color: #fff; transform: scale(1.03); }
 
-        .meta-card { padding: 18px; border-radius: 16px; background: rgba(0,0,0,0.4); border-left: 4px solid #f6851b; }
+        .meta-card { padding: 18px; border-radius: 16px; background: rgba(0,0,0,0.5); border-left: 4px solid #ba0cf3; border-top: 1px solid rgba(255,255,255,0.05); }
         
         .clock { 
             margin-top: auto; text-align: center; font-family: 'Courier New', Courier, monospace; 
-            font-size: 24px; font-weight: bold; color: var(--accent-orange); padding: 18px; 
-            border-radius: 14px; background: rgba(0,0,0,0.35); border: 1px solid var(--glass-border);
-            text-shadow: 0 0 10px rgba(255, 122, 0, 0.2);
+            font-size: 26px; font-weight: bold; color: #ba0cf3; padding: 18px; 
+            border-radius: 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-right-border);
+            text-shadow: 0 0 10px rgba(186, 12, 243, 0.5);
         }
 
-        #qr-code-final { margin-top: 25px; text-align: center; animation: fadeIn 0.5s ease; }
-        #canvas-qr { background: white; padding: 12px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 25px rgba(0,0,0,0.4); }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #qr-code-final { margin-top: 25px; text-align: center; }
+        #canvas-qr { background: white; padding: 12px; border-radius: 12px; display: inline-block; }
     </style>
 </head>
 <body>
@@ -144,24 +156,24 @@
     <div class="sidebar-left glass">
         <div class="logo-header">
             <img src="img/logo-isc.png" alt="ISC Logo">
-            <span style="font-weight: 900; font-size: 15px; letter-spacing: 0.5px;">LGT HUB ISC</span>
+            <span style="font-weight: 900; font-size: 16px; letter-spacing: 0.5px; color: #00b4d8;">LGT HUB ISC</span>
         </div>
         <button class="btn-menu active"><i class="fas fa-plus-circle"></i> Nouveau Scellage</button>
         <button class="btn-menu"><i class="fas fa-database"></i> Registre Global</button>
         <button class="btn-menu" onclick="window.open('verification.html')"><i class="fas fa-external-link-alt"></i> Vérification Publique</button>
-        <button class="btn-menu" onclick="toggleTheme()"><i class="fas fa-adjust"></i> Mode Clair/Sombre</button>
+        <button class="btn-menu" onclick="toggleTheme()"><i class="fas fa-adjust"></i> Mode Visuel</button>
         
         <div style="margin-top: 15px;">
-            <label>Scanner QR Matricule</label>
-            <button class="btn-menu" id="cam-toggle" onclick="toggleCamera()" style="background: rgba(0,0,0,0.4); margin-top:8px; border-color: rgba(255,255,255,0.1);">
-                <i class="fas fa-camera" style="color: var(--accent-orange);"></i> Activer Caméra
+            <label style="color: #00b4d8;">Scanner Numérique QR</label>
+            <button class="btn-menu" id="cam-toggle" onclick="toggleCamera()" style="background: rgba(0,0,0,0.5); margin-top:8px; border-color: rgba(0,180,216,0.3);">
+                <i class="fas fa-camera" style="color: #00b4d8;"></i> Activer Caméra
             </button>
             <div id="scanner-box"><div id="reader"></div></div>
         </div>
     </div>
 
     <div class="main-content">
-        <img src="img/logo-isc.png" height="75" class="center-logo" alt="ISC Centered">
+        <img src="img/logo-isc.png" height="80" class="center-logo" alt="ISC Centered">
         
         <div class="faculty-counters">
             <div class="count-card">
@@ -191,7 +203,7 @@
                         <input type="text" id="stdMat" placeholder="Ex: ISC-2026-001">
                     </div>
                     <div class="field">
-                        <label>Faculté</label>
+                        <label>Faculté d'Origine</label>
                         <select id="stdFac" onchange="updateMajors()">
                             <option value="Info">Informatique de Gestion</option>
                             <option value="ScComm">Sciences Commerciales & Financières</option>
@@ -199,27 +211,26 @@
                         </select>
                     </div>
                     <div class="field">
-                        <label>Filière / Option</label>
-                        <select id="stdMajor">
-                            </select>
+                        <label>Filière / Option Spécifique</label>
+                        <select id="stdMajor"></select>
                     </div>
                     <div class="field">
                         <label>Sexe</label>
                         <select id="stdSexe"><option>Masculin (M)</option><option>Féminin (F)</option></select>
                     </div>
                     <div class="field">
-                        <label>Fichier du diplôme (PDF)</label>
+                        <label>Spécimen Diplôme (PDF)</label>
                         <input type="file" id="stdFile" accept="application/pdf">
                     </div>
                 </div>
                 <button type="button" class="btn-anchor" onclick="processBlockchainAnchor()">
-                    <i class="fas fa-shield-alt"></i> Effectuer l'ancrage sécurisé
+                    <i class="fas fa-shield-alt"></i> Exécuter l'ancrage cryptographique
                 </button>
             </form>
 
             <div id="qr-code-final" style="display:none;">
                 <div id="canvas-qr"></div>
-                <p style="color: var(--success); font-weight: bold; font-size: 13px; margin-top: 12px; letter-spacing: 0.5px;">SCELLAGE REUSSI — TRACE DISTRIBUÉE</p>
+                <p style="color: var(--success); font-weight: bold; font-size: 13px; margin-top: 12px;">SCELLAGE CRYPTOGRAPHIQUE SÉCURISÉ</p>
             </div>
         </div>
     </div>
@@ -229,36 +240,35 @@
             <div class="avatar-container">
                 <div class="avatar-upload" onclick="document.getElementById('adminInput').click()">
                     <img id="avatarImg" src="https://via.placeholder.com/150" alt="Profile">
-                    <div class="hint">Changer photo</div>
+                    <div class="hint">Changer</div>
                 </div>
             </div>
             <input type="file" id="adminInput" hidden onchange="loadAvatar(this)" accept="image/*">
             
-            <input type="text" id="adminName" placeholder="Identifiant SGA" style="width:100%; margin-bottom:12px;">
-            <input type="email" id="adminEmail" placeholder="Adresse Email Admin" style="width:100%; margin-bottom:15px;">
+            <input type="text" id="adminName" placeholder="Identifiant SGA Admin" style="width:100%; margin-bottom:12px; border-color:rgba(186,12,243,0.3)">
+            <input type="email" id="adminEmail" placeholder="Email Institutionnel SGA" style="width:100%; margin-bottom:15px; border-color:rgba(186,12,243,0.3)">
             
-            <button class="btn-menu" onclick="validateSGASession()" style="background: rgba(255,255,255,0.03); border: 1px solid var(--accent-orange); justify-content: center;">
-                <i class="fas fa-fingerprint" style="color: var(--accent-orange);"></i> Signer la Session
+            <button class="btn-menu" onclick="validateSGASession()" style="background: rgba(0,0,0,0.4); border: 1px solid #ba0cf3; justify-content: center;">
+                <i class="fas fa-fingerprint" style="color: #ba0cf3;"></i> Authentifier Session
             </button>
-            <p id="sga-status" style="font-size: 11px; margin-top:12px; color: var(--danger); font-weight: 800; letter-spacing: 0.5px;">SESSION INTERDITE</p>
+            <p id="sga-status" style="font-size: 11px; margin-top:12px; color: var(--danger); font-weight: 800; letter-spacing: 0.5px;">SGA NON CONNECTÉ</p>
         </div>
 
         <div class="meta-card glass">
-            <label style="color: #f6851b; font-weight: 800;"><i class="fab fa-ethereum"></i> Extension MetaMask</label>
-            <button class="btn-menu" onclick="connectWallet()" style="background: #090a10; margin-top: 10px; border-color: #f6851b;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="16"> Connecter Node Web3
+            <label style="color: #ba0cf3; font-weight: 800;"><i class="fab fa-ethereum"></i> Infrastructure Web3</label>
+            <button class="btn-menu" onclick="connectWallet()" style="background: #050816; margin-top: 10px; border-color: #ba0cf3;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="16"> Connecter MetaMask
             </button>
-            <p id="wallet-addr" style="font-size: 10px; opacity: 0.6; word-break: break-all; margin-top: 8px; font-family: monospace;">Node: Déconnecté</p>
+            <p id="wallet-addr" style="font-size: 10px; opacity: 0.6; word-break: break-all; margin-top: 8px; font-family: monospace;">Nœud : Orphelin</p>
         </div>
 
         <div class="clock">
             <div id="time-display">00:00:00</div>
-            <div id="date-display" style="font-size: 13px; opacity: 0.7; margin-top: 4px; font-weight: 600; font-family: sans-serif;">-- -- ----</div>
+            <div id="date-display" style="font-size: 13px; opacity: 0.8; margin-top: 4px; font-family: sans-serif;">-- -- ----</div>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION DU PROJET FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyCAG6C8eHeF3C_-qhmfh8_hwiEN8itHmQQ",
             authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
@@ -269,41 +279,32 @@
             appId: "1:355077255297:web:cbc97343febd93edbcdd80"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const storage = firebase.storage();
 
         let isSGASigned = false;
         let html5QrScanner = null;
 
-        // --- 2. BRANCHEMENT DES COMPTEURS TEMPS RÉEL ---
+        // Écouteur Firebase en temps réel
         function initRealtimeCounters() {
             database.ref('diplomes').on('value', (snapshot) => {
-                let countInfo = 0;
-                let countScComm = 0;
-                let countSecret = 0;
-
+                let countInfo = 0, countScComm = 0, countSecret = 0;
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
                         const data = childSnapshot.val();
-                        // Vérification basée sur la valeur stockée (Faculté)
                         if (data.faculte === "Informatique de Gestion") countInfo++;
                         else if (data.faculte === "Sciences Commerciales & Financières") countScComm++;
                         else if (data.faculte === "Secrétariat de Direction") countSecret++;
                     });
                 }
-                
                 document.getElementById('count-info').innerText = countInfo;
                 document.getElementById('count-sccomm').innerText = countScComm;
                 document.getElementById('count-secret').innerText = countSecret;
             });
         }
-        // Lancement immédiat de l'écoute temps réel
         initRealtimeCounters();
 
-        // Nomenclature officielle ISC Lubumbashi
         const filieres = {
             Info: ["Conception des Systèmes d'Information (CSI)", "Réseaux Informatiques", "Gestion Informatique"],
             ScComm: ["Comptabilité", "Marketing", "Fiscalité", "Banque et Assurance"],
@@ -317,7 +318,6 @@
         }
         updateMajors();
 
-        // --- 3. COMMUTATEUR DE COULEUR DE FOND ---
         function toggleTheme() { document.body.classList.toggle('light-mode'); }
 
         setInterval(() => {
@@ -326,7 +326,6 @@
             document.getElementById('date-display').innerText = d.toLocaleDateString('fr-FR', {weekday: 'long', day:'numeric', month:'long'});
         }, 1000);
 
-        // --- 4. GESTION DU PROFIL ET DU MAIL ---
         function loadAvatar(input) {
             if (input.files && input.files[0]) {
                 let reader = new FileReader();
@@ -338,58 +337,40 @@
         function validateSGASession() {
             const name = document.getElementById('adminName').value.trim();
             const email = document.getElementById('adminEmail').value.trim();
-            
-            if(!name || !email) {
-                return alert("Veuillez saisir votre Identifiant SGA ET votre adresse Email d'accréditation !");
-            }
+            if(!name || !email) return alert("Identifiant et Email requis !");
             
             isSGASigned = true;
             const statusLabel = document.getElementById('sga-status');
-            statusLabel.innerText = "SGA CONNECTÉ : " + name;
+            statusLabel.innerText = "SGA AUTHENTIFIÉ : " + name;
             statusLabel.style.color = "var(--success)";
-            alert(`Accréditation validée pour l'administrateur :\n${name} (${email})`);
         }
 
-        // --- 5. CONNECTIVITÉ INTERFACE METAMASK ---
         async function connectWallet() {
             if (window.ethereum) {
                 try {
                     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                    document.getElementById('wallet-addr').innerText = "Node: " + accounts[0];
+                    document.getElementById('wallet-addr').innerText = "Nœud : " + accounts[0];
                     document.getElementById('wallet-addr').style.color = "var(--success)";
-                } catch (e) { alert("Connexion annulée par l'opérateur."); }
-            } else {
-                alert("Veuillez installer le plug-in MetaMask.");
-            }
+                } catch (e) { alert("Refusé."); }
+            } else { alert("MetaMask introuvable."); }
         }
 
-        // --- 6. CONTRÔLE LOGIQUE DU SCANNER QR ---
         function toggleCamera() {
             const box = document.getElementById('scanner-box');
             if(box.style.display === "block") {
                 box.style.display = "none";
-                if (html5QrScanner) {
-                    html5QrScanner.stop().then(() => { html5QrScanner = null; });
-                }
+                if (html5QrScanner) html5QrScanner.stop().then(() => { html5QrScanner = null; });
             } else {
                 box.style.display = "block";
                 html5QrScanner = new Html5Qrcode("reader");
                 html5QrScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
-                (txt) => { 
-                    document.getElementById('stdMat').value = txt; 
-                    toggleCamera();
-                },
-                (err) => {});
+                (txt) => { document.getElementById('stdMat').value = txt; toggleCamera(); }, () => {});
             }
         }
 
-        // --- 7. TRAITEMENT, REQUÊTE ET ANCRAGE CLOUD ---
         function processBlockchainAnchor() {
-            if (!isSGASigned) {
-                alert("🛑 OPÉRATION INTERDITE : Votre jeton de session SGA n'est pas signé à droite !");
-                return;
-            }
-
+            if (!isSGASigned) return alert("🛑 SESSION NON AUTHENTIFIÉE !");
+            
             const name = document.getElementById('stdName').value.trim();
             const mat = document.getElementById('stdMat').value.trim();
             const fac = document.getElementById('stdFac').options[document.getElementById('stdFac').selectedIndex].text;
@@ -397,52 +378,24 @@
             const sexe = document.getElementById('stdSexe').value;
             const fileInput = document.getElementById('stdFile');
 
-            if(!name || !mat || fileInput.files.length === 0) {
-                return alert("Tous les champs de l'étudiant sont obligatoires, y compris le fichier PDF !");
-            }
+            if(!name || !mat || fileInput.files.length === 0) return alert("Tous les champs sont requis !");
 
             const file = fileInput.files[0];
             const storageRef = storage.ref('diplomes_scelles/' + mat + '_' + file.name);
 
-            alert("Transmission des paquets binaires vers Firebase Storage...");
-
-            // Stockage Cloud du PDF
-            storageRef.put(file).then((snapshot) => {
-                return snapshot.ref.getDownloadURL();
-            }).then((downloadURL) => {
-                
-                // Empreinte hexadécimale simulée (Hachage de bloc)
+            storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(downloadURL => {
                 const mockHash = "0x" + Array.from({length:40}, () => Math.floor(Math.random()*16).toString(16)).join("");
-                const timestamp = Date.now();
-
-                // Injection Realtime Database (Mise à jour instantanée des compteurs grâce à l'observateur .on())
+                
                 return database.ref('diplomes/' + mat).set({
-                    nomEtudiant: name,
-                    matricule: mat,
-                    faculte: fac,
-                    filiere: major,
-                    sexe: sexe,
-                    blockchainHash: mockHash,
-                    dateAncrage: timestamp,
-                    fileUrl: downloadURL
+                    nomEtudiant: name, matricule: mat, faculte: fac, filiere: major, sexe: sexe, blockchainHash: mockHash, dateAncrage: Date.now(), fileUrl: downloadURL
                 }).then(() => {
-                    // Construction du QR code
                     document.getElementById('qr-code-final').style.display = "block";
                     const qrBox = document.getElementById('canvas-qr');
                     qrBox.innerHTML = "";
-                    
-                    new QRCode(qrBox, {
-                        text: `https://lgt-hub-archivage-isc.firebaseapp.com/verification.html?mat=${mat}`,
-                        width: 130,
-                        height: 130
-                    });
-
-                    alert(`✅ Succès absolu !\nDiplôme archivé et enregistré cryptographiquement.`);
+                    new QRCode(qrBox, { text: `https://lgt-hub-archivage-isc.firebaseapp.com/verification.html?mat=${mat}`, width: 130, height: 130 });
+                    alert("✅ Ancrage réussi !");
                 });
-            }).catch((error) => {
-                console.error(error);
-                alert("Erreur technique de communication. Vérifiez vos autorisations Firebase Realtime & Storage.");
-            });
+            }).catch(() => alert("Erreur de liaison réseau Cloud."));
         }
     </script>
 </body>
