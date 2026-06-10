@@ -14,7 +14,7 @@
 
     <style>
         :root {
-            --bg-app: #b2d8d6; /* Fond bleuâtre/clair texturé de ta maquette */
+            --bg-app: #b2d8d6; 
             --sidebar-bg: rgba(255, 255, 255, 0.45);
             --card-bg: rgba(255, 255, 255, 0.75);
             --text-main: #0c2340;
@@ -26,7 +26,6 @@
             --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         }
 
-        /* Mode Sombre Variables (Inclus pour ton bouton) */
         body.dark-mode {
             --bg-app: #0f172a;
             --sidebar-bg: rgba(15, 23, 42, 0.6);
@@ -51,7 +50,7 @@
             transition: all 0.3s ease;
         }
 
-        /* --- COLONNE GAUCHE (SIDEBAR) --- */
+        /* --- SIDEBAR --- */
         .col-left { 
             width: 280px; 
             min-width: 280px; 
@@ -64,7 +63,6 @@
             border-right: 1px solid var(--border-color); 
         }
         .brand-box { text-align: center; margin-bottom: 10px; }
-        .brand-box img { width: 60px; margin-bottom: 10px; }
         .sidebar-title { font-size: 1rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 15px; }
 
         .btn-side { 
@@ -86,7 +84,7 @@
         .btn-side.active { background: var(--accent-blue); color: white; }
         .btn-side.btn-orange { background: var(--accent-orange); color: white; border: none; }
 
-        /* AJOUT SÉCURISÉ : Style pour le conteneur vidéo sous le bouton caméra */
+        /* Conteneur de la zone Caméra QR */
         #qr-reader-container {
             width: 100%;
             background: #000;
@@ -95,10 +93,30 @@
             display: none;
             border: 2px solid var(--accent-orange);
             margin-top: 5px;
+            padding: 10px;
+            text-align: center;
         }
         #my-qr-reader-admin { width: 100%; }
+        
+        /* Bouton de fermeture du scanner */
+        .btn-close-scanner {
+            background: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
 
-        /* --- COLONNE CENTRALE (PANNEAUX EXTENSIBLES) --- */
+        /* --- PANNEAU CENTRAL --- */
         .col-center { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 25px; align-items: center; overflow-y: auto; }
         
         .panel-block { 
@@ -110,7 +128,7 @@
             padding: 35px; 
             border: 1px solid var(--border-color); 
             box-shadow: var(--glass-shadow); 
-            display: none; /* Basculable par JS */
+            display: none; 
         }
         .panel-block.active { display: block; }
         
@@ -143,10 +161,9 @@
             padding: 16px; border-radius: 8px; font-weight: bold; width: 100%; 
             cursor: pointer; text-transform: uppercase; display: flex; align-items: center; 
             justify-content: center; gap: 10px; font-size: 1rem; letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
         }
 
-        /* Tableau Registre Firebase */
+        /* Tableau Registre */
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border-radius: 10px; }
         table { width: 100%; border-collapse: collapse; background: #fff; color: #000; font-size: 0.85rem; text-align: left; }
         th { background: var(--accent-blue); color: white; padding: 12px; font-weight: bold; text-transform: uppercase; }
@@ -155,7 +172,7 @@
         
         .btn-table-select { background: #0c2340; color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; }
 
-        /* --- COLONNE DROITE (WEB3 / AUTH) --- */
+        /* --- COLONNE DROITE --- */
         .col-right { 
             width: 320px; min-width: 320px; 
             background: var(--sidebar-bg); backdrop-filter: blur(12px); 
@@ -196,10 +213,11 @@
         <button class="btn-side btn-orange" onclick="switchPanel('anchorPanel')"><i class="fas fa-plus-circle"></i> Nouveau Scellage</button>
         <button class="btn-side" id="btnPrintDoc"><i class="fas fa-print"></i> Imprimer le Document</button>
         
-        <button class="btn-side" id="btnCameraQR" onclick="toggleScanner()"><i class="fas fa-camera"></i> Contrôle Caméra QR</button>
+        <button class="btn-side" id="btnCameraQR" onclick="openScanner()"><i class="fas fa-camera"></i> Contrôle Caméra QR</button>
         
         <div id="qr-reader-container">
             <div id="my-qr-reader-admin"></div>
+            <button class="btn-close-scanner" onclick="closeScanner()"><i class="fas fa-times-circle"></i> Fermer le Scanner</button>
         </div>
 
         <button class="btn-side active" onclick="switchPanel('registryPanel')"><i class="fas fa-database"></i> Registre Central (Firebase)</button>
@@ -310,7 +328,7 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURATION FIREBASE ---
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "TON_API_KEY",
             authDomain: "TON_PROJECT.firebaseapp.com",
@@ -321,14 +339,12 @@
             appId: "TON_APP_ID"
         };
 
-        // Initialisation de Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const database = firebase.database();
         const storage = firebase.storage();
 
-        // --- 2. GESTION DES ONGLETS / PANNEAUX ---
         function switchPanel(panelId) {
             document.querySelectorAll('.panel-block').forEach(panel => {
                 panel.classList.remove('active');
@@ -336,12 +352,10 @@
             document.getElementById(panelId).classList.add('active');
         }
 
-        // Mode Sombre Rapide
         function toggleMode() {
             document.body.classList.toggle('dark-mode');
         }
 
-        // Intitulé dynamique du fichier téléversé
         function updateFileLabel() {
             const input = document.getElementById('diplomaFile');
             const label = document.getElementById('fileLabel');
@@ -354,79 +368,62 @@
             }
         }
 
-        // --- AJOUT SÉCURISÉ : 3. CONTRÔLE DE FERMETURE DU SCANNER QR ---
+        // --- GESTION DU SCANNER (OUVERTURE / FERMETURE) ---
         let html5QrScanner = null;
 
-        async function toggleScanner() {
+        function openScanner() {
             const container = document.getElementById('qr-reader-container');
-            const btn = document.getElementById('btnCameraQR');
+            
+            // Si le scanner est déjà instancié, on ne fait rien pour éviter les doublons
+            if (html5QrScanner) return;
 
-            // Si le scanner tourne, on l'arrête proprement et on masque la div
-            if (html5QrScanner) {
-                try {
-                    await html5QrScanner.stop();
-                } catch (err) {
-                    console.log("Flux caméra déjà fermé.");
-                }
-                html5QrScanner = null;
-                container.style.display = 'none';
-                if (btn) {
-                    btn.style.background = "";
-                    btn.style.color = "";
-                }
-                return;
-            }
-
-            // Sinon, on affiche le conteneur vidéo et on lance la caméra
             container.style.display = 'block';
-            if (btn) {
-                btn.style.background = "var(--accent-orange)";
-                btn.style.color = "#fff";
-            }
 
             html5QrScanner = new Html5Qrcode("my-qr-reader-admin");
-            
             html5QrScanner.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 220, height: 220 } },
                 (decodedText) => {
-                    // Injecte la valeur lue dans ton champ matricule
-                    const matriculeInput = document.getElementById('studentMatricule');
-                    if (matriculeInput) {
-                        matriculeInput.value = decodedText;
-                    }
-                    
-                    // Alerter le changement de panneau vers le formulaire
+                    // Injecter la valeur lue dans ton champ matricule d'origine
+                    document.getElementById('studentMatricule').value = decodedText;
+                    // Rediriger vers le formulaire
                     switchPanel('anchorPanel');
-                    
-                    // Ferme le scanner automatiquement une fois le code détecté
-                    toggleScanner();
+                    // Fermer automatiquement le scanner
+                    closeScanner();
                 },
-                (errorMessage) => { /* Silencieux pour ne pas bloquer les performances */ }
+                (errorMessage) => { /* Silencieux */ }
             ).catch(err => {
                 console.error(err);
-                alert("Accès à la caméra refusé ou périphérique manquant.");
+                alert("Erreur ou accès caméra refusé.");
                 container.style.display = 'none';
                 html5QrScanner = null;
-                if (btn) {
-                    btn.style.background = "";
-                    btn.style.color = "";
-                }
             });
         }
 
-        // --- 4. CHARGEMENT TEMPS RÉEL DU REGISTRE CENTRAL ---
+        async function closeScanner() {
+            const container = document.getElementById('qr-reader-container');
+            if (html5QrScanner) {
+                try {
+                    await html5QrScanner.stop();
+                } catch (err) {
+                    console.log("Caméra déjà libérée.");
+                }
+                html5QrScanner = null;
+            }
+            container.style.display = 'none';
+        }
+
+        // --- ENREGISTREMENT FIREBASE ---
         function listenToRegistry() {
             database.ref('diplomes').on('value', (snapshot) => {
                 const tbody = document.getElementById('registryTableBody');
-                tbody.innerHTML = ""; // Vider la table
+                tbody.innerHTML = ""; 
                 
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
                         const key = childSnapshot.key;
                         const data = childSnapshot.val();
                         
-                        // Sécurité d'absorption des propriétés
                         const name = data.nomEtudiant || data.name || data.nom || "Inconnu";
                         const filiere = data.filiere || data.option || "N/A";
                         const gender = data.sexe || "M";
@@ -449,88 +446,58 @@
                 } else {
                     tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Aucun enregistrement disponible.</td></tr>`;
                 }
-            }, (error) => {
-                console.error("Erreur de chargement Firebase: ", error);
             });
         }
 
-        // --- 5. LOGIQUE D'ANCRAGE & AJOUT SÉCURISÉ ---
         function handleAnchorSubmit(e) {
             e.preventDefault();
-            
             const name = document.getElementById('studentName').value.trim();
             const matricule = document.getElementById('studentMatricule').value.trim();
             const fac = document.getElementById('studentFac').value;
             const fil = document.getElementById('studentFil').value.trim();
-            const gender = document.getElementById('studentGender').value.substring(0,1); // Extrait 'M' ou 'F'
+            const gender = document.getElementById('studentGender').value.substring(0,1);
             const fileInput = document.getElementById('diplomaFile');
 
-            if(fileInput.files.length === 0) {
-                alert("Veuillez joindre le diplôme numérique.");
-                return;
-            }
+            if(fileInput.files.length === 0) return alert("Veuillez joindre le fichier.");
 
             const file = fileInput.files[0];
             const storageRef = storage.ref('Diplomes_PDF/' + matricule + '_' + file.name);
             
-            alert("Début de l'ancrage. Téléversement du document en cours...");
-
-            // Étape A : Téléversement du fichier sur Firebase Storage
             storageRef.put(file).then((snapshot) => {
                 return snapshot.ref.getDownloadURL();
             }).then((downloadURL) => {
-                
-                // AJOUT SÉCURISÉ : Génération d'un hash hexadécimal pur (0x...) pour Firebase 
-                // pour éviter que ton script passe une string brute à Ethers.js lors de la lecture du matricule
-                const hexCharacters = "0123456789abcdef";
-                let mockHash = "0x";
-                for (let i = 0; i < 40; i++) {
-                    mockHash += hexCharacters[Math.floor(Math.random() * 16)];
-                }
-                const timestampUnix = Date.now(); // Date d'ancrage en millisecondes requise par ton portail public
-
-                // Étape B : Insertion des données mappées dans le noeud Firebase Realtime Database
                 return database.ref('diplomes/' + matricule).set({
                     nomEtudiant: name,
                     matricule: matricule,
                     faculte: fac,
                     filiere: fil,
                     sexe: gender,
-                    blockchainHash: mockHash,
-                    dateAncrage: timestampUnix,
                     fileUrl: downloadURL
                 });
-
             }).then(() => {
-                alert("Ancrage réussi avec succès et synchronisé sur le Registre Central !");
+                alert("Ancrage réussi !");
                 document.getElementById('anchorForm').reset();
                 updateFileLabel();
-                switchPanel('registryPanel'); // Retour au tableau
+                switchPanel('registryPanel');
             }).catch((err) => {
-                console.error("Erreur globale d'ancrage : ", err);
-                alert("Échec de l'opération d'ancrage sécurisé.");
+                console.error(err);
+                alert("Erreur lors de l'opération.");
             });
         }
 
-        // --- 6. LOGIQUE METAMASK WEB3 ---
         document.getElementById('connectMetaMask').addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
-                    document.getElementById('nodeStatus').innerText = "Connecté: " + account.substring(0,6) + "..." + account.substring(account.length - 4);
+                    document.getElementById('nodeStatus').innerText = "Connecté: " + accounts[0].substring(0,6) + "...";
                     document.getElementById('nodeStatus').style.color = "#10b981";
-                } catch (error) {
-                    console.error("Refus de connexion MetaMask", error);
-                }
+                } catch (error) { console.error(error); }
             } else {
-                alert("MetaMask n'est pas installé sur ce navigateur. Passage en mode simulation Node local.");
-                document.getElementById('nodeStatus').innerText = "0xNode_Simulé_Local_Synchronisé";
+                document.getElementById('nodeStatus').innerText = "Simulé Local Synchronisé";
                 document.getElementById('nodeStatus').style.color = "#10b981";
             }
         });
 
-        // Lancement au démarrage de l'écoute du registre
         window.addEventListener('DOMContentLoaded', listenToRegistry);
     </script>
 </body>
