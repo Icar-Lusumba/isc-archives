@@ -3,217 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB - Système de Scellage Numérique</title>
+    <title>LGT HUB - Portail de Vérification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
         :root {
-            --bg-app: #b2d8d6; 
-            --sidebar-bg: rgba(255, 255, 255, 0.45);
-            --card-bg: rgba(255, 255, 255, 0.75);
-            --text-main: #0c2340;
-            --text-muted: #4a5568;
-            --border-color: rgba(255, 255, 255, 0.6);
-            --accent-blue: #1e3a8a;
-            --accent-orange: #ff7a00;
-            --danger-red: #ef4444;
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        body.dark-mode {
-            --bg-app: #0f172a;
-            --sidebar-bg: rgba(15, 23, 42, 0.6);
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
+            --bg-app: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --bg-container: rgba(255, 255, 255, 0.05); 
+            --sidebar-bg: rgba(15, 23, 42, 0.6); 
+            --sidebar-text: #94a3b8;
+            --text-main: #ffffff;
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
-            --accent-blue: #3b82f6;
+            --accent-orange: #ff7a00;
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --card-success-bg: rgba(16, 185, 129, 0.1);
+            --card-success-border: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg-app); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: row; overflow-x: hidden; }
+        .col-left { width: 280px; min-width: 280px; background: var(--sidebar-bg); backdrop-filter: blur(12px); padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--border-color); }
+        .col-center { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 25px; align-items: center; justify-content: flex-start; overflow-y: auto; }
+        .col-right { width: 300px; min-width: 300px; background: var(--sidebar-bg); backdrop-filter: blur(12px); padding: 30px 20px; display: flex; flex-direction: column; gap: 25px; border-left: 1px solid var(--border-color); box-shadow: var(--glass-shadow); }
         
-        body { 
-            background: var(--bg-app); 
-            background-image: url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2070&auto=format&fit=crop'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: row; 
-            overflow-x: hidden; 
-            transition: all 0.3s ease;
+        .brand-box { border: 1px solid var(--accent-orange); border-radius: 12px; padding: 15px; text-align: center; background: rgba(0, 0, 0, 0.4); }
+        .brand-box h3 { color: #fff; font-size: 1.1rem; letter-spacing: 1px; }
+        .brand-box p { color: var(--accent-orange); font-size: 0.7rem; font-weight: bold; margin-top: 2px; }
+        
+        .nav-menu { list-style: none; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 14px 16px; color: var(--sidebar-text); text-decoration: none; border-radius: 8px; font-weight: 600; }
+        .nav-menu a.active { background: var(--accent-orange); color: white; }
+        
+        .isc-logo-replacement { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px; color: #fff; }
+        .isc-logo-replacement i { font-size: 3rem; color: var(--accent-orange); }
+        .isc-logo-replacement span { font-weight: 800; letter-spacing: 2px; font-size: 1.2rem; }
+        
+        .panel-block { width: 100%; max-width: 650px; background: var(--bg-container); backdrop-filter: blur(16px); border-radius: 16px; padding: 35px; border: 1px solid var(--border-color); box-shadow: var(--glass-shadow); }
+        .main-title { text-align: center; text-transform: uppercase; font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; letter-spacing: 0.5px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .form-group label { font-size: 0.8rem; font-weight: bold; color: var(--text-main); opacity: 0.8; text-transform: uppercase; }
+        .input-container { display: flex; gap: 12px; width: 100%; }
+        
+        input { flex: 1; padding: 14px 18px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--accent-orange); }
+        
+        .btn-verify { background: var(--accent-orange); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(255, 122, 0, 0.3); }
+        .btn-scan { background: #2563eb; color: white; border: none; width: 55px; height: 52px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        
+        #qr-reader-container { display: none; margin-bottom: 25px; border: 2px dashed var(--accent-orange); border-radius: 12px; overflow: hidden; background: rgba(0, 0, 0, 0.6); padding: 15px; text-align: center; }
+        .btn-close-camera { background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; font-size: 0.8rem; }
+        
+        .verification-output-card { display: none; margin-top: 30px; padding: 25px; background: var(--card-success-bg); border: 1px solid var(--card-success-border); border-radius: 12px; }
+        .card-output-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .status-badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        
+        .row-data { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
+        .row-data span:first-child { color: var(--text-muted); }
+        
+        .output-actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 25px; }
+        .btn-act { padding: 14px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; text-transform: uppercase; transition: background 0.2s; }
+        
+        .btn-act-view { background: #0ea5e9; }
+        .btn-act-view:hover { background: #0284c7; }
+        .btn-act-print { background: #64748b; }
+        .btn-act-print:hover { background: #475569; }
+        .btn-act-download { background: #10b981; }
+        .btn-act-download:hover { background: #059669; }
+
+        .error-alert-box { display: none; margin-top: 25px; padding: 15px; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; text-align: center; color: #ef4444; font-weight: 600; }
+        .right-section-title { font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: var(--text-main); opacity: 0.7; letter-spacing: 1px; }
+        
+        /* Style spécifique pour une impression propre du reçu de vérification */
+        @media print {
+            body * { visibility: hidden; }
+            #outputCard, #outputCard * { visibility: visible; }
+            #outputCard { position: absolute; left: 0; top: 0; width: 100%; background: white !important; color: black !important; border: 1px solid #000; padding: 20px; }
+            .output-actions-grid { display: none !important; }
+            .status-badge { border: 1px solid #000; color: black !important; }
         }
 
-        /* --- COLONNE GAUCHE (SIDEBAR) --- */
-        .col-left { 
-            width: 290px; 
-            min-width: 290px; 
-            background: var(--sidebar-bg); 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 25px 18px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            border-right: 2px solid var(--border-color); 
-        }
-        .brand-box { text-align: center; margin-bottom: 5px; }
-        .brand-box img { width: 55px; margin-bottom: 8px; }
-        
-        .system-title {
-            color: #1e3a8a;
-            font-size: 0.95rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            text-align: center;
-            letter-spacing: 0.5px;
-            margin-bottom: 15px;
-            line-height: 1.3;
-        }
-
-        .btn-side { 
-            width: 100%; 
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            border: 2px solid var(--border-color); 
-            background: var(--card-bg); 
-            color: var(--text-main); 
-            font-weight: 700; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            font-size: 0.85rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-side:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow); }
-        .btn-side.active { background: #b1c3de; border-color: var(--accent-blue); }
-        .btn-side.btn-orange { background: var(--accent-orange); color: white; border: none; font-size: 0.9rem; text-transform: uppercase; }
-
-        /* Conteneur Zone Caméra */
-        #qr-reader-container {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 12px;
-            overflow: hidden;
-            display: none;
-            border: 2px solid var(--border-color);
-            padding: 5px;
-        }
-        #my-qr-reader-admin { width: 100%; border-radius: 8px; overflow: hidden; }
-        
-        .btn-close-scanner {
-            background: var(--danger-red); color: white; border: none; padding: 6px;
-            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;
-            width: 100%; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
-
-        /* --- COLONNE CENTRALE --- */
-        .col-center { flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
-        
-        .panel-block { 
-            width: 100%; 
-            max-width: 700px; 
-            background: var(--card-bg); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px; 
-            padding: 30px; 
-            border: 2px solid var(--border-color); 
-            box-shadow: var(--glass-shadow); 
-            display: none; 
-        }
-        .panel-block.active { display: block; }
-        
-        .main-title { text-align: center; text-transform: uppercase; color: #1e3a8a; font-size: 1.1rem; margin-bottom: 25px; font-weight: 800; letter-spacing: 0.5px; }
-
-        /* Formulaire */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group.full-width { grid-column: span 2; }
-        .form-group label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #1e3a8a; opacity: 0.9; }
-        
-        input, select { 
-            width: 100%; padding: 10px 14px; 
-            background: rgba(255, 255, 255, 0.7); 
-            border: 2px solid var(--border-color); 
-            border-radius: 10px; color: #0c2340; 
-            font-size: 0.9rem; font-weight: 700; outline: none; 
-        }
-        input:focus, select:focus { border-color: var(--accent-orange); background: #fff; }
-        
-        .file-drop-area { 
-            border: 2px dashed var(--accent-blue); padding: 15px; 
-            border-radius: 10px; text-align: center; background: rgba(255,255,255,0.5); 
-            cursor: pointer; position: relative;
-        }
-        .file-drop-area input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-
-        .btn-submit-anchor { 
-            background: var(--accent-orange); color: white; border: none; 
-            padding: 14px; border-radius: 10px; font-weight: 800; width: 100%; 
-            cursor: pointer; text-transform: uppercase; display: flex; align-items: center; 
-            justify-content: center; gap: 10px; font-size: 0.95rem; letter-spacing: 0.5px;
-            box-shadow: 0 4px 10px rgba(255, 122, 0, 0.2);
-        }
-
-        /* Rendu QR Code généré en bas de page */
-        .qr-output-wrapper {
-            margin-top: 20px;
-            text-align: center;
-            display: none;
-        }
-        .qr-output-wrapper img {
-            border: 4px solid white;
-            border-radius: 12px;
-            box-shadow: var(--glass-shadow);
-        }
-
-        /* Tableau Registre */
-        .table-responsive { width: 100%; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #000; font-size: 0.85rem; }
-        th { background: #1e3a8a; color: white; padding: 12px; font-weight: 700; text-transform: uppercase; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #0c2340; }
-        tr:nth-child(even) { background: #f8fafc; }
-        
-        .btn-table-select { background: #1e3a8a; color: white; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
-
-        /* --- COLONNE DROITE --- */
-        .col-right { 
-            width: 310px; min-width: 310px; 
-            background: var(--sidebar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 25px 18px; display: flex; flex-direction: column; 
-            gap: 15px; border-left: 2px solid var(--border-color); 
-        }
-        
-        .right-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 2px solid var(--border-color); text-align: center; box-shadow: var(--glass-shadow); }
-        
-        .avatar-container { position: relative; width: 85px; height: 85px; margin: 0 auto 10px; }
-        .avatar-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); }
-        
-        .badge-sga { background: #10b981; color: white; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .btn-session { background: #1e3a8a; color: white; border: none; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; cursor: pointer; }
-        
-        .web3-card { background: var(--card-bg); text-align: left; }
-        .web3-title { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #1e3a8a; display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-        .btn-meta { background: #0c2340; color: white; border: none; width: 100%; padding: 11px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-size: 0.8rem; }
-        .status-node { font-size: 0.65rem; text-align: center; color: #ff7a00; margin-top: 6px; font-family: monospace; font-weight: bold; }
-
-        .btn-portal-link { background: rgba(255,255,255,0.5); border: 2px solid var(--border-color); color: var(--text-main); width: 100%; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; margin-top: auto; }
-
-        @media (max-width: 1100px) {
-            body { flex-direction: column; }
-            .col-left, .col-center, .col-right { width: 100%; min-width: 100%; border: none; }
-            .form-grid { grid-template-columns: 1fr; }
-            .form-group.full-width { grid-column: span 1; }
+        @media (max-width: 1024px) { 
+            body { flex-direction: column; } 
+            .col-left, .col-center, .col-right { width: 100%; min-width: 100%; border: none; } 
+            .output-actions-grid { grid-template-columns: 1fr; } 
         }
     </style>
 </head>
@@ -221,143 +99,85 @@
 
     <div class="col-left">
         <div class="brand-box">
-            <div style="font-size: 2rem; color: var(--accent-orange);"><i class="fas fa-cubes"></i></div>
+            <h3 style="color: var(--accent-orange);">LGT HUB</h3>
+            <p>ISC LUBUMBASHI - 2026</p>
         </div>
-        
-        <div class="system-title">Système de Scellage<br>Numérique</div>
-        
-        <button class="btn-side" onclick="toggleMode()"><i class="fas fa-moon"></i> Mode Sombre</button>
-        <button class="btn-side btn-orange" onclick="switchPanel('anchorPanel')"><i class="fas fa-plus-circle"></i> Nouveau Scellage</button>
-        <button class="btn-side" id="btnPrintDoc"><i class="fas fa-print"></i> Imprimer le Document</button>
-        
-        <button class="btn-side" id="btnCameraQR" onclick="openScanner()"><i class="fas fa-camera"></i> <span id="btnCameraText">Activer Scanner</span></button>
-        
-        <div id="qr-reader-container">
-            <div id="my-qr-reader-admin"></div>
-            <button class="btn-close-scanner" onclick="closeScanner()"><i class="fas fa-times-circle"></i> Fermer le Scanner</button>
-        </div>
-
-        <button class="btn-side active" id="btnRegistryTab" onclick="switchPanel('registryPanel')"><i class="fas fa-folder"></i> Registre Central (Firebase)</button>
-        
-        <div style="margin-top: auto; font-size: 0.7rem; opacity: 0.6; font-weight: bold;">
-            <i class="fas fa-clock"></i> <span id="liveTime">mardi 9 juin 2026 à 16:03:39</span>
-        </div>
+        <ul class="nav-menu">
+            <li><a href="#" class="active"><i class="fas fa-shield-check"></i> Portail de Vérification</a></li>
+        </ul>
     </div>
 
     <div class="col-center">
+        <div class="isc-logo-replacement">
+            <i class="fas fa-university"></i>
+            <span>ISC LUBUMBASHI</span>
+        </div>
         
-        <div class="panel-block" id="anchorPanel">
-            <div class="main-title">Ancrage Blockchain Immuable</div>
+        <div class="panel-block">
+            <div class="main-title">Vérification de Diplômes</div>
             
-            <form id="anchorForm" onsubmit="handleAnchorSubmit(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nom complet de l'étudiant</label>
-                        <input type="text" id="studentName" placeholder="Ex: MBUYA KITENGE HARDIE" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Matricule Académique</label>
-                        <input type="text" id="studentMatricule" placeholder="Ex: ISC-2026-03M" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Faculté / Section</label>
-                        <select id="studentFac">
-                            <option value="Informatique de Gestion">Informatique de Gestion</option>
-                            <option value="Sciences Commerciales et Financières">Sciences Commerciales et Financières</option>
-                            <option value="Secrétariat de Direction">Secrétariat de Direction</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Filière / Option</label>
-                        <input type="text" id="studentFil" placeholder="Ex: CSI (Conceptions Systèmes)" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Sexe de l'étudiant</label>
-                        <select id="studentGender">
-                            <option value="Masculin (M)">Masculin (M)</option>
-                            <option value="Féminin (F)">Féminin (F)</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Diplôme Numérique Source (PDF ou IMAGE)</label>
-                        <div class="file-drop-area">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem; margin-bottom: 5px; color: var(--accent-blue);"></i>
-                            <p id="fileLabel" style="font-size: 0.8rem; font-weight: bold;">Choisir un fichier... Aucun fichier n'a été sélectionné</p>
-                            <input type="file" id="diplomaFile" onchange="updateFileLabel()" required>
-                        </div>
+            <div id="qr-reader-container">
+                <div id="my-qr-reader" style="width: 100%;"></div>
+                <button type="button" class="btn-close-camera" onclick="stopQRScanner()">
+                    <i class="fas fa-camera-slash"></i> Fermer la caméra
+                </button>
+            </div>
+
+            <form id="searchForm" onsubmit="triggerVerification(event)">
+                <div class="form-group">
+                    <label>Identifiant ou Matricule de l'Étudiant</label>
+                    <div class="input-container">
+                        <input type="text" id="queryMatricule" placeholder="Ex: ISC-2026-002M" required>
+                        <button type="button" class="btn-scan" onclick="startQRScanner()">
+                            <i class="fas fa-camera"></i>
+                        </button>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn-submit-anchor">
-                    <i class="fas fa-link"></i> Effectuer l'ancrage sécurisé
-                </button>
+                <button type="submit" class="btn-verify" id="btnMainSubmit"><i class="fas fa-search"></i> Lancer la recherche</button>
             </form>
 
-            <div class="qr-output-wrapper" id="qrOutputWrapper">
-                <div style="font-size: 0.75rem; font-weight: bold; color: #1e3a8a; margin-bottom: 8px; text-transform: uppercase;">Code QR Généré avec Succès</div>
-                <div id="qrcodeCanvas"></div>
+            <div class="verification-output-card" id="outputCard">
+                <div class="card-output-header">
+                    <i class="fas fa-check-circle" style="color: #10b981; font-size: 2.2rem;"></i>
+                    <div>
+                        <div class="status-badge">Authentique ✓</div>
+                        <h4 style="margin-top: 4px; font-weight: 600;">Validation Réelle Réussie</h4>
+                    </div>
+                </div>
+
+                <div class="row-data"><span>Nom de l'Étudiant :</span><strong id="outName"></strong></div>
+                <div class="row-data"><span>Matricule :</span><span id="outMatricule"></span></div>
+                <div class="row-data"><span>Faculté / Section :</span><span id="outFac"></span></div>
+                <div class="row-data"><span>Filière / Option :</span><span id="outFil"></span></div>
+                <div class="row-data"><span>Signature Blockchain / Hash :</span><span id="outHash" style="font-family: monospace; font-size: 0.8rem; color: #10b981; word-break: break-all;"></span></div>
+                <div class="row-data"><span>Date d'Ancrage :</span><span id="outTime"></span></div>
+
+                <div class="output-actions-grid">
+                    <button type="button" class="btn-act btn-act-view" id="btnVerifOpen"><i class="fas fa-eye"></i> Voir</button>
+                    <button type="button" class="btn-act btn-act-print" id="btnVerifPrint"><i class="fas fa-print"></i> Imprimer</button>
+                    <button type="button" class="btn-act btn-act-download" id="btnVerifDownload"><i class="fas fa-download"></i> Télécharger</button>
+                </div>
+            </div>
+
+            <div class="error-alert-box" id="errorBox">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i> Aucun enregistrement trouvé dans le registre !
             </div>
         </div>
-
-        <div class="panel-block active" id="registryPanel">
-            <div class="main-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span style="font-size: 1rem;"><i class="fas fa-database"></i> Registre Central Décentralisé ISC</span>
-                <button type="button" style="background: var(--danger-red); color: white; border: none; padding: 6px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;" onclick="switchPanel('anchorPanel')">Fermer</button>
-            </div>
-            
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Matricule</th>
-                            <th>Nom</th>
-                            <th>Sexe</th>
-                            <th>Filière</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="registryTableBody">
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted);">Connexion au registre central...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
 
     <div class="col-right">
-        <div class="right-card">
-            <div class="avatar-container">
-                <img src="https://i.imgur.com/K0Y799K.jpeg" alt="ICAR LUSUMBA" onerror="this.src='https://via.placeholder.com/150'">
-            </div>
-            <div class="badge-sga">SGA Authentifié</div>
-            <h3 style="font-size: 0.95rem; font-weight: 800; color: #0c2340; margin-bottom: 2px;">ICAR LUSUMBA</h3>
-            <p style="font-size: 0.75rem; color: var(--accent-blue); font-weight: 700;">lusumbaicar@gmail.com</p>
-            
-            <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
-                <input type="text" placeholder="Nom de l'Administrateur" value="ICAR LUSUMBA" style="font-size: 0.75rem; padding: 8px 10px; background: #fff;">
-                <input type="email" placeholder="Adresse Email ISC" value="lusumbaicar@gmail.com" style="font-size: 0.75rem; padding: 8px 10px; background: #fff;">
-            </div>
-            <button class="btn-session"><i class="fas fa-fingerprint"></i> Signer la session</button>
+        <div>
+            <div class="right-section-title">À propos du Portail</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
+                Ce système interroge en temps réel les registres décentralisés de l'ISC Lubumbashi pour valider l'authenticité des pièces d'études.
+            </p>
         </div>
-
-        <div class="right-card web3-card">
-            <div class="web3-title"><i class="fab fa-ethereum"></i> Connecteur Web3 Node</div>
-            <button class="btn-meta" id="connectMetaMask" type="button">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" style="width: 16px;"> MetaMask Connection
-            </button>
-            <div class="status-node" id="nodeStatus">0x000... Non synchronisé</div>
-        </div>
-
-        <a href="verif.html" target="_blank" class="btn-portal-link">
-            <i class="fas fa-external-link-alt"></i> Ouvrir le portail public
-        </a>
     </div>
 
     <script>
-        // --- CONFIGURATION FIREBASE ---
+        // ==========================================
+        // 1. CONFIGURATION DE TON FIREBASE CENTRAL
+        // ==========================================
         const firebaseConfig = {
             apiKey: "TON_API_KEY",
             authDomain: "TON_PROJECT.firebaseapp.com",
@@ -372,180 +192,155 @@
             firebase.initializeApp(firebaseConfig);
         }
         const database = firebase.database();
-        const storage = firebase.storage();
 
-        function switchPanel(panelId) {
-            document.querySelectorAll('.panel-block').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.btn-side').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(panelId).classList.add('active');
-            if(panelId === 'registryPanel') {
-                document.getElementById('btnRegistryTab').classList.add('active');
-            }
-        }
+        let html5QrcodeScanner = null;
 
-        function toggleMode() { document.body.classList.toggle('dark-mode'); }
-
-        function updateFileLabel() {
-            const input = document.getElementById('diplomaFile');
-            const label = document.getElementById('fileLabel');
-            if(input.files.length > 0) {
-                label.innerText = input.files[0].name;
-                label.style.color = "#10b981";
-            } else {
-                label.innerText = "Choisir un fichier... Aucun fichier n'a été sélectionné";
-                label.style.color = "inherit";
-            }
-        }
-
-        // --- GESTION DU SCANNER QR CODE ---
-        let html5QrScanner = null;
-
-        function openScanner() {
-            const container = document.getElementById('qr-reader-container');
-            if (html5QrScanner) return;
-
-            container.style.display = 'block';
-            document.getElementById('btnCameraText').innerText = "Scanner En Cours...";
-
-            html5QrScanner = new Html5Qrcode("my-qr-reader-admin");
-            html5QrScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 220, height: 220 } },
-                (decodedText) => {
-                    document.getElementById('studentMatricule').value = decodedText;
-                    switchPanel('anchorPanel');
-                    closeScanner();
-                },
-                (errorMessage) => {}
-            ).catch(err => {
-                console.error(err);
-                container.style.display = 'none';
-                html5QrScanner = null;
-                document.getElementById('btnCameraText').innerText = "Activer Scanner";
-            });
-        }
-
-        async function closeScanner() {
-            const container = document.getElementById('qr-reader-container');
-            if (html5QrScanner) {
-                try { await html5QrScanner.stop(); } catch (err) { console.log(err); }
-                html5QrScanner = null;
-            }
-            container.style.display = 'none';
-            document.getElementById('btnCameraText').innerText = "Activer Scanner";
-        }
-
-        // --- SYNCHRONISATION DU REGISTRE CENTRAL ---
-        function listenToRegistry() {
-            database.ref('diplomes').on('value', (snapshot) => {
-                const tbody = document.getElementById('registryTableBody');
-                tbody.innerHTML = ""; 
-                
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const key = childSnapshot.key;
-                        const data = childSnapshot.val();
-                        
-                        // CORRECTION CLÉ UNIQUE : uniformisation sur nomEtudiant pour détruire le bug "Inconnu"
-                        const name = data.nomEtudiant || "Inconnu";
-                        const filiere = data.filiere || "N/A";
-                        const gender = data.sexe || "M";
-
-                        const row = `
-                            <tr>
-                                <td style="color: #2563eb; font-family: monospace;">${key}</td>
-                                <td>${name}</td>
-                                <td>${gender}</td>
-                                <td>${filiere}</td>
-                                <td>
-                                    <button class="btn-table-select" onclick="alert('Étudiant sélectionné : ${name}')">
-                                        <i class="fas fa-check-circle"></i> Sélectionner
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                        tbody.innerHTML += row;
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Aucun enregistrement disponible.</td></tr>`;
-                }
-            });
-        }
-
-        // --- TRANSACTION D'ANCRAGE BLOCKCHAIN NETTOYÉE ---
-        function handleAnchorSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('studentName').value.trim();
-            const matricule = document.getElementById('studentMatricule').value.trim();
-            const fac = document.getElementById('studentFac').value;
-            const fil = document.getElementById('studentFil').value.trim();
-            const gender = document.getElementById('studentGender').value;
-            const fileInput = document.getElementById('diplomaFile');
-
-            if(fileInput.files.length === 0) return alert("Veuillez sélectionner un fichier.");
-
-            const file = fileInput.files[0];
-            const storageRef = storage.ref('Diplomes_PDF/' + matricule + '_' + file.name);
-            
-            // Génération d'un hash de bloc valide et sécurisé sans faire planter ethers/MetaMask
-            let generatedHash = "0x";
-            const hexChars = "0123456789abcdef";
-            for (let i = 0; i < 40; i++) generatedHash += hexChars[Math.floor(Math.random() * 16)];
-            const unixTime = Date.now();
-
-            storageRef.put(file).then((snapshot) => {
-                return snapshot.ref.getDownloadURL();
-            }).then((downloadURL) => {
-                // CORRECTION : Écriture propre et identique des variables lues par le portail public
-                return database.ref('diplomes/' + matricule).set({
-                    nomEtudiant: name, 
-                    matricule: matricule,
-                    faculte: fac,
-                    filiere: fil,
-                    sexe: gender,
-                    blockchainHash: generatedHash,
-                    dateAncrage: unixTime,
-                    fileUrl: downloadURL
-                });
-            }).then(() => {
-                // Rendu visuel immédiat du QR Code généré en bas (comme sur ton ancienne capture)
-                const wrapper = document.getElementById('qrOutputWrapper');
-                const canvasBox = document.getElementById('qrcodeCanvas');
-                canvasBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(matricule)}" alt="QR Code Etudiant">`;
-                wrapper.style.display = 'block';
-
-                alert("Félicitations, ancrage blockchain immuable validé !");
-                document.getElementById('anchorForm').reset();
-                updateFileLabel();
-                switchPanel('registryPanel');
-            }).catch((err) => {
-                console.error(err);
-                alert("Une erreur est survenue lors du scellage.");
-            });
-        }
-
-        // METAMASK
-        document.getElementById('connectMetaMask').addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    document.getElementById('nodeStatus').innerText = "Connecté : " + accounts[0].substring(0,6) + "...";
-                    document.getElementById('nodeStatus').style.color = "#10b981";
-                } catch (error) { console.error(error); }
-            } else {
-                document.getElementById('nodeStatus').innerText = "Simulé Local Connecté";
-                document.getElementById('nodeStatus').style.color = "#10b981";
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idParam = urlParams.get('id');
+            if (idParam) {
+                document.getElementById('queryMatricule').value = idParam;
+                processRealVerification(idParam);
             }
         });
 
-        // Horloge temps réel
-        setInterval(() => {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            document.getElementById('liveTime').innerText = new Date().toLocaleDateString('fr-FR', options);
-        }, 1000);
+        function triggerVerification(e) {
+            e.preventDefault();
+            const mat = document.getElementById('queryMatricule').value.trim();
+            processRealVerification(mat);
+        }
 
-        window.addEventListener('DOMContentLoaded', listenToRegistry);
+        // ==========================================
+        // 2. LOGIQUE DE VÉRIFICATION ET SÉCURISATION
+        // ==========================================
+        function processRealVerification(matriculeKey) {
+            const card = document.getElementById('outputCard');
+            const err = document.getElementById('errorBox');
+            const btn = document.getElementById('btnMainSubmit');
+            
+            card.style.display = "none";
+            err.style.display = "none";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche en cours...';
+
+            database.ref('diplomes/' + matriculeKey).once('value')
+            .then((snapshot) => {
+                btn.innerHTML = '<i class="fas fa-search"></i> Lancer la recherche';
+                if (snapshot.exists()) {
+                    const record = snapshot.val();
+                    showData(record, matriculeKey);
+                } else {
+                    err.style.display = "block";
+                }
+            })
+            .catch((error) => {
+                btn.innerHTML = '<i class="fas fa-search"></i> Lancer la recherche';
+                console.error("Erreur Firebase : ", error);
+                alert("Erreur de connexion avec le registre central.");
+            });
+        }
+
+        function showData(record, matriculeKey) {
+            // Mappings multiples pour absorber toutes les variations de clés Firebase (admin vs public)
+            const studentName = record.nomEtudiant || record.name || record.nom || "Inconnu";
+            const studentMatricule = record.matricule || record.id || matriculeKey || "";
+            const studentFac = record.faculte || record.fac || record.section || "";
+            const studentFil = record.filiere || record.fil || record.option || "";
+            const blockHash = record.blockchainHash || record.hash || "Aucune signature détectée";
+            
+            // Formatage de la date d'ancrage (si c'est un timestamp Unix)
+            let rawDate = record.dateAncrage || record.timestamp || "";
+            if (rawDate && !isNaN(rawDate)) {
+                const dateObj = new Date(parseInt(rawDate));
+                rawDate = dateObj.toLocaleDateString('fr-FR') + ' à ' + dateObj.toLocaleTimeString('fr-FR');
+            } else if (!rawDate) {
+                rawDate = "Récemment";
+            }
+
+            // Injection sécurisée dans le DOM
+            document.getElementById('outName').innerText = studentName;
+            document.getElementById('outMatricule').innerText = studentMatricule;
+            document.getElementById('outFac').innerText = studentFac;
+            document.getElementById('outFil').innerText = studentFil;
+            document.getElementById('outHash').innerText = blockHash;
+            document.getElementById('outTime').innerText = rawDate;
+            
+            // Rendre la carte visible
+            document.getElementById('outputCard').style.display = "block";
+
+            // Détermination du lien du document joint (Firebase Storage ou Local)
+            let fileTargetUrl = "";
+            if (record.fileUrl || record.pdfUrl) {
+                fileTargetUrl = record.fileUrl || record.pdfUrl;
+            } else {
+                fileTargetUrl = 'Docs/' + studentMatricule + '.pdf';
+            }
+
+            // --- ATTRIBUTION SÉCURISÉE DES ACTIONS DES BOUTONS ---
+
+            // 1. Bouton "Voir"
+            document.getElementById('btnVerifOpen').onclick = function(e) {
+                e.preventDefault();
+                if (fileTargetUrl) {
+                    window.open(fileTargetUrl, '_blank');
+                } else {
+                    alert("Aucun document lié trouvé pour cet étudiant.");
+                }
+            };
+            
+            // 2. Bouton "Imprimer" (Imprime proprement le reçu de validation grâce aux règles CSS @media print)
+            document.getElementById('btnVerifPrint').onclick = function(e) { 
+                e.preventDefault();
+                window.print(); 
+            };
+
+            // 3. Bouton "Télécharger"
+            document.getElementById('btnVerifDownload').onclick = function(e) {
+                e.preventDefault();
+                try {
+                    const link = document.createElement('a');
+                    link.href = fileTargetUrl;
+                    link.target = '_blank';
+                    // Nettoyage du nom pour éviter les bugs d'espaces dans l'attribut download
+                    const safeName = studentName.trim().replace(/\s+/g, '_');
+                    link.download = 'Diplome_' + safeName + '.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (err) {
+                    console.error("Erreur de téléchargement: ", err);
+                    window.open(fileTargetUrl, '_blank');
+                }
+            };
+        }
+
+        // ==========================================
+        // 3. CODE DU SCANNER CAMÉRA QR
+        // ==========================================
+        function startQRScanner() {
+            const container = document.getElementById('qr-reader-container');
+            container.style.display = 'block';
+            if (!html5QrcodeScanner) { html5QrcodeScanner = new Html5Qrcode("my-qr-reader"); }
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    document.getElementById('queryMatricule').value = decodedText;
+                    stopQRScanner();
+                    processRealVerification(decodedText);
+                },
+                (errorMessage) => { }
+            ).catch(err => {
+                alert("Permission caméra refusée.");
+                container.style.display = 'none';
+            });
+        }
+
+        function stopQRScanner() {
+            const container = document.getElementById('qr-reader-container');
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                html5QrcodeScanner.stop().then(() => { container.style.display = 'none'; });
+            } else { container.style.display = 'none'; }
+        }
     </script>
 </body>
 </html>
