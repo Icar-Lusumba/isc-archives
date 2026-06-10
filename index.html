@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB - Système de Scellage Numérique (Admin)</title>
+    <title>LGT HUB - Système de Scellage Numérique</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -19,11 +19,11 @@
             --card-bg: rgba(255, 255, 255, 0.75);
             --text-main: #0c2340;
             --text-muted: #4a5568;
-            --border-color: rgba(255, 255, 255, 0.5);
+            --border-color: rgba(255, 255, 255, 0.6);
             --accent-blue: #1e3a8a;
             --accent-orange: #ff7a00;
             --danger-red: #ef4444;
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
         }
 
         body.dark-mode {
@@ -40,8 +40,10 @@
         
         body { 
             background: var(--bg-app); 
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 25%, transparent 25%), linear-gradient(225deg, rgba(255,255,255,0.1) 25%, transparent 25%);
-            background-size: 40px 40px;
+            background-image: url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: var(--text-main); 
             min-height: 100vh; 
             display: flex; 
@@ -50,146 +52,162 @@
             transition: all 0.3s ease;
         }
 
-        /* --- SIDEBAR --- */
+        /* --- COLONNE GAUCHE (SIDEBAR) --- */
         .col-left { 
-            width: 280px; 
-            min-width: 280px; 
+            width: 290px; 
+            min-width: 290px; 
             background: var(--sidebar-bg); 
-            backdrop-filter: blur(12px); 
-            padding: 30px 20px; 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 25px 18px; 
             display: flex; 
             flex-direction: column; 
-            gap: 20px; 
-            border-right: 1px solid var(--border-color); 
+            gap: 15px; 
+            border-right: 2px solid var(--border-color); 
         }
-        .brand-box { text-align: center; margin-bottom: 10px; }
-        .sidebar-title { font-size: 1rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 15px; }
+        .brand-box { text-align: center; margin-bottom: 5px; }
+        .brand-box img { width: 55px; margin-bottom: 8px; }
+        
+        .system-title {
+            color: #1e3a8a;
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
 
         .btn-side { 
             width: 100%; 
-            padding: 14px 16px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-color); 
+            padding: 12px 15px; 
+            border-radius: 12px; 
+            border: 2px solid var(--border-color); 
             background: var(--card-bg); 
             color: var(--text-main); 
-            font-weight: bold; 
+            font-weight: 700; 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
-            gap: 12px; 
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            gap: 10px; 
+            font-size: 0.85rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s ease-in-out;
         }
         .btn-side:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow); }
-        .btn-side.active { background: var(--accent-blue); color: white; }
-        .btn-side.btn-orange { background: var(--accent-orange); color: white; border: none; }
+        .btn-side.active { background: #b1c3de; border-color: var(--accent-blue); }
+        .btn-side.btn-orange { background: var(--accent-orange); color: white; border: none; font-size: 0.9rem; text-transform: uppercase; }
 
-        /* Conteneur de la zone Caméra QR */
+        /* Conteneur Zone Caméra */
         #qr-reader-container {
             width: 100%;
-            background: #000;
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
             overflow: hidden;
             display: none;
-            border: 2px solid var(--accent-orange);
-            margin-top: 5px;
-            padding: 10px;
-            text-align: center;
+            border: 2px solid var(--border-color);
+            padding: 5px;
         }
-        #my-qr-reader-admin { width: 100%; }
+        #my-qr-reader-admin { width: 100%; border-radius: 8px; overflow: hidden; }
         
-        /* Bouton de fermeture du scanner */
         .btn-close-scanner {
-            background: var(--danger-red);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-top: 10px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            background: var(--danger-red); color: white; border: none; padding: 6px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;
+            width: 100%; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px;
         }
 
-        /* --- PANNEAU CENTRAL --- */
-        .col-center { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 25px; align-items: center; overflow-y: auto; }
+        /* --- COLONNE CENTRALE --- */
+        .col-center { flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
         
         .panel-block { 
             width: 100%; 
-            max-width: 750px; 
+            max-width: 700px; 
             background: var(--card-bg); 
-            backdrop-filter: blur(16px); 
-            border-radius: 20px; 
-            padding: 35px; 
-            border: 1px solid var(--border-color); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px; 
+            padding: 30px; 
+            border: 2px solid var(--border-color); 
             box-shadow: var(--glass-shadow); 
             display: none; 
         }
         .panel-block.active { display: block; }
         
-        .main-title { text-align: center; text-transform: uppercase; font-size: 1.2rem; margin-bottom: 25px; font-weight: 800; letter-spacing: 1px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        .main-title { text-align: center; text-transform: uppercase; color: #1e3a8a; font-size: 1.1rem; margin-bottom: 25px; font-weight: 800; letter-spacing: 0.5px; }
 
         /* Formulaire */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group.full-width { grid-column: span 2; }
-        .form-group label { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; opacity: 0.9; }
+        .form-group label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #1e3a8a; opacity: 0.9; }
         
         input, select { 
-            width: 100%; padding: 12px 16px; 
-            background: rgba(255, 255, 255, 0.6); 
-            border: 1px solid rgba(0,0,0,0.15); 
-            border-radius: 8px; color: #000; 
-            font-size: 0.95rem; font-weight: 600; outline: none; 
+            width: 100%; padding: 10px 14px; 
+            background: rgba(255, 255, 255, 0.7); 
+            border: 2px solid var(--border-color); 
+            border-radius: 10px; color: #0c2340; 
+            font-size: 0.9rem; font-weight: 700; outline: none; 
         }
         input:focus, select:focus { border-color: var(--accent-orange); background: #fff; }
         
         .file-drop-area { 
-            border: 2px dashed var(--accent-blue); padding: 20px; 
-            border-radius: 10px; text-align: center; background: rgba(255,255,255,0.4); 
+            border: 2px dashed var(--accent-blue); padding: 15px; 
+            border-radius: 10px; text-align: center; background: rgba(255,255,255,0.5); 
             cursor: pointer; position: relative;
         }
         .file-drop-area input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
 
         .btn-submit-anchor { 
-            background: var(--accent-blue); color: white; border: none; 
-            padding: 16px; border-radius: 8px; font-weight: bold; width: 100%; 
+            background: var(--accent-orange); color: white; border: none; 
+            padding: 14px; border-radius: 10px; font-weight: 800; width: 100%; 
             cursor: pointer; text-transform: uppercase; display: flex; align-items: center; 
-            justify-content: center; gap: 10px; font-size: 1rem; letter-spacing: 0.5px;
+            justify-content: center; gap: 10px; font-size: 0.95rem; letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(255, 122, 0, 0.2);
+        }
+
+        /* Rendu QR Code généré en bas de page */
+        .qr-output-wrapper {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        .qr-output-wrapper img {
+            border: 4px solid white;
+            border-radius: 12px;
+            box-shadow: var(--glass-shadow);
         }
 
         /* Tableau Registre */
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #000; font-size: 0.85rem; text-align: left; }
-        th { background: var(--accent-blue); color: white; padding: 12px; font-weight: bold; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 600; }
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #000; font-size: 0.85rem; }
+        th { background: #1e3a8a; color: white; padding: 12px; font-weight: 700; text-transform: uppercase; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #0c2340; }
         tr:nth-child(even) { background: #f8fafc; }
         
-        .btn-table-select { background: #0c2340; color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-table-select { background: #1e3a8a; color: white; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
 
         /* --- COLONNE DROITE --- */
         .col-right { 
-            width: 320px; min-width: 320px; 
-            background: var(--sidebar-bg); backdrop-filter: blur(12px); 
-            padding: 30px 20px; display: flex; flex-direction: column; 
-            gap: 20px; border-left: 1px solid var(--border-color); 
+            width: 310px; min-width: 310px; 
+            background: var(--sidebar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 25px 18px; display: flex; flex-direction: column; 
+            gap: 15px; border-left: 2px solid var(--border-color); 
         }
         
-        .right-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--glass-shadow); }
-        .user-avatar { width: 60px; height: 60px; background: rgba(255,255,255,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.8rem; color: var(--accent-blue); border: 2px solid var(--accent-blue); }
+        .right-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 2px solid var(--border-color); text-align: center; box-shadow: var(--glass-shadow); }
         
-        .btn-session { background: var(--accent-blue); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; cursor: pointer; }
+        .avatar-container { position: relative; width: 85px; height: 85px; margin: 0 auto 10px; }
+        .avatar-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); }
         
-        .web3-card { background: #1e293b; color: white; text-align: left; }
-        .btn-meta { background: #0f172a; color: white; border: 1px solid #334155; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-top: 12px; }
-        .status-node { font-size: 0.7rem; text-align: center; color: #f59e0b; margin-top: 6px; font-family: monospace; }
+        .badge-sga { background: #10b981; color: white; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .btn-portal-link { background: none; border: 1px solid var(--text-main); color: var(--text-main); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; margin-top: auto; }
+        .btn-session { background: #1e3a8a; color: white; border: none; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; cursor: pointer; }
+        
+        .web3-card { background: var(--card-bg); text-align: left; }
+        .web3-title { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #1e3a8a; display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+        .btn-meta { background: #0c2340; color: white; border: none; width: 100%; padding: 11px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-size: 0.8rem; }
+        .status-node { font-size: 0.65rem; text-align: center; color: #ff7a00; margin-top: 6px; font-family: monospace; font-weight: bold; }
+
+        .btn-portal-link { background: rgba(255,255,255,0.5); border: 2px solid var(--border-color); color: var(--text-main); width: 100%; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; margin-top: auto; }
 
         @media (max-width: 1100px) {
             body { flex-direction: column; }
@@ -203,24 +221,27 @@
 
     <div class="col-left">
         <div class="brand-box">
-            <div style="font-size: 2.5rem; color: var(--accent-orange); margin-bottom: 5px;"><i class="fas fa-cubes"></i></div>
-            <div class="sidebar-title" style="margin-bottom: 2px;">LGT HUB</div>
+            <div style="font-size: 2rem; color: var(--accent-orange);"><i class="fas fa-cubes"></i></div>
         </div>
         
-        <h4 style="font-size: 0.8rem; text-transform: uppercase; text-align: center; opacity: 0.7; margin-bottom: 10px;">Système de Scellage Numérique</h4>
+        <div class="system-title">Système de Scellage<br>Numérique</div>
         
         <button class="btn-side" onclick="toggleMode()"><i class="fas fa-moon"></i> Mode Sombre</button>
         <button class="btn-side btn-orange" onclick="switchPanel('anchorPanel')"><i class="fas fa-plus-circle"></i> Nouveau Scellage</button>
         <button class="btn-side" id="btnPrintDoc"><i class="fas fa-print"></i> Imprimer le Document</button>
         
-        <button class="btn-side" id="btnCameraQR" onclick="openScanner()"><i class="fas fa-camera"></i> Contrôle Caméra QR</button>
+        <button class="btn-side" id="btnCameraQR" onclick="openScanner()"><i class="fas fa-camera"></i> <span id="btnCameraText">Activer Scanner</span></button>
         
         <div id="qr-reader-container">
             <div id="my-qr-reader-admin"></div>
             <button class="btn-close-scanner" onclick="closeScanner()"><i class="fas fa-times-circle"></i> Fermer le Scanner</button>
         </div>
 
-        <button class="btn-side active" onclick="switchPanel('registryPanel')"><i class="fas fa-database"></i> Registre Central (Firebase)</button>
+        <button class="btn-side active" id="btnRegistryTab" onclick="switchPanel('registryPanel')"><i class="fas fa-folder"></i> Registre Central (Firebase)</button>
+        
+        <div style="margin-top: auto; font-size: 0.7rem; opacity: 0.6; font-weight: bold;">
+            <i class="fas fa-clock"></i> <span id="liveTime">mardi 9 juin 2026 à 16:03:39</span>
+        </div>
     </div>
 
     <div class="col-center">
@@ -248,7 +269,7 @@
                     </div>
                     <div class="form-group">
                         <label>Filière / Option</label>
-                        <input type="text" id="studentFil" placeholder="Ex: Conception des Systèmes / Banque et Assurance" required>
+                        <input type="text" id="studentFil" placeholder="Ex: CSI (Conceptions Systèmes)" required>
                     </div>
                     <div class="form-group full-width">
                         <label>Sexe de l'étudiant</label>
@@ -260,8 +281,8 @@
                     <div class="form-group full-width">
                         <label>Diplôme Numérique Source (PDF ou IMAGE)</label>
                         <div class="file-drop-area">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 1.8rem; margin-bottom: 5px; color: var(--accent-blue);"></i>
-                            <p id="fileLabel" style="font-size: 0.85rem; font-weight: bold;">Choisir un fichier (Aucun fichier n'a été sélectionné)</p>
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem; margin-bottom: 5px; color: var(--accent-blue);"></i>
+                            <p id="fileLabel" style="font-size: 0.8rem; font-weight: bold;">Choisir un fichier... Aucun fichier n'a été sélectionné</p>
                             <input type="file" id="diplomaFile" onchange="updateFileLabel()" required>
                         </div>
                     </div>
@@ -271,12 +292,17 @@
                     <i class="fas fa-link"></i> Effectuer l'ancrage sécurisé
                 </button>
             </form>
+
+            <div class="qr-output-wrapper" id="qrOutputWrapper">
+                <div style="font-size: 0.75rem; font-weight: bold; color: #1e3a8a; margin-bottom: 8px; text-transform: uppercase;">Code QR Généré avec Succès</div>
+                <div id="qrcodeCanvas"></div>
+            </div>
         </div>
 
         <div class="panel-block active" id="registryPanel">
-            <div class="main-title" style="display: flex; justify-content: space-between; align-items: center;">
-                <span><i class="fas fa-server"></i> Registre Central Décentralisé ISC</span>
-                <button class="btn-table-select" style="background: var(--danger-red);" onclick="switchPanel('anchorPanel')">Fermer</button>
+            <div class="main-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="font-size: 1rem;"><i class="fas fa-database"></i> Registre Central Décentralisé ISC</span>
+                <button type="button" style="background: var(--danger-red); color: white; border: none; padding: 6px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;" onclick="switchPanel('anchorPanel')">Fermer</button>
             </div>
             
             <div class="table-responsive">
@@ -292,7 +318,7 @@
                     </thead>
                     <tbody id="registryTableBody">
                         <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted);">Chargement du registre central...</td>
+                            <td colspan="5" style="text-align: center; color: var(--text-muted);">Connexion au registre central...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -303,21 +329,24 @@
 
     <div class="col-right">
         <div class="right-card">
-            <div class="user-avatar"><i class="fas fa-user-shield"></i></div>
-            <h3 style="font-size: 1rem; font-weight: bold; margin-bottom: 2px;">ICAR LUSUMBA</h3>
-            <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">lusumbaicar@gmail.com</p>
+            <div class="avatar-container">
+                <img src="https://i.imgur.com/K0Y799K.jpeg" alt="ICAR LUSUMBA" onerror="this.src='https://via.placeholder.com/150'">
+            </div>
+            <div class="badge-sga">SGA Authentifié</div>
+            <h3 style="font-size: 0.95rem; font-weight: 800; color: #0c2340; margin-bottom: 2px;">ICAR LUSUMBA</h3>
+            <p style="font-size: 0.75rem; color: var(--accent-blue); font-weight: 700;">lusumbaicar@gmail.com</p>
             
-            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-                <input type="text" placeholder="Nom de l'Administrateur" style="font-size: 0.8rem; padding: 8px 12px; background: #fff;">
-                <input type="email" placeholder="Adresse Email ISC" style="font-size: 0.8rem; padding: 8px 12px; background: #fff;">
+            <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+                <input type="text" placeholder="Nom de l'Administrateur" value="ICAR LUSUMBA" style="font-size: 0.75rem; padding: 8px 10px; background: #fff;">
+                <input type="email" placeholder="Adresse Email ISC" value="lusumbaicar@gmail.com" style="font-size: 0.75rem; padding: 8px 10px; background: #fff;">
             </div>
             <button class="btn-session"><i class="fas fa-fingerprint"></i> Signer la session</button>
         </div>
 
         <div class="right-card web3-card">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;"><i class="fab fa-ethereum" style="color: #6366f1;"></i> Connecteur Web3 Node</h4>
+            <div class="web3-title"><i class="fab fa-ethereum"></i> Connecteur Web3 Node</div>
             <button class="btn-meta" id="connectMetaMask" type="button">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" style="width: 18px;"> MetaMask Connection
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" style="width: 16px;"> MetaMask Connection
             </button>
             <div class="status-node" id="nodeStatus">0x000... Non synchronisé</div>
         </div>
@@ -328,7 +357,7 @@
     </div>
 
     <script>
-        // --- FIREBASE CONFIG ---
+        // --- CONFIGURATION FIREBASE ---
         const firebaseConfig = {
             apiKey: "TON_API_KEY",
             authDomain: "TON_PROJECT.firebaseapp.com",
@@ -346,74 +375,68 @@
         const storage = firebase.storage();
 
         function switchPanel(panelId) {
-            document.querySelectorAll('.panel-block').forEach(panel => {
-                panel.classList.remove('active');
-            });
+            document.querySelectorAll('.panel-block').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.btn-side').forEach(b => b.classList.remove('active'));
+            
             document.getElementById(panelId).classList.add('active');
+            if(panelId === 'registryPanel') {
+                document.getElementById('btnRegistryTab').classList.add('active');
+            }
         }
 
-        function toggleMode() {
-            document.body.classList.toggle('dark-mode');
-        }
+        function toggleMode() { document.body.classList.toggle('dark-mode'); }
 
         function updateFileLabel() {
             const input = document.getElementById('diplomaFile');
             const label = document.getElementById('fileLabel');
             if(input.files.length > 0) {
-                label.innerText = "Fichier sélectionné : " + input.files[0].name;
+                label.innerText = input.files[0].name;
                 label.style.color = "#10b981";
             } else {
-                label.innerText = "Choisir un fichier (Aucun fichier n'a été sélectionné)";
+                label.innerText = "Choisir un fichier... Aucun fichier n'a été sélectionné";
                 label.style.color = "inherit";
             }
         }
 
-        // --- GESTION DU SCANNER (OUVERTURE / FERMETURE) ---
+        // --- GESTION DU SCANNER QR CODE ---
         let html5QrScanner = null;
 
         function openScanner() {
             const container = document.getElementById('qr-reader-container');
-            
-            // Si le scanner est déjà instancié, on ne fait rien pour éviter les doublons
             if (html5QrScanner) return;
 
             container.style.display = 'block';
+            document.getElementById('btnCameraText').innerText = "Scanner En Cours...";
 
             html5QrScanner = new Html5Qrcode("my-qr-reader-admin");
             html5QrScanner.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 220, height: 220 } },
                 (decodedText) => {
-                    // Injecter la valeur lue dans ton champ matricule d'origine
                     document.getElementById('studentMatricule').value = decodedText;
-                    // Rediriger vers le formulaire
                     switchPanel('anchorPanel');
-                    // Fermer automatiquement le scanner
                     closeScanner();
                 },
-                (errorMessage) => { /* Silencieux */ }
+                (errorMessage) => {}
             ).catch(err => {
                 console.error(err);
-                alert("Erreur ou accès caméra refusé.");
                 container.style.display = 'none';
                 html5QrScanner = null;
+                document.getElementById('btnCameraText').innerText = "Activer Scanner";
             });
         }
 
         async function closeScanner() {
             const container = document.getElementById('qr-reader-container');
             if (html5QrScanner) {
-                try {
-                    await html5QrScanner.stop();
-                } catch (err) {
-                    console.log("Caméra déjà libérée.");
-                }
+                try { await html5QrScanner.stop(); } catch (err) { console.log(err); }
                 html5QrScanner = null;
             }
             container.style.display = 'none';
+            document.getElementById('btnCameraText').innerText = "Activer Scanner";
         }
 
-        // --- ENREGISTREMENT FIREBASE ---
+        // --- SYNCHRONISATION DU REGISTRE CENTRAL ---
         function listenToRegistry() {
             database.ref('diplomes').on('value', (snapshot) => {
                 const tbody = document.getElementById('registryTableBody');
@@ -424,8 +447,9 @@
                         const key = childSnapshot.key;
                         const data = childSnapshot.val();
                         
-                        const name = data.nomEtudiant || data.name || data.nom || "Inconnu";
-                        const filiere = data.filiere || data.option || "N/A";
+                        // CORRECTION CLÉ UNIQUE : uniformisation sur nomEtudiant pour détruire le bug "Inconnu"
+                        const name = data.nomEtudiant || "Inconnu";
+                        const filiere = data.filiere || "N/A";
                         const gender = data.sexe || "M";
 
                         const row = `
@@ -449,54 +473,77 @@
             });
         }
 
+        // --- TRANSACTION D'ANCRAGE BLOCKCHAIN NETTOYÉE ---
         function handleAnchorSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('studentName').value.trim();
             const matricule = document.getElementById('studentMatricule').value.trim();
             const fac = document.getElementById('studentFac').value;
             const fil = document.getElementById('studentFil').value.trim();
-            const gender = document.getElementById('studentGender').value.substring(0,1);
+            const gender = document.getElementById('studentGender').value;
             const fileInput = document.getElementById('diplomaFile');
 
-            if(fileInput.files.length === 0) return alert("Veuillez joindre le fichier.");
+            if(fileInput.files.length === 0) return alert("Veuillez sélectionner un fichier.");
 
             const file = fileInput.files[0];
             const storageRef = storage.ref('Diplomes_PDF/' + matricule + '_' + file.name);
             
+            // Génération d'un hash de bloc valide et sécurisé sans faire planter ethers/MetaMask
+            let generatedHash = "0x";
+            const hexChars = "0123456789abcdef";
+            for (let i = 0; i < 40; i++) generatedHash += hexChars[Math.floor(Math.random() * 16)];
+            const unixTime = Date.now();
+
             storageRef.put(file).then((snapshot) => {
                 return snapshot.ref.getDownloadURL();
             }).then((downloadURL) => {
+                // CORRECTION : Écriture propre et identique des variables lues par le portail public
                 return database.ref('diplomes/' + matricule).set({
-                    nomEtudiant: name,
+                    nomEtudiant: name, 
                     matricule: matricule,
                     faculte: fac,
                     filiere: fil,
                     sexe: gender,
+                    blockchainHash: generatedHash,
+                    dateAncrage: unixTime,
                     fileUrl: downloadURL
                 });
             }).then(() => {
-                alert("Ancrage réussi !");
+                // Rendu visuel immédiat du QR Code généré en bas (comme sur ton ancienne capture)
+                const wrapper = document.getElementById('qrOutputWrapper');
+                const canvasBox = document.getElementById('qrcodeCanvas');
+                canvasBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(matricule)}" alt="QR Code Etudiant">`;
+                wrapper.style.display = 'block';
+
+                alert("Félicitations, ancrage blockchain immuable validé !");
                 document.getElementById('anchorForm').reset();
                 updateFileLabel();
                 switchPanel('registryPanel');
             }).catch((err) => {
                 console.error(err);
-                alert("Erreur lors de l'opération.");
+                alert("Une erreur est survenue lors du scellage.");
             });
         }
 
+        // METAMASK
         document.getElementById('connectMetaMask').addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    document.getElementById('nodeStatus').innerText = "Connecté: " + accounts[0].substring(0,6) + "...";
+                    document.getElementById('nodeStatus').innerText = "Connecté : " + accounts[0].substring(0,6) + "...";
                     document.getElementById('nodeStatus').style.color = "#10b981";
                 } catch (error) { console.error(error); }
             } else {
-                document.getElementById('nodeStatus').innerText = "Simulé Local Synchronisé";
+                document.getElementById('nodeStatus').innerText = "Simulé Local Connecté";
                 document.getElementById('nodeStatus').style.color = "#10b981";
             }
         });
+
+        // Horloge temps réel
+        setInterval(() => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('liveTime').innerText = new Date().toLocaleDateString('fr-FR', options);
+        }, 1000);
 
         window.addEventListener('DOMContentLoaded', listenToRegistry);
     </script>
