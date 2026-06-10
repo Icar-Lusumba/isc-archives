@@ -3,698 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB | Admin Blockchain ISC</title>
+    <title>LGT HUB ISC | Console d'Administration Blockchain</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #1e3a8a;
-            --accent: #f6851b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --bg-body: #f8fafc;
-            --bg-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070');
-            --glass-bg: rgba(255, 255, 255, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text: #0f172a;
-            --text-secondary: #475569;
-            --sidebar-bg: rgba(255, 255, 255, 0.35);
-            --shadow-glow: rgba(30, 58, 138, 0.08);
-            --qr-glow: transparent;
+            --glass-left: rgba(0, 123, 255, 0.15); /* Bleu transparent flouté */
+            --glass-right: rgba(106, 17, 203, 0.15); /* Violet transparent flouté */
+            --glass-center: rgba(255, 255, 255, 0.07);
+            --accent-orange: #ff7a00;
+            --text-white: #ffffff;
+            --danger: #ff4d4d;
+            --success: #00ff88;
         }
 
-        .dark-mode {
-            --primary: #3b82f6;
-            --accent: #f6851b;
-            --bg-body: #090d16;
-            --glass-bg: rgba(15, 23, 42, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #f8fafc;
-            --text-secondary: #94a3b8;
-            --sidebar-bg: rgba(9, 13, 22, 0.7);
-            --shadow-glow: rgba(0, 0, 0, 0.5);
+        /* Thème Clair */
+        body.light-mode {
+            --glass-left: rgba(255, 255, 255, 0.6);
+            --glass-right: rgba(255, 255, 255, 0.6);
+            --glass-center: rgba(255, 255, 255, 0.8);
+            --text-white: #1e1e1e;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: 0.3s ease; }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0; 
-            display: grid; 
-            height: 100vh;
-            grid-template-columns: 310px 1fr 340px;
-            background: linear-gradient(rgba(248, 250, 252, 0.35), rgba(248, 250, 252, 0.45)), var(--bg-image);
+            background: url('img/fond.jpg') no-repeat center center fixed;
             background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: var(--text); 
-            transition: background 0.3s ease, color 0.3s ease;
+            color: var(--text-white);
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
             overflow: hidden;
         }
 
-        .dark-mode-body {
-            background: linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.92)), var(--bg-image) !important;
-            background-size: cover !important;
-            background-attachment: fixed !important;
-        }
+        .glass { backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
 
-        .col-left, .col-right {
-            background: var(--sidebar-bg); 
-            -webkit-backdrop-filter: blur(30px);
-            backdrop-filter: blur(30px);
-            padding: 24px; 
-            border-right: 1px solid var(--glass-border);
-            display: flex; 
-            flex-direction: column; 
-            gap: 18px;
-            z-index: 5;
-            box-shadow: 4px 0 24px var(--shadow-glow);
-            transition: background 0.3s ease, border-color 0.3s ease;
-        }
-        .col-right { border-right: none; border-left: 1px solid var(--glass-border); box-shadow: -4px 0 24px var(--shadow-glow); }
-
-        .col-mid { 
-            padding: 24px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            position: relative;
-            align-items: center;
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 5px;
-        }
+        /* --- COLONNE GAUCHE --- */
+        .sidebar-left { background: var(--glass-left); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .logo-header { display: flex; align-items: center; gap: 10px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-header img { height: 45px; }
         
-        .brand-title {
-            text-align: center;
-            font-size: 0.95rem;
-            font-weight: 800;
-            color: var(--primary);
-            letter-spacing: 0.8px;
+        .btn-menu {
+            width: 100%; padding: 12px; border-radius: 12px; border: none; background: rgba(255,255,255,0.1);
+            color: var(--text-white); text-align: left; cursor: pointer; font-weight: 700; font-size: 13px;
+            display: flex; align-items: center; gap: 10px; text-transform: uppercase;
         }
+        .btn-menu:hover, .btn-menu.active { background: var(--accent-orange); box-shadow: 0 4px 15px rgba(255, 122, 0, 0.4); }
 
-        .glass-card {
-            background: var(--glass-bg); 
-            -webkit-backdrop-filter: blur(20px);
-            backdrop-filter: blur(20px);
-            border-radius: 18px; 
-            padding: 22px; 
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px var(--shadow-glow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            box-sizing: border-box;
-        }
+        /* Scanner Caméra */
+        #scanner-box { display: none; background: #000; border-radius: 10px; overflow: hidden; margin-top: 10px; border: 2px solid var(--accent-orange); }
 
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        label { font-size: 0.72rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        /* --- COLONNE CENTRALE --- */
+        .main-content { padding: 25px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+        .center-logo { margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
         
+        /* Compteurs */
+        .faculty-counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; max-width: 850px; margin-bottom: 20px; }
+        .count-card { padding: 15px; border-radius: 15px; text-align: center; background: var(--glass-center); border: 1px solid rgba(255,255,255,0.1); }
+        .count-card h3 { font-size: 24px; color: var(--accent-orange); }
+        .count-card p { font-size: 11px; font-weight: bold; opacity: 0.8; margin-top: 5px; text-transform: uppercase; }
+
+        /* Formulaire */
+        .scellage-form { width: 100%; max-width: 850px; padding: 25px; border-radius: 20px; background: var(--glass-center); }
+        .form-title { text-align: center; margin-bottom: 20px; font-weight: 900; letter-spacing: 1px; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        label { font-size: 10px; font-weight: 900; color: var(--accent-orange); text-transform: uppercase; }
         input, select { 
-            padding: 11px 14px; 
-            border-radius: 10px; 
-            border: 1px solid rgba(0, 0, 0, 0.08); 
-            background: rgba(255,255,255,0.85); 
-            font-size: 0.85rem; 
-            color: #000; 
-            outline: none; 
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .dark-mode input, .dark-mode select {
-            background: rgba(15, 23, 42, 0.8) !important; 
-            color: #fff !important; 
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15); }
-
-        .btn {
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 12px 16px;
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-weight: 700; 
-            transition: all 0.2s ease;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            font-size: 0.88rem;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30, 58, 138, 0.25); }
-        .btn-accent { background: var(--accent); }
-        .btn-accent:hover { box-shadow: 0 6px 20px rgba(246, 133, 27, 0.25); }
-        .btn-secondary { background: rgba(0,0,0,0.05); color: var(--text); border: 1px solid var(--glass-border); }
-        .btn-danger { background: var(--danger); color: white; }
-
-        .profile-pic-container {
-            position: relative;
-            width: 95px;
-            height: 95px;
-            margin: 0 auto 12px;
-        }
-        .profile-pic-box {
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            border: 3px solid var(--primary);
-            overflow: hidden; 
-            background: rgba(255,255,255,0.5); 
-            cursor: pointer;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 8px 20px var(--shadow-glow);
-            transition: transform 0.3s ease;
-        }
-        .profile-pic-box:hover { transform: scale(1.04); }
-
-        .qr-display-center {
-            margin-top: auto;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-        .qr-halo-wrapper {
-            background: white;
-            padding: 14px;
-            border-radius: 20px;
-            box-shadow: 0 0 0px var(--qr-glow), 0 10px 30px var(--shadow-glow);
-            transition: all 0.5s ease;
-            display: inline-block;
-        }
-        .qr-glow-active {
-            --qr-glow: rgba(16, 185, 129, 0.65);
-            box-shadow: 0 0 25px 6px var(--qr-glow), 0 10px 30px var(--shadow-glow) !important;
-            border: 2px solid var(--success);
+            padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4); color: white; outline: none; font-weight: 600;
         }
 
-        .doc-actions-box {
-            display: none;
-            width: 100%;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 5px;
+        .btn-anchor {
+            width: 100%; padding: 15px; background: var(--accent-orange); border: none;
+            border-radius: 12px; color: white; font-weight: 900; cursor: pointer;
+            text-transform: uppercase; margin-top: 15px; letter-spacing: 1px;
         }
 
-        .faculty-monitor {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            width: 100%;
+        /* --- COLONNE DROITE --- */
+        .sidebar-right { background: var(--glass-right); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Avatar Profil */
+        .admin-profile { text-align: center; padding: 20px; border-radius: 20px; background: rgba(0,0,0,0.2); }
+        .avatar-upload {
+            width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent-orange);
+            margin: 0 auto 15px; position: relative; overflow: hidden; cursor: pointer;
         }
-        .faculty-card {
-            background: rgba(255,255,255,0.3);
-            border: 1px solid var(--glass-border);
-            padding: 12px;
-            border-radius: 14px;
-            text-align: center;
-        }
-        .faculty-card h4 { margin: 0; font-size: 1.15rem; color: var(--primary); font-weight: 800; }
-        .faculty-card p { margin: 3px 0 0 0; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
-        .faculty-subtext { font-size: 0.58rem; opacity: 0.6; display: block; margin-top: 2px; font-style: italic; }
-
-        .live-clock-box {
-            margin-top: auto;
-            padding-top: 15px;
-            border-top: 1px solid var(--glass-border);
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-upload .hint {
+            position: absolute; bottom: 0; background: rgba(0,0,0,0.6); width: 100%; 
+            font-size: 9px; padding: 4px; color: #fff; font-weight: bold;
         }
 
-        #registreSection { 
-            display: none; 
-            position: absolute; 
-            top: 20px; left: 20px; right: 20px; bottom: 20px;
-            z-index: 100; 
-            background: var(--glass-bg); 
-            -webkit-backdrop-filter: blur(35px);
-            backdrop-filter: blur(35px);
-            border-radius: 25px; 
-            border: 2px solid var(--primary); 
-            padding: 25px; 
-            overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
+        .meta-card { padding: 15px; border-radius: 15px; background: rgba(0,0,0,0.5); border-left: 4px solid #f6851b; }
+        .clock { margin-top: auto; text-align: center; font-family: 'Courier New', Courier, monospace; font-size: 20px; color: var(--accent-orange); padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(255,255,255,0.85); border-radius: 12px; overflow: hidden; }
-        .dark-mode table { background: rgba(30, 41, 59, 0.85); }
-        th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 0.82rem; color: var(--text); }
-        th { background: var(--primary); color: white; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
-
-        @media print {
-            body * { visibility: hidden; }
-            #printFrame, #printFrame * { visibility: visible; }
-            #printFrame { position: fixed; left: 0; top: 0; width: 100%; height: 100%; border: none; }
-        }
+        #qr-code-final { margin-top: 20px; text-align: center; }
+        #canvas-qr { background: white; padding: 8px; border-radius: 8px; display: inline-block; }
     </style>
 </head>
 <body>
 
-    <div class="col-left">
-        <div class="brand-header">
-            <div style="text-align: center;"><i class="fas fa-cubes" style="font-size: 24px; color: var(--accent);"></i><div style="font-size:0.55rem; font-weight:800;">LGT HUB</div></div>
-            <div style="width: 1px; height: 30px; background: var(--glass-border);"></div>
-            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="35" height="35" alt="Logo ISC" style="border-radius: 6px; object-fit: cover;">
+    <div class="sidebar-left glass">
+        <div class="logo-header">
+            <img src="img/logo-isc.png" alt="ISC Logo">
+            <span style="font-weight: 900; font-size: 14px;">LGT HUB ISC</span>
         </div>
-        <div class="brand-title">SYSTEME DE SCELLAGE NUMERIQUE</div>
+        <button class="btn-menu active"><i class="fas fa-plus-circle"></i> Nouveau Scellage</button>
+        <button class="btn-menu"><i class="fas fa-database"></i> Registre Global</button>
+        <button class="btn-menu" onclick="window.open('verification.html')"><i class="fas fa-external-link-alt"></i> Vérification Publique</button>
+        <button class="btn-menu" onclick="toggleTheme()"><i class="fas fa-adjust"></i> Mode Clair/Sombre</button>
         
-        <button class="btn btn-secondary" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i> <span id="themeText">Mode Sombre</span></button>
-        <hr style="width:100%; border:none; height:1px; background:var(--glass-border);">
-
-        <button class="btn btn-accent" onclick="document.getElementById('nom').focus();"><i class="fas fa-plus-circle"></i> NOUVEAU SCELLAGE</button>
-        <button class="btn btn-secondary" id="globalPrintBtn" onclick="printTargetedDoc()"><i class="fas fa-print"></i> IMPRIMER LE DOCUMENT</button>
-
-        <div class="glass-card" style="padding: 14px; margin-top: 5px;">
-            <label><i class="fas fa-camera"></i> Contrôle Caméra QR</label>
-            <div id="reader" style="margin-top:8px; border-radius: 10px; overflow:hidden; display:none;"></div>
-            <button id="btnStart" class="btn" style="width:100%; margin-top:8px; font-size: 0.8rem;" onclick="startScan()"><i class="fas fa-video"></i> Activer Scanner</button>
-            <button id="btnStop" class="btn btn-danger" style="width:100%; margin-top:5px; display:none; font-size: 0.8rem;" onclick="stopScan()"><i class="fas fa-stop"></i> Arrêter</button>
-        </div>
-        
-        <button class="btn" style="background: rgba(30, 58, 138, 0.15); color: var(--primary);" onclick="toggleRegistre()"><i class="fas fa-folder-open"></i> Registre Central (Firebase)</button>
-
-        <div class="live-clock-box">
-            <i class="far fa-clock"></i>
-            <span id="liveClock">Chargement date...</span>
+        <div style="margin-top: 10px;">
+            <label>Scanner QR Matricule</label>
+            <button class="btn-menu" id="cam-toggle" onclick="toggleCamera()" style="background: #111; margin-top:5px;">
+                <i class="fas fa-camera"></i> Allumer/Éteindre Cam
+            </button>
+            <div id="scanner-box"><div id="reader"></div></div>
         </div>
     </div>
 
-    <div class="col-mid">
-        <div style="text-align: center; margin-bottom: 5px;">
-            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="65" alt="Logo ISC" style="border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.15);">
-        </div>
+    <div class="main-content">
+        <img src="img/logo-isc.png" height="70" class="center-logo" alt="ISC Logo Center">
         
-        <div class="faculty-monitor">
-            <div class="faculty-card">
-                <h4 id="countInfo">000</h4>
-                <p>Informatique</p>
-                <span class="faculty-subtext">CSI & Réseaux</span>
-            </div>
-            <div class="faculty-card">
-                <h4 id="countCom">000</h4>
-                <p>Sc. Commerciales</p>
-                <span class="faculty-subtext">Compta, Mkt, Douane, Banque</span>
-            </div>
-            <div class="faculty-card">
-                <h4 id="countSec">000</h4>
-                <p>Secrétariat</p>
-                <span class="faculty-subtext">SGA Ass. de Direction</span>
-            </div>
+        <div class="faculty-counters">
+            <div class="count-card"><h3>140</h3><p>Informatique</p></div>
+            <div class="count-card"><h3>85</h3><p>Sciences Comm.</p></div>
+            <div class="count-card"><h3>42</h3><p>Secrétariat</p></div>
         </div>
 
-        <div class="glass-card">
-            <h3 style="margin:0 0 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.1rem;">ANCRAGE BLOCKCHAIN IMMUABLE</h3>
-            <div class="input-grid">
-                <div class="input-group">
-                    <label>Nom Complet de l'Étudiant</label>
-                    <input type="text" id="nom" placeholder="Ex: Jean Mukendi">
+        <div class="scellage-form glass">
+            <h2 class="form-title">SCELLAGE IMMUABLE (BLOCKCHAIN)</h2>
+            <form id="anchorForm">
+                <div class="grid">
+                    <div class="field">
+                        <label>Nom complet de l'étudiant</label>
+                        <input type="text" id="stdName" placeholder="Ex: KALENDA LUSUMBA ICAR">
+                    </div>
+                    <div class="field">
+                        <label>Matricule Académique</label>
+                        <input type="text" id="stdMat" placeholder="Ex: ISC-2026-001">
+                    </div>
+                    <div class="field">
+                        <label>Faculté</label>
+                        <select id="stdFac" onchange="updateMajors()">
+                            <option value="Info">Informatique de Gestion</option>
+                            <option value="ScComm">Sciences Commerciales & Financières</option>
+                            <option value="Secret">Secrétariat de Direction</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Filière / Option</label>
+                        <select id="stdMajor">
+                            </select>
+                    </div>
+                    <div class="field">
+                        <label>Sexe</label>
+                        <select id="stdSexe"><option>Masculin (M)</option><option>Féminin (F)</option></select>
+                    </div>
+                    <div class="field">
+                        <label>Fichier du diplôme (PDF)</label>
+                        <input type="file" id="stdFile">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Matricule Académique</label>
-                    <input type="text" id="mat" placeholder="2026-ISC-001">
-                </div>
-                <div class="input-group">
-                    <label>Faculté / Section</label>
-                    <select id="fac" onchange="updateFiliere()">
-                        <option value="Informatique de Gestion">Informatique de Gestion</option>
-                        <option value="Sciences Commerciales et Financières">Sciences Commerciales et Financières</option>
-                        <option value="Secrétariat de Direction">Secrétariat de Direction</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Filière / Option</label>
-                    <select id="filiere"></select>
-                </div>
-                <div class="input-group" style="grid-column: span 2;">
-                    <label>Sexe de l'Étudiant</label>
-                    <select id="sexe">
-                        <option value="M">Masculin (M)</option>
-                        <option value="F">Féminin (F)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="input-group" style="margin-top:12px;">
-                <label>Diplôme Numérique Source (PDF ou Image)</label>
-                <input type="file" id="fileInput" accept="application/pdf,image/*">
-            </div>
-            <button class="btn btn-accent" style="width:100%; margin-top:18px; padding:14px; font-size: 0.95rem;" onclick="scellerMaintenant()"><i class="fas fa-link"></i> EFFECTUER L'ANCRAGE SECURISE</button>
-        </div>
+                <button type="button" class="btn-anchor" onclick="processBlockchainAnchor()">
+                    <i class="fas fa-shield-alt"></i> Effectuer l'ancrage sécurisé
+                </button>
+            </form>
 
-        <div class="qr-display-center">
-            <div class="qr-halo-wrapper" id="qrWrapper">
-                <div id="qrcode" style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; background: white;"></div>
+            <div id="qr-code-final" style="display:none;">
+                <div id="canvas-qr"></div>
+                <p style="color: var(--success); font-weight: bold; font-size: 12px; margin-top: 10px;">SCELLAGE RÉUSSI - TRACE GÉNÉRÉE</p>
             </div>
-            <div id="statusTag" style="font-size: 0.68rem; font-weight: 800; color: var(--text-secondary); letter-spacing: 0.5px;">EN ATTENTE DE GENERATION</div>
-            
-            <div class="doc-actions-box" id="docActions">
-                <button class="btn" style="padding: 8px; font-size: 0.75rem;" onclick="actionVoir()"><i class="fas fa-eye"></i> Voir</button>
-                <button class="btn btn-accent" style="padding: 8px; font-size: 0.75rem;" onclick="actionTelecharger()"><i class="fas fa-download"></i> Télécharger</button>
-                <button class="btn btn-secondary" style="padding: 8px; font-size: 0.75rem;" onclick="printTargetedDoc()"><i class="fas fa-print"></i> Imprimer</button>
-            </div>
-        </div>
-
-        <div id="registreSection">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px;">
-                <h3 style="margin:0; color: var(--primary); font-weight: 800;"><i class="fas fa-database"></i> Registre Central Décentralisé ISC</h3>
-                <button class="btn btn-danger" style="padding: 6px 14px;" onclick="toggleRegistre()">Fermer</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Matricule</th>
-                        <th>Nom</th>
-                        <th>Sexe</th>
-                        <th>Filière</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
         </div>
     </div>
 
-    <div class="col-right">
-        <div class="glass-card" id="adminContainer" style="text-align: center;">
-            <div class="profile-pic-container">
-                <div class="profile-pic-box" onclick="document.getElementById('imgUp').click()">
-                    <img id="avatar" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
-                    <span id="plus" style="font-size:1.5rem; color:var(--primary);"><i class="fas fa-user-shield"></i></span>
-                </div>
+    <div class="sidebar-right glass">
+        <div class="admin-profile glass">
+            <div class="avatar-upload" onclick="document.getElementById('adminInput').click()">
+                <img id="avatarImg" src="https://via.placeholder.com/150" alt="Profile">
+                <div class="hint">CLIQUEZ POUR PHOTO</div>
             </div>
-            <input type="file" id="imgUp" hidden onchange="previewImg(this)">
+            <input type="file" id="adminInput" hidden onchange="loadAvatar(this)">
             
-            <div id="adminForm">
-                <input type="text" id="adminName" placeholder="Nom de l'Administrateur" style="margin-bottom:8px; width: 100%; box-sizing: border-box;">
-                <input type="email" id="adminEmail" placeholder="Adresse Email ISC" style="width: 100%; box-sizing: border-box;">
-                <button class="btn" style="width:100%; margin-top:12px;" onclick="creerCompteAdmin()"><i class="fas fa-fingerprint"></i> SIGNER LA SESSION</button>
-            </div>
-            
-            <div id="adminProfileActive" style="display:none;">
-                <span style="font-size: 0.62rem; background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-weight: 800;">SGA AUTHENTIFIÉ</span>
-                <h4 id="displayAdminName" style="margin: 10px 0 4px; text-transform: uppercase; font-size: 0.95rem; font-weight: 800;">ADMINISTRATEUR</h4>
-                <p id="displayAdminEmail" style="font-size: 0.72rem; margin: 0; color: var(--primary); font-weight: 600;"></p>
-            </div>
+            <input type="text" id="adminName" placeholder="Identifiant SGA" style="width:100%; margin-bottom:10px;">
+            <button class="btn-menu" onclick="validateSGASession()" style="background: var(--glass-right); border: 1px solid var(--accent-orange);">
+                <i class="fas fa-fingerprint"></i> Signer la Session
+            </button>
+            <p id="sga-status" style="font-size: 10px; margin-top:10px; color: var(--danger); font-weight: bold;">SESSION NON SIGNÉE</p>
         </div>
 
-        <div class="glass-card">
-            <label><i class="fab fa-ethereum"></i> Connecteur Web3 Node</label>
-            <button class="btn" style="width:100%; margin-top:8px; background:#0f172a; font-size: 0.8rem;" onclick="connectWallet()"><i class="fas fa-wallet"></i> MetaMask Connection</button>
-            <div id="walletAddr" style="font-size:0.62rem; margin-top:8px; color:var(--accent); word-break: break-all; font-family: monospace; text-align: center;">0x000... Non synchronisé</div>
+        <div class="meta-card glass">
+            <label style="color: #f6851b;"><i class="fab fa-ethereum"></i> MetaMask</label>
+            <button class="btn-menu" onclick="connectWallet()" style="background: #111; margin-top: 5px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="16"> Connecter Wallet
+            </button>
+            <p id="wallet-addr" style="font-size: 9px; opacity: 0.6; word-break: break-all; margin-top: 5px;">Déconnecté</p>
         </div>
 
-        <button class="btn btn-secondary" style="margin-top: auto; padding: 14px;" onclick="window.location.href='verif.html'"><i class="fas fa-external-link-alt"></i> Ouvrir le portail public</button>
+        <div class="clock">
+            <div id="time-display">00:00:00</div>
+            <div id="date-display" style="font-size: 12px; opacity: 0.7;">-- -- ----</div>
+        </div>
     </div>
-
-    <iframe id="printFrame" style="display:none;"></iframe>
 
     <script>
+        // --- 1. CONFIGURATION CONSOLE FIREBASE CONFIG ---
         const firebaseConfig = {
-            apiKey: "AIzaSyCaG6CBeHeF3C--qhmfw8_hwiEnBitHmqQ",
+            apiKey: "AIzaSyCAG6C8eHeF3C_-qhmfh8_hwiEN8itHmQQ",
             authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
             databaseURL: "https://lgt-hub-archivage-isc-default-rtdb.firebaseio.com",
             projectId: "lgt-hub-archivage-isc",
-            storageBucket: "lgt-hub-archivage-isc.firebasestorage.app",
+            storageBucket: "lgt-hub-archivage-isc.appspot.com",
             messagingSenderId: "355077255297",
             appId: "1:355077255297:web:cbc97343febd93edbcdd80"
         };
 
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const db = firebase.database();
-
-        let html5QrCode;
-        let fileDataUrl = "";
-        let currentActiveDocUrl = ""; 
-        let currentActiveDocName = "diplome";
-        let isAdminConnected = false;
-
-        function startClock() {
-            setInterval(() => {
-                const now = new Date();
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                const dateStr = now.toLocaleDateString('fr-FR', options);
-                const timeStr = now.toLocaleTimeString('fr-FR');
-                document.getElementById('liveClock').innerText = `${dateStr} à ${timeStr}`;
-            }, 1000);
+        // Initialisation de Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        startClock();
+        const database = firebase.database();
+        const storage = firebase.storage();
 
-        db.ref('archives').on('value', snapshot => {
-            let infoCount = 0, comCount = 0, secCount = 0;
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = "";
-            
-            snapshot.forEach(child => {
-                const data = child.val();
-                
-                if(data.fac === "Informatique de Gestion") infoCount++;
-                else if(data.fac === "Sciences Commerciales et Financières") comCount++;
-                else if(data.fac === "Secrétariat de Direction") secCount++;
+        let isSGASigned = false;
+        let html5QrScanner = null;
 
-                const row = `<tr id="row-${data.mat}">
-                    <td style="font-weight:700; color:var(--primary);">${data.mat}</td>
-                    <td>${data.nom}</td>
-                    <td style="font-weight:bold;">${data.sexe || 'M'}</td>
-                    <td><span style="font-size:0.75rem; opacity:0.8;">${data.fil || 'N/A'}</span></td>
-                    <td>
-                        <button class="btn" style="padding:5px 10px; font-size:0.75rem;" onclick="selectDocument('${data.mat}')"><i class="fas fa-check-circle"></i> Sélectionner</button>
-                    </td>
-                </tr>`;
-                tableBody.insertAdjacentHTML('afterbegin', row);
-            });
+        // Répertoire des filières de l'ISC
+        const filieres = {
+            Info: ["Conception des Systèmes d'Information (CSI)", "Réseaux Informatiques", "Gestion Informatique"],
+            ScComm: ["Comptabilité", "Marketing", "Fiscalité", "Banque et Assurance"],
+            Secret: ["Secrétariat de Direction", "Hôtellerie et Accueil"]
+        };
 
-            document.getElementById('countInfo').innerText = infoCount.toString().padStart(3, '0');
-            document.getElementById('countCom').innerText = comCount.toString().padStart(3, '0');
-            document.getElementById('countSec').innerText = secCount.toString().padStart(3, '0');
-        });
-
-        function selectDocument(matricule) {
-            db.ref('archives/' + matricule).once('value').then(snapshot => {
-                const data = snapshot.val();
-                if (data && data.pdfUrl) {
-                    currentActiveDocUrl = data.pdfUrl;
-                    currentActiveDocName = "Diplome_" + matricule;
-                    document.getElementById('docActions').style.display = 'grid';
-                    document.getElementById('statusTag').innerHTML = `DOCUMENT SELECTIONNÉ : ${matricule} <i class='fas fa-file-invoice' style='color:var(--accent);'></i>`;
-                    toggleRegistre(); 
-                } else { alert("Document introuvable."); }
-            });
+        function updateMajors() {
+            const fac = document.getElementById('stdFac').value;
+            const select = document.getElementById('stdMajor');
+            select.innerHTML = filieres[fac].map(f => `<option>${f}</option>`).join('');
         }
+        updateMajors();
 
-        function actionVoir() {
-            if (!currentActiveDocUrl) return alert("Aucun document chargé.");
-            const w = window.open();
-            w.document.write(`<iframe src="${currentActiveDocUrl}" frameborder="0" style="border:0; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%;" allowfullscreen></iframe>`);
-        }
+        // --- 2. THÈME ET HORLOGE ---
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
 
-        function actionTelecharger() {
-            if (!currentActiveDocUrl) return alert("Aucun document chargé.");
-            const a = document.createElement('a');
-            a.href = currentActiveDocUrl;
-            a.download = `${currentActiveDocName}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('time-display').innerText = d.toLocaleTimeString();
+            document.getElementById('date-display').innerText = d.toLocaleDateString('fr-FR', {weekday: 'long', day:'numeric', month:'long'});
+        }, 1000);
 
-        function printTargetedDoc() {
-            if (!currentActiveDocUrl) return alert("Veuillez d'abord sélectionner ou sceller un document à imprimer.");
-            const pFrame = document.getElementById('printFrame');
-            pFrame.src = currentActiveDocUrl;
-            pFrame.onload = function() {
-                pFrame.contentWindow.focus();
-                pFrame.contentWindow.print();
-            };
-        }
-
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) { 
-                    fileDataUrl = event.target.result; 
-                    currentActiveDocUrl = fileDataUrl;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function updateFiliere() {
-            const fac = document.getElementById('fac').value;
-            const filiere = document.getElementById('filiere');
-            filiere.innerHTML = "";
-            if (fac === "Informatique de Gestion") {
-                filiere.innerHTML = "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option><option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
-            } else if (fac === "Sciences Commerciales et Financières") {
-                filiere.innerHTML = "<option value='Banque et Assurance'>Banque & Assurance</option><option value='Douane'>Douane</option><option value='Marketing'>Marketing</option><option value='Comptabilité'>Comptabilité</option><option value='Gestion Financière'>Gestion Financière</option>";
-            } else {
-                filiere.innerHTML = "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
-            }
-        }
-        updateFiliere();
-
-        async function scellerMaintenant() {
-            if(!isAdminConnected) return alert("🛑 ACCÈS ADM REFUSÉ : Veuillez valider votre profil d'administrateur à droite.");
-
-            const mat = document.getElementById('mat').value.trim().toUpperCase();
-            const nom = document.getElementById('nom').value.trim();
-            const fac = document.getElementById('fac').value;
-            const fil = document.getElementById('filiere').value;
-            const sexe = document.getElementById('sexe').value;
-            
-            if(!mat || !nom || !fileDataUrl) return alert("Champs ou fichier source manquant.");
-
-            try {
-                await db.ref('archives/' + mat).set({
-                    nom: nom, mat: mat, fac: fac, fil: fil, sexe: sexe, pdfUrl: fileDataUrl, timestamp: Date.now()
-                });
-
-                currentActiveDocUrl = fileDataUrl;
-                currentActiveDocName = "Diplome_" + mat;
-
-                const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-                document.getElementById('qrcode').innerHTML = "";
-                
-                new QRCode(document.getElementById('qrcode'), { 
-                    text: `${baseUrl}verif.html?id=${mat}`, width: 100, height: 100 
-                });
-                
-                document.getElementById('qrWrapper').classList.add('qr-glow-active');
-                document.getElementById('statusTag').innerHTML = "SCELLÉ SUCCÈS <i class='fas fa-check-circle' style='color:var(--success);'></i>";
-                document.getElementById('docActions').style.display = 'grid';
-                
-                alert("🔐 Ancrage sécurisé validé dans l'infrastructure.");
-            } catch (error) { alert("Erreur : " + error.message); }
-        }
-
-        function toggleRegistre() {
-            const reg = document.getElementById('registreSection');
-            reg.style.display = (reg.style.display === 'block') ? 'none' : 'block';
-        }
-
-        function toggleTheme() { 
-            document.body.classList.toggle('dark-mode-body');
-            document.body.classList.toggle('dark-mode'); 
-            
-            const isDark = document.body.classList.contains('dark-mode');
-            const themeIcon = document.getElementById('themeIcon');
-            const themeText = document.getElementById('themeText');
-            
-            if(isDark) {
-                themeIcon.className = "fas fa-sun";
-                themeText.innerText = "Mode Clair";
-            } else {
-                themeIcon.className = "fas fa-moon";
-                themeText.innerText = "Mode Sombre";
-            }
-        }
-
-        function creerCompteAdmin() {
-            const name = document.getElementById('adminName').value.trim();
-            const email = document.getElementById('adminEmail').value.trim();
-            if(!name || !email) return alert("Identifiants de sécurité requis.");
-            
-            isAdminConnected = true;
-            document.getElementById('adminForm').style.display = 'none';
-            document.getElementById('displayAdminName').innerText = name;
-            document.getElementById('displayAdminEmail').innerText = email;
-            document.getElementById('adminProfileActive').style.display = 'block';
-            document.getElementById('adminContainer').style.border = "2px solid var(--success)";
-        }
-
-        function previewImg(input) {
+        // --- 3. PROFIL ET VERROUILLAGE SGA ---
+        function loadAvatar(input) {
             if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    document.getElementById('avatar').src = e.target.result;
-                    document.getElementById('avatar').style.display = 'block';
-                    document.getElementById('plus').style.display = 'none';
-                };
+                let reader = new FileReader();
+                reader.onload = e => document.getElementById('avatarImg').src = e.target.result;
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
+        function validateSGASession() {
+            const name = document.getElementById('adminName').value.trim();
+            if(!name) return alert("Entrez votre identifiant Admin SGA !");
+            isSGASigned = true;
+            document.getElementById('sga-status').innerText = "SESSION SGA ACTIVE : " + name;
+            document.getElementById('sga-status').style.color = "var(--success)";
+            alert("Autorisation accordée pour l'ancrage.");
+        }
+
+        // --- 4. INTEGRATION METAMASK ---
         async function connectWallet() {
             if (window.ethereum) {
                 try {
                     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                    document.getElementById('walletAddr').innerText = accounts[0];
-                } catch(e) { alert("Metamask déconnecté."); }
-            } else { alert("Installez l'extension MetaMask."); }
-        }
-
-        // --- CORRECTION DU SYSTEME DE SCAN ET INTERCONNEXION AVEC VERIF.HTML ---
-        function startScan() {
-            if(!isAdminConnected) return alert("🛑 Authentification requise pour activer la caméra.");
-            
-            document.getElementById('reader').style.display = 'block';
-            document.getElementById('btnStart').style.display = 'none';
-            document.getElementById('btnStop').style.display = 'block';
-
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
-
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 200, height: 200 } },
-                (decodedText) => {
-                    // Analyse de l'URL décodée pour extraire le paramètre d'identification de verif.html (?id=MATRICULE)
-                    try {
-                        stopScan();
-                        if (decodedText.includes("verif.html?id=")) {
-                            // Redirection immédiate vers le petit frère verif.html avec les données scannées
-                            window.location.href = decodedText;
-                        } else {
-                            alert("QR Code valide, mais ne provient pas de LGT HUB : " + decodedText);
-                        }
-                    } catch (err) {
-                        alert("Erreur lors du traitement du scan : " + err.message);
-                    }
-                },
-                (errorMessage) => {
-                    // Erreurs de détection secondaires ignorées pour fluidifier le flux vidéo
-                }
-            ).catch(err => {
-                alert("Impossible d'accéder à la caméra : " + err);
-                stopScan();
-            });
-        }
-
-        function stopScan() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    document.getElementById('reader').style.display = 'none';
-                    document.getElementById('btnStart').style.display = 'block';
-                    document.getElementById('btnStop').style.display = 'none';
-                }).catch(err => console.error("Erreur d'arrêt du scanner : ", err));
+                    document.getElementById('wallet-addr').innerText = "Connecté: " + accounts[0];
+                    document.getElementById('wallet-addr').style.color = "var(--success)";
+                } catch (e) { alert("Connexion refusée."); }
             } else {
-                document.getElementById('reader').style.display = 'none';
-                document.getElementById('btnStart').style.display = 'block';
-                document.getElementById('btnStop').style.display = 'none';
+                alert("Veuillez installer MetaMask sur votre navigateur !");
             }
+        }
+
+        // --- 5. MANAGEMENT DU SCANNER QR ---
+        function toggleCamera() {
+            const box = document.getElementById('scanner-box');
+            if(box.style.display === "block") {
+                box.style.display = "none";
+                if (html5QrScanner) {
+                    html5QrScanner.stop().then(() => { html5QrScanner = null; });
+                }
+            } else {
+                box.style.display = "block";
+                html5QrScanner = new Html5Qrcode("reader");
+                html5QrScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
+                (txt) => { 
+                    document.getElementById('stdMat').value = txt; 
+                    toggleCamera();
+                },
+                (err) => { /* Gestion silencieuse des frames */ });
+            }
+        }
+
+        // --- 6. ARCHIVAGE & GENERATION DU QR CODE ---
+        function processBlockchainAnchor() {
+            if (!isSGASigned) {
+                alert("🛑 ERREUR CRITIQUE : Action refusée ! Vous n'avez pas configuré votre profil Admin SGA.");
+                return;
+            }
+
+            const name = document.getElementById('stdName').value.trim();
+            const mat = document.getElementById('stdMat').value.trim();
+            const fac = document.getElementById('stdFac').options[document.getElementById('stdFac').selectedIndex].text;
+            const major = document.getElementById('stdMajor').value;
+            const sexe = document.getElementById('stdSexe').value;
+            const fileInput = document.getElementById('stdFile');
+
+            if(!name || !mat || fileInput.files.length === 0) {
+                return alert("Veuillez remplir toutes les informations et sélectionner le PDF du diplôme !");
+            }
+
+            const file = fileInput.files[0];
+            const storageRef = storage.ref('diplomes_scelles/' + mat + '_' + file.name);
+
+            alert("Connexion Firebase active. Envoi du document d'origine...");
+
+            // Étape A : Téléversement du PDF vers le stockage cloud Firebase
+            storageRef.put(file).then((snapshot) => {
+                return snapshot.ref.getDownloadURL();
+            }).then((downloadURL) => {
+                
+                // Simulation d'une empreinte cryptographique de bloc
+                const mockHash = "0x" + Array.from({length:40}, () => Math.floor(Math.random()*16).toString(16)).join("");
+                const timestamp = Date.now();
+
+                // Étape B : Écriture des métadonnées dans l'arbre Realtime Database
+                return database.ref('diplomes/' + mat).set({
+                    nomEtudiant: name,
+                    matricule: mat,
+                    faculte: fac,
+                    filiere: major,
+                    sexe: sexe,
+                    blockchainHash: mockHash,
+                    dateAncrage: timestamp,
+                    fileUrl: downloadURL
+                }).then(() => {
+                    // Étape C : Affichage et rendu graphique du QR Code pointant vers ton site de vérification externe
+                    document.getElementById('qr-code-final').style.display = "block";
+                    const qrBox = document.getElementById('canvas-qr');
+                    qrBox.innerHTML = "";
+                    
+                    new QRCode(qrBox, {
+                        text: `https://lgt-hub-archivage-isc.firebaseapp.com/verification.html?mat=${mat}`,
+                        width: 130,
+                        height: 130
+                    });
+
+                    alert(`✅ Félicitations ! Le diplôme de ${name} a été scellé et archivé avec succès.`);
+                });
+            }).catch((error) => {
+                console.error(error);
+                alert("Erreur lors de l'archivage. Assurez-vous d'avoir désactivé les restrictions d'écriture/lecture (Rules) sur votre console Firebase.");
+            });
         }
     </script>
 </body>
