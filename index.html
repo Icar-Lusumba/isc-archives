@@ -545,4 +545,111 @@
             const fac = document.getElementById('fac').value;
             const filiere = document.getElementById('filiere');
             filiere.innerHTML = "";
-            if (fac ===
+            if (fac === "Informatique de Gestion") {
+                filiere.innerHTML = "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option><option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
+            } else if (fac === "Sciences Commerciales et Financières") {
+                filiere.innerHTML = "<option value='Banque et Assurance'>Banque & Assurance</option><option value='Douane'>Douane</option><option value='Marketing'>Marketing</option><option value='Comptabilité'>Comptabilité</option><option value='Gestion Financière'>Gestion Financière</option>";
+            } else {
+                filiere.innerHTML = "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
+            }
+        }
+        updateFiliere();
+
+        async function scellerMaintenant() {
+            if(!isAdminConnected) return alert("🛑 ACCÈS ADM REFUSÉ : Veuillez valider votre profil d'administrateur à droite.");
+
+            const mat = document.getElementById('mat').value.trim().toUpperCase();
+            const nom = document.getElementById('nom').value.trim();
+            const fac = document.getElementById('fac').value;
+            const fil = document.getElementById('filiere').value;
+            const sexe = document.getElementById('sexe').value;
+            
+            if(!mat || !nom || !fileDataUrl) return alert("Champs ou fichier source manquant.");
+
+            try {
+                await db.ref('archives/' + mat).set({
+                    nom: nom, mat: mat, fac: fac, fil: fil, sexe: sexe, pdfUrl: fileDataUrl, timestamp: Date.now()
+                });
+
+                currentActiveDocUrl = fileDataUrl;
+                currentActiveDocName = "Diplome_" + mat;
+
+                const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+                document.getElementById('qrcode').innerHTML = "";
+                
+                new QRCode(document.getElementById('qrcode'), { 
+                    text: `${baseUrl}verif.html?id=${mat}`, width: 100, height: 100 
+                });
+                
+                document.getElementById('qrWrapper').classList.add('qr-glow-active');
+                document.getElementById('statusTag').innerHTML = "SCELLÉ SUCCÈS <i class='fas fa-check-circle' style='color:var(--success);'></i>";
+                document.getElementById('docActions').style.display = 'grid';
+                
+                alert("🔐 Ancrage sécurisé validé dans l'infrastructure.");
+            } catch (error) { alert("Erreur : " + error.message); }
+        }
+
+        function toggleRegistre() {
+            const reg = document.getElementById('registreSection');
+            reg.style.display = (reg.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function toggleTheme() { 
+            document.body.classList.toggle('dark-mode-body');
+            document.body.classList.toggle('dark-mode'); 
+            
+            const isDark = document.body.classList.contains('dark-mode');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            if(isDark) {
+                themeIcon.className = "fas fa-sun";
+                themeText.innerText = "Mode Clair";
+            } else {
+                themeIcon.className = "fas fa-moon";
+                themeText.innerText = "Mode Sombre";
+            }
+        }
+
+        function creerCompteAdmin() {
+            const name = document.getElementById('adminName').value.trim();
+            const email = document.getElementById('adminEmail').value.trim();
+            if(!name || !email) return alert("Identifiants de sécurité requis.");
+            
+            isAdminConnected = true;
+            document.getElementById('adminForm').style.display = 'none';
+            document.getElementById('displayAdminName').innerText = name;
+            document.getElementById('displayAdminEmail').innerText = email;
+            document.getElementById('adminProfileActive').style.display = 'block';
+            document.getElementById('adminContainer').style.border = "2px solid var(--success)";
+        }
+
+        function previewImg(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('avatar').src = e.target.result;
+                    document.getElementById('avatar').style.display = 'block';
+                    document.getElementById('plus').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    document.getElementById('walletAddr').innerText = accounts[0];
+                } catch(e) { alert("Metamask déconnecté."); }
+            } else { alert("Installez l'extension MetaMask."); }
+        }
+
+        function startScan() {
+            if(!isAdminConnected) return alert("🛑 Authentification requise pour activer la caméra.");
+            document.getElementById('reader').style.display = 'block';
+            // Ajout ici de l'initialisation de html5QrCode si nécessaire
+        }
+    </script>
+</body>
+</html>
