@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vérification Publique - Blockchain ISC</title>
+    <title>Portail Public de Vérification - Blockchain ISC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Code CSS original de ton portail de vérification */
         * {
             margin: 0;
             padding: 0;
@@ -15,8 +14,7 @@
         }
 
         body {
-            /* Utilisation de ton image de fond webp comme vu dans tes dossiers */
-            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), url('assets/img/fond.webp');
+            background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), url('assets/img/fond.webp');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -29,46 +27,55 @@
         }
 
         .verification-container {
-            background-color: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(8px);
+            background-color: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
             border: 1px solid #334155;
             padding: 40px;
             border-radius: 16px;
             width: 100%;
-            max-width: 550px;
-            text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            max-width: 650px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
+        /* Section Logo Institutionnel */
         .logo-section {
+            text-align: center;
             margin-bottom: 25px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 20px;
         }
 
         .logo-section img {
-            width: 80px;
+            width: 90px;
             height: auto;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .logo-section h2 {
             font-size: 24px;
             color: #f8fafc;
+            font-weight: 700;
         }
 
         .logo-section p {
             color: #38bdf8;
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             margin-top: 5px;
         }
 
-        .search-box {
-            margin-top: 30px;
-            position: relative;
+        /* Zone de recherche et Scanner QR */
+        .search-container {
+            margin-top: 20px;
         }
 
-        .search-box input {
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
             width: 100%;
             padding: 16px 20px;
             padding-left: 50px;
@@ -78,14 +85,15 @@
             color: #f8fafc;
             font-size: 16px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
-        .search-box input:focus {
+        .input-group input:focus {
             border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
         }
 
-        .search-box i {
+        .input-group i {
             position: absolute;
             left: 20px;
             top: 50%;
@@ -94,7 +102,36 @@
             font-size: 18px;
         }
 
-        .verify-btn {
+        /* Simulation Scanner QR Code pour la démo */
+        .qr-scanner-box {
+            background-color: #0f172a;
+            border: 2px dashed #334155;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .qr-scanner-box:hover {
+            border-color: #38bdf8;
+            background-color: rgba(15, 23, 42, 0.6);
+        }
+
+        .qr-scanner-box i {
+            font-size: 40px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .qr-scanner-box.scanning i {
+            color: #38bdf8;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Boutons principaux */
+        .btn-verify {
             width: 100%;
             background-color: #38bdf8;
             color: #0f172a;
@@ -103,7 +140,6 @@
             border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
-            margin-top: 20px;
             cursor: pointer;
             transition: background-color 0.3s;
             display: flex;
@@ -112,14 +148,88 @@
             gap: 10px;
         }
 
-        .verify-btn:hover {
+        .btn-verify:hover {
             background-color: #0ea5e9;
         }
 
+        /* Bloc des résultats Blockchain (masqué par défaut, s'affiche après recherche) */
+        .result-card {
+            display: none; /* Changé via JS lors de la démo */
+            background-color: #0f172a;
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+            text-align: left;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .result-details {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .result-details strong {
+            color: #f8fafc;
+        }
+
+        /* Grille des boutons d'action (Télécharger, Imprimer, Voir) */
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .btn-action {
+            background-color: #334155;
+            color: #f8fafc;
+            padding: 12px;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            background-color: #475569;
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
         .footer-text {
-            margin-top: 35px;
+            margin-top: 30px;
+            text-align: center;
             color: #64748b;
             font-size: 12px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -127,28 +237,109 @@
 
     <div class="verification-container">
         <div class="logo-section">
-            <img src="assets/img/logo-isc.webp" alt="Logo ISC">
-            <h2>Portail de Vérification Public</h2>
-            <p>Institut Supérieur de Commerce</p>
+            <img src="assets/img/logo-isc.webp" alt="Logo Officiel ISC">
+            <h2>Portail Public de Vérification</h2>
+            <p>Institut Supérieur de Commerce - Lubumbashi</p>
         </div>
 
-        <p style="color: #94a3b8; font-size: 15px; line-height: 1.6;">
-            Entrez l'identifiant unique ou l'adresse de hachage Blockchain du diplôme pour vérifier instantanément sa validité.
-        </p>
+        <div class="search-container">
+            <p style="color: #94a3b8; font-size: 14px; text-align: center; margin-bottom: 20px;">
+                Scannez le QR Code du diplôme ou saisissez manuellement le matricule de l'étudiant pour interroger le registre Blockchain.
+            </p>
 
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Ex: 0x71C... ou ID Diplôme">
+            <div class="qr-scanner-box" id="qrBox" onclick="simulerScan()">
+                <i class="fas fa-qrcode"></i>
+                <p id="qrText" style="font-size: 14px; color: #94a3b8;">Cliquez ici pour simuler le scan du QR Code</p>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" id="matriculeInput" placeholder="Saisir le matricule (Ex: ISC-2026-897)">
+            </div>
+
+            <button class="btn-verify" onclick="interrogerBlockchain()">
+                <i class="fas fa-link"></i> Interroger la Blockchain
+            </button>
         </div>
 
-        <button class="verify-btn">
-            <i class="fas fa-shield-check"></i> Vérifier l'authenticité
-        </button>
+        <div class="result-card" id="resultCard">
+            <div class="result-header">
+                <i class="fas fa-check-circle"></i> Authentification Blockchain Réussie
+            </div>
+            
+            <div class="result-details">
+                <p><strong>Étudiant :</strong> MUKENDI KABONGO Jean</p>
+                <p><strong>Option :</strong> Informatique de Gestion (IG)</p>
+                <p><strong>Grade :</strong> Licence</p>
+                <p><strong>Statut Blockchain :</strong> Scellé de manière permanente</p>
+                <p style="font-family: monospace; font-size: 11px; margin-top: 5px; color: #38bdf8;">
+                    <strong>Hash :</strong> 0x71c6291b7e15d7e5642e1281cb9f3f2256c1f034
+                </p>
+            </div>
+
+            <div class="action-buttons-grid">
+                <button class="btn-action" onclick="voirDocument()">
+                    <i class="fas fa-eye"></i> Voir le document
+                </button>
+                <button class="btn-action" onclick="telechargerDiplome()">
+                    <i class="fas fa-download"></i> Télécharger
+                </button>
+                <button class="btn-action" onclick="imprimerAttestation()">
+                    <i class="fas fa-print"></i> Imprimer
+                </button>
+            </div>
+        </div>
 
         <div class="footer-text">
-            <p>© 2025 ISC Lubumbashi - Système Sécurisé Blockchain</p>
+            <p>© 2026 ISC Lubumbashi - Système Intègre Blockchain d'Ancrage</p>
         </div>
     </div>
 
+    <script>
+        // Fonction pour simuler visuellement le scan QR Code
+        function simulerScan() {
+            const qrBox = document.getElementById('qrBox');
+            const qrText = document.getElementById('qrText');
+            const input = document.getElementById('matriculeInput');
+            
+            qrBox.classList.add('scanning');
+            qrText.innerText = "Lecture du QR Code en cours...";
+            
+            setTimeout(() => {
+                qrBox.classList.remove('scanning');
+                qrText.innerText = "QR Code détecté avec succès !";
+                input.value = "ISC-2026-897"; // Auto-complétion du matricule simulé
+            }, 1500);
+        }
+
+        // Fonction pour afficher le résultat blockchain complet
+        function interrogerBlockchain() {
+            const input = document.getElementById('matriculeInput').value;
+            const resultCard = document.getElementById('resultCard');
+            
+            if(input.trim() === "") {
+                alert("Veuillez saisir un matricule ou scanner un diplôme.");
+                return;
+            }
+            
+            // Affiche la carte des résultats et des actions
+            resultCard.style.display = "block";
+            resultCard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Logique des trois boutons d'action demandés
+        function voirDocument() {
+            alert("Ouverture du diplôme scellé original sous format sécurisé PDF...");
+            // Ici tu pourras lier vers l'ouverture de ton PDF de démonstration
+        }
+
+        function telechargerDiplome() {
+            alert("Téléchargement de la copie certifiée conforme par la Blockchain...");
+        }
+
+        function imprimerAttestation() {
+            window.print(); // Lance directement l'impression native Windows pour le jury
+        }
+    </script>
 </body>
 </html>
