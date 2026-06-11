@@ -3,449 +3,769 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB - Système de Scellage Numérique (Admin)</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>LGT HUB | Admin Blockchain ISC</title>
     
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-app: #b2d8d6; /* Fond bleuâtre/clair texturé de ta maquette */
-            --sidebar-bg: rgba(255, 255, 255, 0.45);
-            --card-bg: rgba(255, 255, 255, 0.75);
-            --text-main: #0c2340;
-            --text-muted: #4a5568;
-            --border-color: rgba(255, 255, 255, 0.5);
-            --accent-blue: #1e3a8a;
-            --accent-orange: #ff7a00;
-            --danger-red: #ef4444;
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            --primary: #1e3a8a;
+            --accent: #f6851b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-body: #f8fafc;
+            --bg-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070');
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --sidebar-bg: rgba(255, 255, 255, 0.35);
+            --shadow-glow: rgba(30, 58, 138, 0.08);
+            --qr-glow: transparent;
         }
 
-        /* Mode Sombre Variables (Inclus pour ton bouton) */
-        body.dark-mode {
-            --bg-app: #0f172a;
-            --sidebar-bg: rgba(15, 23, 42, 0.6);
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-blue: #3b82f6;
+        .dark-mode {
+            --primary: #3b82f6;
+            --accent: #f6851b;
+            --bg-body: #090d16;
+            --glass-bg: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --sidebar-bg: rgba(9, 13, 22, 0.7);
+            --shadow-glow: rgba(0, 0, 0, 0.5);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        
-        body { 
-            background: var(--bg-app); 
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 25%, transparent 25%), linear-gradient(225deg, rgba(255,255,255,0.1) 25%, transparent 25%);
-            background-size: 40px 40px;
-            color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: row; 
-            overflow-x: hidden; 
-            transition: all 0.3s ease;
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0; 
+            display: grid; 
+            height: 100vh;
+            grid-template-columns: 310px 1fr 340px;
+            background: linear-gradient(rgba(248, 250, 252, 0.35), rgba(248, 250, 252, 0.45)), var(--bg-image);
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: var(--text); 
+            transition: background 0.3s ease, color 0.3s ease;
+            overflow: hidden;
         }
 
-        /* --- COLONNE GAUCHE (SIDEBAR) --- */
-        .col-left { 
-            width: 280px; 
-            min-width: 280px; 
+        .dark-mode-body {
+            background: linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.92)), var(--bg-image) !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
+        }
+
+        .col-left, .col-right {
             background: var(--sidebar-bg); 
-            backdrop-filter: blur(12px); 
-            padding: 30px 20px; 
+            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+            padding: 24px; 
+            border-right: 1px solid var(--glass-border);
+            display: flex; 
+            flex-direction: column; 
+            gap: 18px;
+            z-index: 5;
+            box-shadow: 4px 0 24px var(--shadow-glow);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .col-right { border-right: none; border-left: 1px solid var(--glass-border); box-shadow: -4px 0 24px var(--shadow-glow); }
+
+        .col-mid { 
+            padding: 24px; 
+            overflow-y: auto; 
             display: flex; 
             flex-direction: column; 
             gap: 20px; 
-            border-right: 1px solid var(--border-color); 
+            position: relative;
+            align-items: center;
         }
-        .brand-box { text-align: center; margin-bottom: 10px; }
-        .brand-box img { width: 60px; margin-bottom: 10px; }
-        .sidebar-title { font-size: 1rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 15px; }
 
-        .btn-side { 
-            width: 100%; 
-            padding: 14px 16px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-color); 
-            background: var(--card-bg); 
-            color: var(--text-main); 
-            font-weight: bold; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            font-size: 0.9rem;
-            transition: all 0.2s;
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 5px;
         }
-        .btn-side:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow); }
-        .btn-side.active { background: var(--accent-blue); color: white; }
-        .btn-side.btn-orange { background: var(--accent-orange); color: white; border: none; }
-
-        /* --- COLONNE CENTRALE (PANNEAUX EXTENSIBLES) --- */
-        .col-center { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 25px; align-items: center; overflow-y: auto; }
         
-        .panel-block { 
-            width: 100%; 
-            max-width: 750px; 
-            background: var(--card-bg); 
-            backdrop-filter: blur(16px); 
-            border-radius: 20px; 
-            padding: 35px; 
-            border: 1px solid var(--border-color); 
-            box-shadow: var(--glass-shadow); 
-            display: none; /* Basculable par JS */
+        .brand-title {
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.8px;
         }
-        .panel-block.active { display: block; }
-        
-        .main-title { text-align: center; text-transform: uppercase; font-size: 1.2rem; margin-bottom: 25px; font-weight: 800; letter-spacing: 1px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
 
-        /* Formulaire */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; }
-        .form-group.full-width { grid-column: span 2; }
-        .form-group label { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; opacity: 0.9; }
+        .glass-card {
+            background: var(--glass-bg); 
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 18px; 
+            padding: 22px; 
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px var(--shadow-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 0.72rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
         
         input, select { 
-            width: 100%; padding: 12px 16px; 
-            background: rgba(255, 255, 255, 0.6); 
-            border: 1px solid rgba(0,0,0,0.15); 
-            border-radius: 8px; color: #000; 
-            font-size: 0.95rem; font-weight: 600; outline: none; 
+            padding: 11px 14px; 
+            border-radius: 10px; 
+            border: 1px solid rgba(0, 0, 0, 0.08); 
+            background: rgba(255,255,255,0.85); 
+            font-size: 0.85rem; 
+            color: #000; 
+            outline: none; 
+            font-weight: 600;
+            transition: all 0.2s;
         }
-        input:focus, select:focus { border-color: var(--accent-orange); background: #fff; }
-        
-        .file-drop-area { 
-            border: 2px dashed var(--accent-blue); padding: 20px; 
-            border-radius: 10px; text-align: center; background: rgba(255,255,255,0.4); 
-            cursor: pointer; position: relative;
+        .dark-mode input, .dark-mode select {
+            background: rgba(15, 23, 42, 0.8) !important; 
+            color: #fff !important; 
+            border: 1px solid rgba(255,255,255,0.15);
         }
-        .file-drop-area input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15); }
 
-        .btn-submit-anchor { 
-            background: var(--accent-blue); color: white; border: none; 
-            padding: 16px; border-radius: 8px; font-weight: bold; width: 100%; 
-            cursor: pointer; text-transform: uppercase; display: flex; align-items: center; 
-            justify-content: center; gap: 10px; font-size: 1rem; letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        .btn {
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px 16px;
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 700; 
+            transition: all 0.2s ease;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            font-size: 0.88rem;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30, 58, 138, 0.25); }
+        .btn-accent { background: var(--accent); }
+        .btn-accent:hover { box-shadow: 0 6px 20px rgba(246, 133, 27, 0.25); }
+        .btn-secondary { background: rgba(0,0,0,0.05); color: var(--text); border: 1px solid var(--glass-border); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { box-shadow: 0 6px 20px rgba(239, 68, 68, 0.25); }
+
+        .profile-pic-container {
+            position: relative;
+            width: 95px;
+            height: 95px;
+            margin: 0 auto 12px;
+        }
+        .profile-pic-box {
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            border: 3px solid var(--primary);
+            overflow: hidden; 
+            background: rgba(255,255,255,0.5); 
+            cursor: pointer;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 8px 20px var(--shadow-glow);
+            transition: transform 0.3s ease;
+        }
+        .profile-pic-box:hover { transform: scale(1.04); }
+
+        .qr-display-center {
+            margin-top: auto;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+        .qr-halo-wrapper {
+            background: white;
+            padding: 14px;
+            border-radius: 20px;
+            box-shadow: 0 0 0px var(--qr-glow), 0 10px 30px var(--shadow-glow);
+            transition: all 0.5s ease;
+            display: inline-block;
+        }
+        .qr-glow-active {
+            --qr-glow: rgba(16, 185, 129, 0.65);
+            box-shadow: 0 0 25px 6px var(--qr-glow), 0 10px 30px var(--shadow-glow) !important;
+            border: 2px solid var(--success);
         }
 
-        /* Tableau Registre Firebase */
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #000; font-size: 0.85rem; text-align: left; }
-        th { background: var(--accent-blue); color: white; padding: 12px; font-weight: bold; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 600; }
-        tr:nth-child(even) { background: #f8fafc; }
-        
-        .btn-table-select { background: #0c2340; color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; }
-
-        /* --- COLONNE DROITE (WEB3 / AUTH) --- */
-        .col-right { 
-            width: 320px; min-width: 320px; 
-            background: var(--sidebar-bg); backdrop-filter: blur(12px); 
-            padding: 30px 20px; display: flex; flex-direction: column; 
-            gap: 20px; border-left: 1px solid var(--border-color); 
+        .doc-actions-box {
+            display: none;
+            width: 100%;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-top: 5px;
         }
-        
-        .right-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--glass-shadow); }
-        .user-avatar { width: 60px; height: 60px; background: rgba(255,255,255,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.8rem; color: var(--accent-blue); border: 2px solid var(--accent-blue); }
-        
-        .btn-session { background: var(--accent-blue); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; cursor: pointer; }
-        
-        .web3-card { background: #1e293b; color: white; text-align: left; }
-        .btn-meta { background: #0f172a; color: white; border: 1px solid #334155; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-top: 12px; }
-        .status-node { font-size: 0.7rem; text-align: center; color: #f59e0b; margin-top: 6px; font-family: monospace; }
 
-        .btn-portal-link { background: none; border: 1px solid var(--text-main); color: var(--text-main); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; margin-top: auto; }
+        .faculty-monitor {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+        .faculty-card {
+            background: rgba(255,255,255,0.3);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+        }
+        .faculty-card h4 { margin: 0; font-size: 1.15rem; color: var(--primary); font-weight: 800; }
+        .faculty-card p { margin: 3px 0 0 0; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
+        .faculty-subtext { font-size: 0.58rem; opacity: 0.6; display: block; margin-top: 2px; font-style: italic; }
 
-        @media (max-width: 1100px) {
-            body { flex-direction: column; }
-            .col-left, .col-center, .col-right { width: 100%; min-width: 100%; border: none; }
-            .form-grid { grid-template-columns: 1fr; }
-            .form-group.full-width { grid-column: span 1; }
+        .live-clock-box {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #registreSection { 
+            display: none; 
+            position: absolute; 
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
+            z-index: 100; 
+            background: var(--glass-bg); 
+            -webkit-backdrop-filter: blur(35px);
+            backdrop-filter: blur(35px);
+            border-radius: 25px; 
+            border: 2px solid var(--primary); 
+            padding: 25px; 
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(255,255,255,0.85); border-radius: 12px; overflow: hidden; }
+        .dark-mode table { background: rgba(30, 41, 59, 0.85); }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 0.82rem; color: var(--text); }
+        th { background: var(--primary); color: white; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printFrame, #printFrame * { visibility: visible; }
+            #printFrame { position: fixed; left: 0; top: 0; width: 100%; height: 100%; border: none; }
         }
     </style>
 </head>
 <body>
 
     <div class="col-left">
-        <div class="brand-box">
-            <div style="font-size: 2.5rem; color: var(--accent-orange); margin-bottom: 5px;"><i class="fas fa-cubes"></i></div>
-            <div class="sidebar-title" style="margin-bottom: 2px;">LGT HUB</div>
+        <div class="brand-header">
+            <div style="text-align: center;"><i class="fas fa-cubes" style="font-size: 24px; color: var(--accent);"></i><div style="font-size:0.55rem; font-weight:800;">LGT HUB</div></div>
+            <div style="width: 1px; height: 30px; background: var(--glass-border);"></div>
+            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="35" height="35" alt="Logo ISC" style="border-radius: 6px; object-fit: cover;">
+        </div>
+        <div class="brand-title">SYSTEME DE SCELLAGE NUMERIQUE</div>
+        
+        <button class="btn btn-secondary" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i> <span id="themeText">Mode Sombre</span></button>
+        <hr style="width:100%; border:none; height:1px; background:var(--glass-border);">
+
+        <button class="btn btn-accent" onclick="document.getElementById('nom').focus();"><i class="fas fa-plus-circle"></i> NOUVEAU SCELLAGE</button>
+        <button class="btn btn-secondary" id="globalPrintBtn" onclick="printTargetedDoc()"><i class="fas fa-print"></i> IMPRIMER LE DOCUMENT</button>
+
+        <div class="glass-card" style="padding: 14px; margin-top: 5px;">
+            <label><i class="fas fa-camera"></i> Contrôle Caméra QR</label>
+            <div id="reader" style="margin-top:8px; border-radius: 10px; overflow:hidden; display:none;"></div>
+            <button id="btnStart" class="btn" style="width:100%; margin-top:8px; font-size: 0.8rem;" onclick="startScan()"><i class="fas fa-video"></i> Activer Scanner</button>
+            <button id="btnStop" class="btn btn-danger" style="width:100%; margin-top:5px; display:none; font-size: 0.8rem;" onclick="stopScan()"><i class="fas fa-stop"></i> Arrêter</button>
         </div>
         
-        <h4 style="font-size: 0.8rem; text-transform: uppercase; text-align: center; opacity: 0.7; margin-bottom: 10px;">Système de Scellage Numérique</h4>
-        
-        <button class="btn-side" onclick="toggleMode()"><i class="fas fa-moon"></i> Mode Sombre</button>
-        <button class="btn-side btn-orange" onclick="switchPanel('anchorPanel')"><i class="fas fa-plus-circle"></i> Nouveau Scellage</button>
-        <button class="btn-side" id="btnPrintDoc"><i class="fas fa-print"></i> Imprimer le Document</button>
-        <button class="btn-side" id="btnCameraQR"><i class="fas fa-camera"></i> Contrôle Caméra QR</button>
-        <button class="btn-side active" onclick="switchPanel('registryPanel')"><i class="fas fa-database"></i> Registre Central (Firebase)</button>
+        <button class="btn" style="background: rgba(30, 58, 138, 0.15); color: var(--primary);" onclick="toggleRegistre()"><i class="fas fa-folder-open"></i> Registre Central (Firebase)</button>
+
+        <div class="live-clock-box">
+            <i class="far fa-clock"></i>
+            <span id="liveClock">Chargement date...</span>
+        </div>
     </div>
 
-    <div class="col-center">
+    <div class="col-mid">
+        <div style="text-align: center; margin-bottom: 5px;">
+            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="65" alt="Logo ISC" style="border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.15);">
+        </div>
         
-        <div class="panel-block" id="anchorPanel">
-            <div class="main-title">Ancrage Blockchain Immuable</div>
-            
-            <form id="anchorForm" onsubmit="handleAnchorSubmit(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nom complet de l'étudiant</label>
-                        <input type="text" id="studentName" placeholder="Ex: MBUYA KITENGE HARDIE" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Matricule Académique</label>
-                        <input type="text" id="studentMatricule" placeholder="Ex: ISC-2026-03M" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Faculté / Section</label>
-                        <select id="studentFac">
-                            <option value="Informatique de Gestion">Informatique de Gestion</option>
-                            <option value="Sciences Commerciales et Financières">Sciences Commerciales et Financières</option>
-                            <option value="Secrétariat de Direction">Secrétariat de Direction</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Filière / Option</label>
-                        <input type="text" id="studentFil" placeholder="Ex: Conception des Systèmes / Banque et Assurance" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Sexe de l'étudiant</label>
-                        <select id="studentGender">
-                            <option value="Masculin (M)">Masculin (M)</option>
-                            <option value="Féminin (F)">Féminin (F)</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Diplôme Numérique Source (PDF ou IMAGE)</label>
-                        <div class="file-drop-area">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 1.8rem; margin-bottom: 5px; color: var(--accent-blue);"></i>
-                            <p id="fileLabel" style="font-size: 0.85rem; font-weight: bold;">Choisir un fichier (Aucun fichier n'a été sélectionné)</p>
-                            <input type="file" id="diplomaFile" onchange="updateFileLabel()" required>
-                        </div>
-                    </div>
+        <div class="faculty-monitor">
+            <div class="faculty-card">
+                <h4 id="countInfo">000</h4>
+                <p>Informatique</p>
+                <span class="faculty-subtext">CSI & Réseaux</span>
+            </div>
+            <div class="faculty-card">
+                <h4 id="countCom">000</h4>
+                <p>Sc. Commerciales</p>
+                <span class="faculty-subtext">Compta, Mkt, Douane, Banque</span>
+            </div>
+            <div class="faculty-card">
+                <h4 id="countSec">000</h4>
+                <p>Secrétariat</p>
+                <span class="faculty-subtext">SGA Ass. de Direction</span>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="margin:0 0 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.1rem;">ANCRAGE BLOCKCHAIN IMMUABLE</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Nom Complet de l'Étudiant</label>
+                    <input type="text" id="nom" placeholder="Ex: Jean Mukendi">
                 </div>
-                
-                <button type="submit" class="btn-submit-anchor">
-                    <i class="fas fa-link"></i> Effectuer l'ancrage sécurisé
-                </button>
-            </form>
+                <div class="input-group">
+                    <label>Matricule Académique</label>
+                    <input type="text" id="mat" placeholder="2026-ISC-001">
+                </div>
+                <div class="input-group">
+                    <label>Faculté / Section</label>
+                    <select id="fac" onchange="updateFiliere()">
+                        <option value="Informatique de Gestion">Informatique de Gestion</option>
+                        <option value="Sciences Commerciales et Financières">Sciences Commerciales et Financières</option>
+                        <option value="Secrétariat de Direction">Secrétariat de Direction</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Filière / Option</label>
+                    <select id="filiere"></select>
+                </div>
+                <div class="input-group" style="grid-column: span 2;">
+                    <label>Sexe de l'Étudiant</label>
+                    <select id="sexe">
+                        <option value="M">Masculin (M)</option>
+                        <option value="F">Féminin (F)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group" style="margin-top:12px;">
+                <label>Diplôme Numérique Source (PDF ou Image)</label>
+                <input type="file" id="fileInput" accept="application/pdf,image/*">
+            </div>
+            <button class="btn btn-accent" style="width:100%; margin-top:18px; padding:14px; font-size: 0.95rem;" onclick="scellerMaintenant()"><i class="fas fa-link"></i> EFFECTUER L'ANCRAGE SECURISE</button>
         </div>
 
-        <div class="panel-block active" id="registryPanel">
-            <div class="main-title" style="display: flex; justify-content: space-between; align-items: center;">
-                <span><i class="fas fa-server"></i> Registre Central Décentralisé ISC</span>
-                <button class="btn-table-select" style="background: var(--danger-red);" onclick="switchPanel('anchorPanel')">Fermer</button>
+        <div class="qr-display-center">
+            <div class="qr-halo-wrapper" id="qrWrapper">
+                <div id="qrcode" style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; background: white;"></div>
             </div>
+            <div id="statusTag" style="font-size: 0.68rem; font-weight: 800; color: var(--text-secondary); letter-spacing: 0.5px;">EN ATTENTE DE GENERATION</div>
             
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Matricule</th>
-                            <th>Nom</th>
-                            <th>Sexe</th>
-                            <th>Filière</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="registryTableBody">
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted);">Chargement du registre central...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="doc-actions-box" id="docActions">
+                <button class="btn" style="padding: 8px; font-size: 0.7rem;" onclick="actionVoir()"><i class="fas fa-eye"></i> Voir</button>
+                <button class="btn btn-accent" style="padding: 8px; font-size: 0.7rem;" onclick="actionTelecharger()"><i class="fas fa-download"></i> Télécharger</button>
+                <button class="btn btn-secondary" style="padding: 8px; font-size: 0.7rem;" onclick="printTargetedDoc()"><i class="fas fa-print"></i> Imprimer</button>
+                <button class="btn btn-danger" id="btnDeleteCurrent" style="padding: 8px; font-size: 0.7rem;" onclick="supprimerDiplomeSelectionne()"><i class="fas fa-trash-alt"></i> Supprimer</button>
             </div>
         </div>
 
+        <div id="registreSection">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px;">
+                <h3 style="margin:0; color: var(--primary); font-weight: 800;"><i class="fas fa-database"></i> Registre Central Décentralisé ISC</h3>
+                <button class="btn btn-danger" style="padding: 6px 14px;" onclick="toggleRegistre()">Fermer</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Matricule</th>
+                        <th>Nom</th>
+                        <th>Sexe</th>
+                        <th>Filière</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <div class="col-right">
-        <div class="right-card">
-            <div class="user-avatar"><i class="fas fa-user-shield"></i></div>
-            <h3 style="font-size: 1rem; font-weight: bold; margin-bottom: 2px;">ICAR LUSUMBA</h3>
-            <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">lusumbaicar@gmail.com</p>
-            
-            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-                <input type="text" placeholder="Nom de l'Administrateur" style="font-size: 0.8rem; padding: 8px 12px; background: #fff;">
-                <input type="email" placeholder="Adresse Email ISC" style="font-size: 0.8rem; padding: 8px 12px; background: #fff;">
+        <div class="glass-card" id="adminContainer" style="text-align: center;">
+            <div class="profile-pic-container">
+                <div class="profile-pic-box" onclick="document.getElementById('imgUp').click()">
+                    <img id="avatar" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                    <span id="plus" style="font-size:1.5rem; color:var(--primary);"><i class="fas fa-user-shield"></i></span>
+                </div>
             </div>
-            <button class="btn-session"><i class="fas fa-fingerprint"></i> Signer la session</button>
+            <input type="file" id="imgUp" hidden onchange="previewImg(this)">
+            
+            <div id="adminForm">
+                <input type="text" id="adminName" placeholder="Nom de l'Administrateur" style="margin-bottom:8px; width: 100%; box-sizing: border-box;">
+                <input type="email" id="adminEmail" placeholder="Adresse Email ISC" style="width: 100%; box-sizing: border-box;">
+                <button class="btn" style="width:100%; margin-top:12px;" onclick="creerCompteAdmin()"><i class="fas fa-fingerprint"></i> SIGNER LA SESSION</button>
+            </div>
+            
+            <div id="adminProfileActive" style="display:none;">
+                <span style="font-size: 0.62rem; background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-weight: 800;">SGA AUTHENTIFIÉ</span>
+                <h4 id="displayAdminName" style="margin: 10px 0 4px; text-transform: uppercase; font-size: 0.95rem; font-weight: 800;">ADMINISTRATEUR</h4>
+                <p id="displayAdminEmail" style="font-size: 0.72rem; margin: 0; color: var(--primary); font-weight: 600;"></p>
+            </div>
         </div>
 
-        <div class="right-card web3-card">
-            <h4 style="font-size: 0.75rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;"><i class="fab fa-ethereum" style="color: #6366f1;"></i> Connecteur Web3 Node</h4>
-            <button class="btn-meta" id="connectMetaMask" type="button">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" style="width: 18px;"> MetaMask Connection
-            </button>
-            <div class="status-node" id="nodeStatus">0x000... Non synchronisé</div>
+        <div class="glass-card">
+            <label><i class="fab fa-ethereum"></i> Connecteur Web3 Node</label>
+            <button class="btn" style="width:100%; margin-top:8px; background:#0f172a; font-size: 0.8rem;" onclick="connectWallet()"><i class="fas fa-wallet"></i> MetaMask Connection</button>
+            <div id="walletAddr" style="font-size:0.62rem; margin-top:8px; color:var(--accent); word-break: break-all; font-family: monospace; text-align: center;">0x000... Non synchronisé</div>
         </div>
 
-        <a href="verif.html" target="_blank" class="btn-portal-link">
-            <i class="fas fa-external-link-alt"></i> Ouvrir le portail public
-        </a>
+        <button class="btn btn-secondary" style="margin-top: auto; padding: 14px;" onclick="window.location.href='https://lgt-hub-archivage-isc.vercel.app/'"><i class="fas fa-external-link-alt"></i> Ouvrir le portail public</button>
     </div>
 
+    <iframe id="printFrame" style="display:none;"></iframe>
+
     <script>
-        // --- 1. CONFIGURATION FIREBASE ---
         const firebaseConfig = {
-            apiKey: "TON_API_KEY",
-            authDomain: "TON_PROJECT.firebaseapp.com",
-            databaseURL: "https://TON_PROJECT-default-rtdb.firebaseio.com",
-            projectId: "TON_PROJECT",
-            storageBucket: "TON_PROJECT.appspot.com",
-            messagingSenderId: "TON_SENDER_ID",
-            appId: "TON_APP_ID"
+            apiKey: "AIzaSyCaG6CBeHeF3C--qhmfw8_hwiEnBitHmqQ",
+            authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
+            databaseURL: "https://lgt-hub-archivage-isc-default-rtdb.firebaseio.com",
+            projectId: "lgt-hub-archivage-isc",
+            storageBucket: "lgt-hub-archivage-isc.firebasestorage.app",
+            messagingSenderId: "355077255297",
+            appId: "1:355077255297:web:cbc97343febd93edbcdd80"
         };
 
-        // Initialisation de Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        let html5QrCode;
+        let fileDataUrl = "";
+        let currentActiveDocUrl = ""; 
+        let currentActiveDocName = "diplome";
+        let currentActiveMatricule = "";
+        let isAdminConnected = false;
+        let qrcodeInstance = null;
+
+        let provider;
+        let signer;
+        let contractInstance = null;
+
+        const contractAddress = "0xYourDeployedContractAddressHere"; // AJOUTE TON ADRESSE REMIX ICI
+        const contractABI = [
+            "function stockerDocument(string memory _id, string memory _nom, string memory _filiere, string memory _timestamp) public",
+            "function obtenirDocument(string memory _id) public view returns (string memory, string memory, string memory, bool)"
+        ];
+
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const dateStr = now.toLocaleDateString('fr-FR', options);
+                const timeStr = now.toLocaleTimeString('fr-FR');
+                document.getElementById('liveClock').innerText = `${dateStr} à ${timeStr}`;
+            }, 1000);
         }
-        const database = firebase.database();
-        const storage = firebase.storage();
+        startClock();
 
-        // --- 2. GESTION DES ONGLETS / PANNEAUX ---
-        function switchPanel(panelId) {
-            document.querySelectorAll('.panel-block').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            document.getElementById(panelId).classList.add('active');
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode-body');
+            document.documentElement.classList.toggle('dark-mode');
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            document.getElementById('themeIcon').className = isDark ? "fas fa-sun" : "fas fa-moon";
+            document.getElementById('themeText').innerText = isDark ? "Mode Clair" : "Mode Sombre";
         }
 
-        // Mode Sombre Rapide
-        function toggleMode() {
-            document.body.classList.toggle('dark-mode');
+        function toggleRegistre() {
+            const reg = document.getElementById('registreSection');
+            reg.style.display = (reg.style.display === 'block') ? 'none' : 'block';
         }
 
-        // Intitulé dynamique du fichier téléversé
-        function updateFileLabel() {
-            const input = document.getElementById('diplomaFile');
-            const label = document.getElementById('fileLabel');
-            if(input.files.length > 0) {
-                label.innerText = "Fichier sélectionné : " + input.files[0].name;
-                label.style.color = "#10b981";
-            } else {
-                label.innerText = "Choisir un fichier (Aucun fichier n'a été sélectionné)";
-                label.style.color = "inherit";
-            }
+        function creerCompteAdmin() {
+            const name = document.getElementById('adminName').value.trim();
+            const email = document.getElementById('adminEmail').value.trim();
+            if(!name || !email) return alert("Veuillez remplir les informations administrateur.");
+            
+            isAdminConnected = true;
+            document.getElementById('adminForm').style.display = 'none';
+            document.getElementById('adminProfileActive').style.display = 'block';
+            document.getElementById('displayAdminName').innerText = name;
+            document.getElementById('displayAdminEmail').innerText = email;
         }
 
-        // --- 3. CHARGEMENT TEMPS RÉEL DU REGISTRE CENTRAL ---
-        function listenToRegistry() {
-            database.ref('diplomes').on('value', (snapshot) => {
-                const tbody = document.getElementById('registryTableBody');
-                tbody.innerHTML = ""; // Vider la table
-                
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const key = childSnapshot.key;
-                        const data = childSnapshot.val();
-                        
-                        // Sécurité d'absorption des propriétés
-                        const name = data.nomEtudiant || data.name || data.nom || "Inconnu";
-                        const filiere = data.filiere || data.option || "N/A";
-                        const gender = data.sexe || "M";
-
-                        const row = `
-                            <tr>
-                                <td style="color: #2563eb; font-family: monospace;">${key}</td>
-                                <td>${name}</td>
-                                <td>${gender}</td>
-                                <td>${filiere}</td>
-                                <td>
-                                    <button class="btn-table-select" onclick="alert('Étudiant sélectionné : ${name}')">
-                                        <i class="fas fa-check-circle"></i> Sélectionner
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                        tbody.innerHTML += row;
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Aucun enregistrement disponible.</td></tr>`;
+        function previewImg(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatar').src = e.target.result;
+                    document.getElementById('avatar').style.display = 'block';
+                    document.getElementById('plus').style.display = 'none';
                 }
-            }, (error) => {
-                console.error("Erreur de chargement Firebase: ", error);
-            });
-        }
-
-        // --- 4. LOGIQUE D'ANCRAGE & AJOUT SÉCURISÉ ---
-        function handleAnchorSubmit(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('studentName').value.trim();
-            const matricule = document.getElementById('studentMatricule').value.trim();
-            const fac = document.getElementById('studentFac').value;
-            const fil = document.getElementById('studentFil').value.trim();
-            const gender = document.getElementById('studentGender').value.substring(0,1); // Extrait 'M' ou 'F'
-            const fileInput = document.getElementById('diplomaFile');
-
-            if(fileInput.files.length === 0) {
-                alert("Veuillez joindre le diplôme numérique.");
-                return;
+                reader.readAsDataURL(input.files[0]);
             }
-
-            const file = fileInput.files[0];
-            const storageRef = storage.ref('Diplomes_PDF/' + matricule + '_' + file.name);
-            
-            alert("Début de l'ancrage. Téléversement du document en cours...");
-
-            // Étape A : Téléversement du fichier sur Firebase Storage
-            storageRef.put(file).then((snapshot) => {
-                return snapshot.ref.getDownloadURL();
-            }).then((downloadURL) => {
-                
-                // Simulation d'un Hash Blockchain (Exemple Web3 local ou sha256)
-                const mockHash = "0x" + Array.from({length:40}, () => Math.floor(Math.random()*16).toString(16)).join("");
-                const timestampUnix = Date.now(); // Date d'ancrage en millisecondes requise par ton portail public
-
-                // Étape B : Insertion des données mappées dans le noeud Firebase Realtime Database
-                return database.ref('diplomes/' + matricule).set({
-                    nomEtudiant: name,
-                    matricule: matricule,
-                    faculte: fac,
-                    filiere: fil,
-                    sexe: gender,
-                    blockchainHash: mockHash,
-                    dateAncrage: timestampUnix,
-                    fileUrl: downloadURL
-                });
-
-            }).then(() => {
-                alert("Ancrage réussi avec succès et synchronisé sur le Registre Central !");
-                document.getElementById('anchorForm').reset();
-                updateFileLabel();
-                switchPanel('registryPanel'); // Retour au tableau
-            }).catch((err) => {
-                console.error("Erreur globale d'ancrage : ", err);
-                alert("Échec de l'opération d'ancrage sécurisé.");
-            });
         }
 
-        // --- 5. LOGIQUE METAMASK WEB3 ---
-        document.getElementById('connectMetaMask').addEventListener('click', async () => {
+        async function connectWallet() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
-                    document.getElementById('nodeStatus').innerText = "Connecté: " + account.substring(0,6) + "..." + account.substring(account.length - 4);
-                    document.getElementById('nodeStatus').style.color = "#10b981";
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    
+                    document.getElementById('walletAddr').innerText = `Connecté : ${address}`;
+                    document.getElementById('walletAddr').style.color = "var(--success)";
+                    
+                    contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
                 } catch (error) {
-                    console.error("Refus de connexion MetaMask", error);
+                    alert("Erreur de connexion MetaMask : " + error.message);
                 }
             } else {
-                alert("MetaMask n'est pas installé sur ce navigateur. Passage en mode simulation Node local.");
-                document.getElementById('nodeStatus').innerText = "0xNode_Simulé_Local_Synchronisé";
-                document.getElementById('nodeStatus').style.color = "#10b981";
+                alert("Veuillez installer MetaMask !");
+            }
+        }
+
+        // Ecouteur Realtime Database avec clés STRICTEMENT EN MAJUSCULES
+        db.ref('archives').on('value', snapshot => {
+            let infoCount = 0, comCount = 0, secCount = 0;
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = "";
+            
+            snapshot.forEach(child => {
+                const data = child.val();
+                
+                // Sécurité antianomalie pour ignorer les lignes vides ou indéfinies dans Firebase
+                if (!data.MATRICULE || data.MATRICULE === "undefined") return;
+
+                if(data.FACULTE === "Informatique de Gestion") infoCount++;
+                else if(data.FACULTE === "Sciences Commerciales et Financières") comCount++;
+                else if(data.FACULTE === "Secrétariat de Direction") secCount++;
+
+                const row = `<tr id="row-${data.MATRICULE}">
+                    <td style="font-weight:700; color:var(--primary);">${data.MATRICULE}</td>
+                    <td>${data.NOM}</td>
+                    <td style="font-weight:bold;">${data.SEXE || 'M'}</td>
+                    <td><span style="font-size:0.75rem; opacity:0.8;">${data.FILIERE || 'N/A'}</span></td>
+                    <td style="display:flex; gap:5px;">
+                        <button class="btn" style="padding:5px 10px; font-size:0.75rem;" onclick="selectDocument('${data.MATRICULE}')"><i class="fas fa-check-circle"></i> Choisir</button>
+                        <button class="btn btn-danger" style="padding:5px 10px; font-size:0.75rem;" onclick="supprimerDirectement('${data.MATRICULE}')"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>`;
+                tableBody.insertAdjacentHTML('afterbegin', row);
+            });
+
+            document.getElementById('countInfo').innerText = infoCount.toString().padStart(3, '0');
+            document.getElementById('countCom').innerText = comCount.toString().padStart(3, '0');
+            document.getElementById('countSec').innerText = secCount.toString().padStart(3, '0');
+        });
+
+        function selectDocument(matricule) {
+            db.ref('archives/' + matricule).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (data && data.PDFURL) {
+                    currentActiveDocUrl = data.PDFURL;
+                    currentActiveMatricule = matricule;
+                    currentActiveDocName = "Diplome_" + matricule;
+                    document.getElementById('docActions').style.display = 'grid';
+                    document.getElementById('statusTag').innerHTML = `DOCUMENT SÉLECTIONNÉ : ${matricule} <i class='fas fa-file-invoice' style='color:var(--accent);'></i>`;
+                    
+                    // Génération dynamique du QR Code pointant vers Vercel avec le paramètre ?mat=
+                    genererQrCode(matricule);
+                    toggleRegistre(); 
+                } else { alert("Document introuvable."); }
+            });
+        }
+
+        function genererQrCode(matricule) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = "";
+            
+            // Lien absolu de ton portail public Vercel avec paramètre de recherche direct
+            const lienVerification = `https://lgt-hub-archivage-isc.vercel.app/?mat=${matricule}`;
+            
+            qrcodeInstance = new QRCode(qrContainer, {
+                text: lienVerification,
+                width: 100,
+                height: 100,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            document.getElementById('qrWrapper').classList.add('qr-glow-active');
+        }
+
+        function supprimerDiplomeSelectionne() {
+            if (!currentActiveMatricule) return alert("Aucun diplôme sélectionné à supprimer.");
+            supprimerDirectement(currentActiveMatricule);
+        }
+
+        function supprimerDirectement(matricule) {
+            if(!isAdminConnected) return alert("🛑 ACTION REFUSÉE : Authentifiez-vous en tant qu'administrateur à droite.");
+            
+            const confirmation = confirm(`Supprimer définitivement le diplôme ${matricule} du registre central ?`);
+            if (confirmation) {
+                db.ref('archives/' + matricule).remove()
+                .then(() => {
+                    alert(`✅ Le diplôme lié au matricule ${matricule} a été supprimé.`);
+                    if (currentActiveMatricule === matricule) {
+                        currentActiveMatricule = "";
+                        currentActiveDocUrl = "";
+                        document.getElementById('qrcode').innerHTML = "";
+                        document.getElementById('qrWrapper').classList.remove('qr-glow-active');
+                        document.getElementById('docActions').style.display = 'none';
+                        document.getElementById('statusTag').innerText = "EN ATTENTE DE GENERATION";
+                    }
+                })
+                .catch((error) => { alert("Erreur lors de la suppression : " + error.message); });
+            }
+        }
+
+        function actionVoir() {
+            if (!currentActiveDocUrl) return alert("Aucun document chargé.");
+            const w = window.open();
+            w.document.write(`<iframe src="${currentActiveDocUrl}" frameborder="0" style="border:0; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%;" allowfullscreen></iframe>`);
+        }
+
+        function actionTelecharger() {
+            if (!currentActiveDocUrl) return alert("Aucun document chargé.");
+            const a = document.createElement('a');
+            a.href = currentActiveDocUrl;
+            a.download = `${currentActiveDocName}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function printTargetedDoc() {
+            if (!currentActiveDocUrl) return alert("Sélectionnez ou scellez un document à imprimer.");
+            const pFrame = document.getElementById('printFrame');
+            pFrame.src = currentActiveDocUrl;
+            pFrame.onload = function() {
+                pFrame.contentWindow.focus();
+                pFrame.contentWindow.print();
+            };
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) { 
+                    fileDataUrl = event.target.result; 
+                    currentActiveDocUrl = fileDataUrl;
+                };
+                reader.readAsDataURL(file);
             }
         });
 
-        // Lancement au démarrage de l'écoute du registre
-        window.addEventListener('DOMContentLoaded', listenToRegistry);
+        function updateFiliere() {
+            const fac = document.getElementById('fac').value;
+            const filiere = document.getElementById('filiere');
+            filiere.innerHTML = "";
+            if (fac === "Informatique de Gestion") {
+                filiere.innerHTML = "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option><option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
+            } else if (fac === "Sciences Commerciales et Financières") {
+                filiere.innerHTML = "<option value='Banque et Assurance'>Banque & Assurance</option><option value='Douane'>Douane</option><option value='Marketing'>Marketing</option><option value='Comptabilité'>Comptabilité</option><option value='Gestion Financière'>Gestion Financière</option>";
+            } else {
+                filiere.innerHTML = "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
+            }
+        }
+        updateFiliere();
+
+        // ANCRAGE BLOCKCHAIN DOUBLE CORRIGÉ (Clés Firebase en MAJUSCULES)
+        async function scellerMaintenant() {
+            if(!isAdminConnected) return alert("🛑 ACCÈS ADM REFUSÉ : Validez votre profil d'administrateur à droite.");
+            if(!contractInstance) return alert("🛑 METAMASK REQUIS : Connectez votre portefeuille à droite.");
+
+            const mat = document.getElementById('mat').value.trim().toUpperCase();
+            const nom = document.getElementById('nom').value.trim();
+            const fac = document.getElementById('fac').value;
+            const fil = document.getElementById('filiere').value;
+            const sexe = document.getElementById('sexe').value;
+            
+            if(!mat || !nom || !fileDataUrl) return alert("Champs ou fichier source manquant.");
+
+            // Sécurité anti-lignes corrompues
+            if(mat === "UNDEFINED" || mat === "") return alert("Matricule invalide.");
+
+            try {
+                document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
+                
+                const timestampStr = Date.now().toString();
+                const tx = await contractInstance.stockerDocument(mat, nom, fil, timestampStr);
+                await tx.wait();
+
+                // Injection Firebase corrigée en MAJUSCULES strictes
+                await db.ref('archives/' + mat).set({
+                    MATRICULE: mat,
+                    NOM: nom,
+                    FACULTE: fac,
+                    FILIERE: fil,
+                    SEXE: sexe,
+                    PDFURL: fileDataUrl,
+                    TIMESTAMP: timestampStr
+                });
+
+                document.getElementById('statusTag').innerText = "ANCRAGE REUSSI AVEC SUCCES !";
+                currentActiveMatricule = mat;
+                currentActiveDocUrl = fileDataUrl;
+                currentActiveDocName = "Diplome_" + mat;
+                
+                genererQrCode(mat);
+                document.getElementById('docActions').style.display = 'grid';
+                alert("✅ Document ancré avec succès sur la Blockchain et sauvegardé dans le Registre Central Firebase !");
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusTag').innerText = "ERREUR D'ANCRAGE";
+                alert("Erreur lors de l'exécution : " + error.message);
+            }
+        }
+
+        function startScan() {
+            document.getElementById('reader').style.display = 'block';
+            document.getElementById('btnStart').style.display = 'none';
+            document.getElementById('btnStop').style.display = 'block';
+
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                qrCodeMessage => {
+                    stopScan();
+                    // Extraction automatique de la matricule si c'est un lien URL
+                    if(qrCodeMessage.includes("?mat=")) {
+                        const urlParams = new URLSearchParams(qrCodeMessage.split('?')[1]);
+                        const matriculeId = urlParams.get('mat');
+                        selectDocument(matriculeId);
+                    } else {
+                        selectDocument(qrCodeMessage.trim().toUpperCase());
+                    }
+                },
+                errorMessage => { /* Ne pas surcharger la console */ }
+            ).catch(err => {
+                alert("Impossible d'accéder à la caméra : " + err);
+                stopScan();
+            });
+        }
+
+        function stopScan() {
+            if(html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('reader').style.display = 'none';
+                    document.getElementById('btnStart').style.display = 'block';
+                    document.getElementById('btnStop').style.display = 'none';
+                }).catch(err => console.log(err));
+            }
+        }
     </script>
 </body>
 </html>
