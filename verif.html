@@ -3,280 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGT HUB - Portail de Vérification</title>
+    <title>Vérification Publique - Blockchain ISC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
     <style>
-        :root {
-            --bg-app: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --bg-container: rgba(255, 255, 255, 0.05); 
-            --sidebar-bg: rgba(15, 23, 42, 0.6); 
-            --sidebar-text: #94a3b8;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-orange: #ff7a00;
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            --card-success-bg: rgba(16, 185, 129, 0.1);
-            --card-success-border: #10b981;
+        /* Code CSS original de ton portail de vérification */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: var(--bg-app); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: row; overflow-x: hidden; }
-        .col-left { width: 280px; min-width: 280px; background: var(--sidebar-bg); backdrop-filter: blur(12px); padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--border-color); }
-        .col-center { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 25px; align-items: center; justify-content: flex-start; overflow-y: auto; }
-        .col-right { width: 300px; min-width: 300px; background: var(--sidebar-bg); backdrop-filter: blur(12px); padding: 30px 20px; display: flex; flex-direction: column; gap: 25px; border-left: 1px solid var(--border-color); box-shadow: var(--glass-shadow); }
-        .brand-box { border: 1px solid var(--accent-orange); border-radius: 12px; padding: 15px; text-align: center; background: rgba(0, 0, 0, 0.4); }
-        .brand-box h3 { color: #fff; font-size: 1.1rem; letter-spacing: 1px; }
-        .brand-box p { color: var(--accent-orange); font-size: 0.7rem; font-weight: bold; margin-top: 2px; }
-        .nav-menu { list-style: none; }
-        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 14px 16px; color: var(--sidebar-text); text-decoration: none; border-radius: 8px; font-weight: 600; }
-        .nav-menu a.active { background: var(--accent-orange); color: white; }
-        .isc-logo-replacement { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px; color: #fff; }
-        .isc-logo-replacement i { font-size: 3rem; color: var(--accent-orange); }
-        .isc-logo-replacement span { font-weight: 800; letter-spacing: 2px; font-size: 1.2rem; }
-        .panel-block { width: 100%; max-width: 650px; background: var(--bg-container); backdrop-filter: blur(16px); border-radius: 16px; padding: 35px; border: 1px solid var(--border-color); box-shadow: var(--glass-shadow); }
-        .main-title { text-align: center; text-transform: uppercase; font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; letter-spacing: 0.5px; }
-        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .form-group label { font-size: 0.8rem; font-weight: bold; color: var(--text-main); opacity: 0.8; text-transform: uppercase; }
-        .input-container { display: flex; gap: 12px; width: 100%; }
-        input { flex: 1; padding: 14px 18px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; }
-        input:focus { border-color: var(--accent-orange); }
-        .btn-verify { background: var(--accent-orange); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(255, 122, 0, 0.3); }
-        .btn-scan { background: #2563eb; color: white; border: none; width: 55px; height: 52px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-        #qr-reader-container { display: none; margin-bottom: 25px; border: 2px dashed var(--accent-orange); border-radius: 12px; overflow: hidden; background: rgba(0, 0, 0, 0.6); padding: 15px; text-align: center; }
-        .btn-close-camera { background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; font-size: 0.8rem; }
-        .verification-output-card { display: none; margin-top: 30px; padding: 25px; background: var(--card-success-bg); border: 1px solid var(--card-success-border); border-radius: 12px; }
-        .card-output-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-        .status-badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-        .row-data { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
-        .row-data span:first-child { color: var(--text-muted); }
-        .output-actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 25px; }
-        .btn-act { padding: 14px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; text-transform: uppercase; }
-        .btn-act-view { background: #0ea5e9; }
-        .btn-act-print { background: #64748b; }
-        .btn-act-download { background: #10b981; }
-        .error-alert-box { display: none; margin-top: 25px; padding: 15px; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; text-align: center; color: #ef4444; font-weight: 600; }
-        .right-section-title { font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: var(--text-main); opacity: 0.7; letter-spacing: 1px; }
-        @media (max-width: 1024px) { body { flex-direction: column; } .col-left, .col-center, .col-right { width: 100%; min-width: 100%; border: none; } .output-actions-grid { grid-template-columns: 1fr; } }
+        body {
+            /* Utilisation de ton image de fond webp comme vu dans tes dossiers */
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), url('assets/img/fond.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .verification-container {
+            background-color: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid #334155;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-section {
+            margin-bottom: 25px;
+        }
+
+        .logo-section img {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .logo-section h2 {
+            font-size: 24px;
+            color: #f8fafc;
+        }
+
+        .logo-section p {
+            color: #38bdf8;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .search-box {
+            margin-top: 30px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 20px;
+            padding-left: 50px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            color: #f8fafc;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #38bdf8;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        .verify-btn {
+            width: 100%;
+            background-color: #38bdf8;
+            color: #0f172a;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .verify-btn:hover {
+            background-color: #0ea5e9;
+        }
+
+        .footer-text {
+            margin-top: 35px;
+            color: #64748b;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="col-left">
-        <div class="brand-box">
-            <h3 style="color: var(--accent-orange);">LGT HUB</h3>
-            <p>ISC LUBUMBASHI - 2026</p>
+    <div class="verification-container">
+        <div class="logo-section">
+            <img src="assets/img/logo-isc.webp" alt="Logo ISC">
+            <h2>Portail de Vérification Public</h2>
+            <p>Institut Supérieur de Commerce</p>
         </div>
-        <ul class="nav-menu">
-            <li><a href="#" class="active"><i class="fas fa-shield-check"></i> Portail de Vérification</a></li>
-        </ul>
-    </div>
 
-    <div class="col-center">
-        <div class="isc-logo-replacement">
-            <i class="fas fa-university"></i>
-            <span>ISC LUBUMBASHI</span>
+        <p style="color: #94a3b8; font-size: 15px; line-height: 1.6;">
+            Entrez l'identifiant unique ou l'adresse de hachage Blockchain du diplôme pour vérifier instantanément sa validité.
+        </p>
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Ex: 0x71C... ou ID Diplôme">
         </div>
-        
-        <div class="panel-block">
-            <div class="main-title">Vérification de Diplômes</div>
-            
-            <div id="qr-reader-container">
-                <div id="my-qr-reader" style="width: 100%;"></div>
-                <button type="button" class="btn-close-camera" onclick="stopQRScanner()">
-                    <i class="fas fa-camera-slash"></i> Fermer la caméra
-                </button>
-            </div>
 
-            <form id="searchForm" onsubmit="triggerVerification(event)">
-                <div class="form-group">
-                    <label>Identifiant ou Matricule de l'Étudiant</label>
-                    <div class="input-container">
-                        <input type="text" id="queryMatricule" placeholder="Ex: ISC-2026-002M" required>
-                        <button type="button" class="btn-scan" onclick="startQRScanner()">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" class="btn-verify"><i class="fas fa-search"></i> Lancer la recherche</button>
-            </form>
+        <button class="verify-btn">
+            <i class="fas fa-shield-check"></i> Vérifier l'authenticité
+        </button>
 
-            <div class="verification-output-card" id="outputCard">
-                <div class="card-output-header">
-                    <i class="fas fa-check-circle" style="color: #10b981; font-size: 2.2rem;"></i>
-                    <div>
-                        <div class="status-badge">Authentique ✓</div>
-                        <h4 style="margin-top: 4px; font-weight: 600;">Validation Réelle Réussie</h4>
-                    </div>
-                </div>
-
-                <div class="row-data"><span>Nom de l'Étudiant :</span><strong id="outName"></strong></div>
-                <div class="row-data"><span>Matricule :</span><span id="outMatricule"></span></div>
-                <div class="row-data"><span>Faculté / Section :</span><span id="outFac"></span></div>
-                <div class="row-data"><span>Filière / Option :</span><span id="outFil"></span></div>
-                <div class="row-data"><span>Signature Blockchain / Hash :</span><span id="outHash" style="font-family: monospace; font-size: 0.8rem; color: #10b981; word-break: break-all;"></span></div>
-                <div class="row-data"><span>Date d'Ancrage :</span><span id="outTime"></span></div>
-
-                <div class="output-actions-grid">
-                    <button type="button" class="btn-act btn-act-view" id="btnVerifOpen"><i class="fas fa-eye"></i> Voir</button>
-                    <button type="button" class="btn-act btn-act-print" id="btnVerifPrint"><i class="fas fa-print"></i> Imprimer</button>
-                    <button type="button" class="btn-act btn-act-download" id="btnVerifDownload"><i class="fas fa-download"></i> Télécharger</button>
-                </div>
-            </div>
-
-            <div class="error-alert-box" id="errorBox">
-                <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i> Aucun enregistrement trouvé dans le registre !
-            </div>
+        <div class="footer-text">
+            <p>© 2025 ISC Lubumbashi - Système Sécurisé Blockchain</p>
         </div>
     </div>
 
-    <div class="col-right">
-        <div>
-            <div class="right-section-title">À propos du Portail</div>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
-                Ce système interroge en temps réel les registres décentralisés de l'ISC Lubumbashi pour valider l'authenticité des pièces d'études.
-            </p>
-        </div>
-    </div>
-
-    <script>
-        // ==========================================
-        // 1. CONFIGURATION DE TON FIREBASE CENTRAL
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "TON_API_KEY",
-            authDomain: "TON_PROJECT.firebaseapp.com",
-            databaseURL: "https://TON_PROJECT-default-rtdb.firebaseio.com",
-            projectId: "TON_PROJECT",
-            storageBucket: "TON_PROJECT.appspot.com",
-            messagingSenderId: "TON_SENDER_ID",
-            appId: "TON_APP_ID"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const database = firebase.database();
-
-        let html5QrcodeScanner = null;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const idParam = urlParams.get('id');
-            if (idParam) {
-                document.getElementById('queryMatricule').value = idParam;
-                processRealVerification(idParam);
-            }
-        });
-
-        function triggerVerification(e) {
-            e.preventDefault();
-            const mat = document.getElementById('queryMatricule').value.trim();
-            processRealVerification(mat);
-        }
-
-        // ==========================================
-        // 2. LOGIQUE DE VÉRIFICATION EN TEMPS RÉEL
-        // ==========================================
-        function processRealVerification(matriculeKey) {
-            const card = document.getElementById('outputCard');
-            const err = document.getElementById('errorBox');
-            
-            card.style.display = "none";
-            err.style.display = "none";
-
-            database.ref('diplomes/' + matriculeKey).once('value')
-            .then((snapshot) => {
-                if (snapshot.exists()) {
-                    const record = snapshot.val();
-                    showData(record);
-                } else {
-                    err.style.display = "block";
-                }
-            })
-            .catch((error) => {
-                console.error("Erreur Firebase : ", error);
-                alert("Erreur de connexion avec le registre central.");
-            });
-        }
-
-        function showData(record) {
-            const studentName = record.nomEtudiant || record.name || "Inconnu";
-            const studentMatricule = record.matricule || record.id || "";
-
-            document.getElementById('outName').innerText = studentName;
-            document.getElementById('outMatricule').innerText = studentMatricule;
-            document.getElementById('outFac').innerText = record.faculte || record.fac || "";
-            document.getElementById('outFil').innerText = record.filiere || record.fil || "";
-            document.getElementById('outHash').innerText = record.blockchainHash || record.hash || "Ancrage local sans hash";
-            document.getElementById('outTime').innerText = record.dateAncrage || record.timestamp || "Récemment";
-            
-            document.getElementById('outputCard').style.display = "block";
-
-            // Détermination du lien du fichier (Firebase Storage ou local)
-            let fileTargetUrl = "";
-            if (record.fileUrl || record.pdfUrl) {
-                fileTargetUrl = record.fileUrl || record.pdfUrl;
-            } else {
-                fileTargetUrl = 'Docs/' + studentMatricule + '.pdf';
-            }
-
-            // Bouton : Voir Document
-            document.getElementById('btnVerifOpen').onclick = function() {
-                window.open(fileTargetUrl, '_blank');
-            };
-            
-            // Bouton : Imprimer la carte de vérification
-            document.getElementById('btnVerifPrint').onclick = function() { 
-                window.print(); 
-            };
-
-            // Bouton : Télécharger directement le PDF du diplôme
-            document.getElementById('btnVerifDownload').onclick = function() {
-                const link = document.createElement('a');
-                link.href = fileTargetUrl;
-                link.target = '_blank';
-                // Attribut download fonctionne de manière optimale pour les fichiers du même domaine (dossier Docs/)
-                link.download = 'Diplome_' + studentName.replace(/\s+/g, '_') + '.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-        }
-
-        // ==========================================
-        // 3. CODE DU SCANNER CAMÉRA QR
-        // ==========================================
-        function startQRScanner() {
-            const container = document.getElementById('qr-reader-container');
-            container.style.display = 'block';
-            if (!html5QrcodeScanner) { html5QrcodeScanner = new Html5Qrcode("my-qr-reader"); }
-            html5QrcodeScanner.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                (decodedText) => {
-                    document.getElementById('queryMatricule').value = decodedText;
-                    stopQRScanner();
-                    processRealVerification(decodedText);
-                },
-                (errorMessage) => { }
-            ).catch(err => {
-                alert("Permission caméra refusée.");
-                container.style.display = 'none';
-            });
-        }
-
-        function stopQRScanner() {
-            const container = document.getElementById('qr-reader-container');
-            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-                html5QrcodeScanner.stop().then(() => { container.style.display = 'none'; });
-            } else { container.style.display = 'none'; }
-        }
-    </script>
 </body>
 </html>
