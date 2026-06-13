@@ -459,11 +459,45 @@
         let signer;
         let contractInstance = null;
 
-        const contractAddress = "0xYourDeployedContractAddressHere"; // Remplacer par l'adresse Remix après déploiement
-        const contractABI = [
-            "function stockerDocument(string memory _id, string memory _nom, string memory _filiere, string memory _timestamp) public",
-            "function obtenirDocument(string memory _id) public view returns (string memory, string memory, string memory, bool)"
-        ];
+        const contractAddress = "0x805466c788D249d7186D81831Fd60F706921e595";
+
+const contractABI = [
+{
+"inputs":[{"components":[
+{"internalType":"string","name":"nom","type":"string"},
+{"internalType":"string","name":"mat","type":"string"},
+{"internalType":"string","name":"fac","type":"string"},
+{"internalType":"string","name":"fil","type":"string"},
+{"internalType":"string","name":"promo","type":"string"},
+{"internalType":"string","name":"mention","type":"string"},
+{"internalType":"string","name":"sexe","type":"string"},
+{"internalType":"string","name":"docHash","type":"string"}
+],"internalType":"struct LGT_HUB_Archives.DiplomeInput","name":"d","type":"tuple"}],
+"name":"scellerDiplome",
+"outputs":[],
+"stateMutability":"nonpayable",
+"type":"function"
+},
+{
+"inputs":[{"internalType":"string","name":"_mat","type":"string"}],
+"name":"verifierDiplome",
+"outputs":[{"components":[
+{"internalType":"string","name":"nomEtudiant","type":"string"},
+{"internalType":"string","name":"matricule","type":"string"},
+{"internalType":"string","name":"faculte","type":"string"},
+{"internalType":"string","name":"filiere","type":"string"},
+{"internalType":"string","name":"promotion","type":"string"},
+{"internalType":"string","name":"mention","type":"string"},
+{"internalType":"string","name":"sexe","type":"string"},
+{"internalType":"string","name":"documentHash","type":"string"},
+{"internalType":"uint256","name":"dateEnregistrement","type":"uint256"},
+{"internalType":"address","name":"auteurAction","type":"address"},
+{"internalType":"bool","name":"estValide","type":"bool"}
+],"internalType":"struct LGT_HUB_Archives.Diplome","name":"","type":"tuple"}],
+"stateMutability":"view",
+"type":"function"
+}
+];
 
         function startClock() {
             setInterval(() => {
@@ -489,30 +523,6 @@
             reg.style.display = (reg.style.display === 'block') ? 'none' : 'block';
         }
 
-        function updateFiliere() {
-            const fac = document.getElementById('fac').value;
-            const filiereSelect = document.getElementById('filiere');
-            filiereSelect.innerHTML = "";
-            
-            let options = [];
-            if (fac === "Informatique de Gestion") {
-                options = ["Conception des Systèmes d'Information", "Réseaux et Administration Système"];
-            } else if (fac === "Sciences Commerciales et Financières") {
-                options = ["Comptabilité et Finance", "Marketing", "Douane et Commerce Extérieur", "Banque et Assurance"];
-            } else if (fac === "Secrétariat de Direction") {
-                options = ["Secrétariat de Direction", "Gestion des Administrations"];
-            }
-            
-            options.forEach(opt => {
-                let element = document.createElement("option");
-                element.value = opt;
-                element.innerText = opt;
-                filiereSelect.appendChild(element);
-            });
-        }
-        // Exécution initiale pour charger les options de la première faculté
-        updateFiliere();
-
         function creerCompteAdmin() {
             const name = document.getElementById('adminName').value.trim();
             const email = document.getElementById('adminEmail').value.trim();
@@ -537,26 +547,9 @@
             }
         }
 
-        async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    const address = await signer.getAddress();
-                    
-                    document.getElementById('walletAddr').innerText = `Connecté : ${address}`;
-                    document.getElementById('walletAddr').style.color = "var(--success)";
-                    
-                    contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
-                } catch (error) {
-                    alert("Erreur de connexion MetaMask : " + error.message);
-                }
-            } else {
-                alert("Veuillez installer MetaMask !");
-            }
-        }
+        
 
+        // Ecouteur Realtime Database avec clés STRICTEMENT EN MAJUSCULES
         db.ref('archives').on('value', snapshot => {
             let infoCount = 0, comCount = 0, secCount = 0;
             const tableBody = document.getElementById('tableBody');
@@ -564,6 +557,8 @@
             
             snapshot.forEach(child => {
                 const data = child.val();
+                
+                // Sécurité antianomalie pour ignorer les lignes vides ou indéfinies dans Firebase
                 if (!data.MATRICULE || data.MATRICULE === "undefined") return;
 
                 if(data.FACULTE === "Informatique de Gestion") infoCount++;
@@ -598,6 +593,7 @@
                     document.getElementById('docActions').style.display = 'grid';
                     document.getElementById('statusTag').innerHTML = `DOCUMENT SÉLECTIONNÉ : ${matricule} <i class='fas fa-file-invoice' style='color:var(--accent);'></i>`;
                     
+                    // Génération dynamique du QR Code pointant vers Vercel avec le paramètre ?mat=
                     genererQrCode(matricule);
                     toggleRegistre(); 
                 } else { alert("Document introuvable."); }
@@ -607,6 +603,8 @@
         function genererQrCode(matricule) {
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = "";
+            
+            // Lien absolu de ton portail public Vercel avec paramètre de recherche direct
             const lienVerification = `https://lgt-hub-archivage-isc.vercel.app/?mat=${matricule}`;
             
             qrcodeInstance = new QRCode(qrContainer, {
@@ -676,60 +674,172 @@
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(evt) {
-                    fileDataUrl = evt.target.result;
+                reader.onload = function(event) { 
+                    fileDataUrl = event.target.result; 
+                    currentActiveDocUrl = fileDataUrl;
                 };
                 reader.readAsDataURL(file);
             }
         });
 
+        function updateFiliere() {
+            const fac = document.getElementById('fac').value;
+            const filiere = document.getElementById('filiere');
+            filiere.innerHTML = "";
+            if (fac === "Informatique de Gestion") {
+                filiere.innerHTML = "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option><option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
+            } else if (fac === "Sciences Commerciales et Financières") {
+                filiere.innerHTML = "<option value='Banque et Assurance'>Banque & Assurance</option><option value='Douane'>Douane</option><option value='Marketing'>Marketing</option><option value='Comptabilité'>Comptabilité</option><option value='Gestion Financière'>Gestion Financière</option>";
+            } else {
+                filiere.innerHTML = "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
+            }
+        }
+        updateFiliere();
+
+        // ANCRAGE BLOCKCHAIN DOUBLE CORRIGÉ (Clés Firebase en MAJUSCULES)
         async function scellerMaintenant() {
+            if(!isAdminConnected) return alert("🛑 ACCÈS ADM REFUSÉ : Validez votre profil d'administrateur à droite.");
+            if(!contractInstance) return alert("🛑 METAMASK REQUIS : Connectez votre portefeuille à droite.");
+
+            const mat = document.getElementById('mat').value.trim().toUpperCase();
             const nom = document.getElementById('nom').value.trim();
-            const matricule = document.getElementById('mat').value.trim();
-            const faculte = document.getElementById('fac').value;
-            const filiere = document.getElementById('filiere').value;
+            const fac = document.getElementById('fac').value;
+            const fil = document.getElementById('filiere').value;
             const sexe = document.getElementById('sexe').value;
+            
+            if(!mat || !nom || !fileDataUrl) return alert("Champs ou fichier source manquant.");
 
-            if(!nom || !matricule || !fileDataUrl) {
-                return alert("Veuillez remplir tous les champs et sélectionner un fichier.");
+            // Sécurité anti-lignes corrompues
+            if(mat === "UNDEFINED" || mat === "") return alert("Matricule invalide.");
+
+            try {
+                document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
+                
+                const docHash = ethers.utils.id(
+    nom + mat + fac + fil + sexe + Date.now()
+);
+
+const diplome = {
+    nom: nom,
+    mat: mat,
+    fac: fac,
+    fil: fil,
+    promo: "LMD",
+    mention: "SATISFAISANT",
+    sexe: sexe,
+    docHash: docHash
+};
+
+// Envoi Blockchain
+const tx = await contractInstance.scellerDiplome(diplome);
+
+document.getElementById('statusTag').innerText =
+"Validation de la transaction Blockchain...";
+
+await tx.wait();
+
+// Sauvegarde Firebase
+await db.ref('archives/' + mat).set({
+    MATRICULE: mat,
+    NOM: nom,
+    FACULTE: fac,
+    FILIERE: fil,
+    SEXE: sexe,
+    PDFURL: fileDataUrl,
+    HASH: docHash,
+    DATE: new Date().toISOString(),
+    TXHASH: tx.hash
+});
+
+document.getElementById('statusTag').innerText =
+"ANCRAGE REUSSI AVEC SUCCES !";
+
+currentActiveMatricule = mat;
+currentActiveDocUrl = fileDataUrl;
+currentActiveDocName = "Diplome_" + mat;
+
+genererQrCode(mat);
+
+document.getElementById('docActions').style.display = 'grid';
+
+alert(
+"✅ Document enregistré dans Firebase et ancré sur la Blockchain.\n\nTX : "
++ tx.hash
+);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusTag').innerText = "ERREUR D'ANCRAGE";
+                alert("Erreur lors de l'exécution : " + error.message);
             }
+        }
 
-            const timestamp = new Date().toLocaleString('fr-FR');
+        function startScan() {
+            document.getElementById('reader').style.display = 'block';
+            document.getElementById('btnStart').style.display = 'none';
+            document.getElementById('btnStop').style.display = 'block';
 
-            // 1. ANCRAGE WEB3 BLOCKCHAIN (Si MetaMask connecté)
-            if (contractInstance) {
-                try {
-                    document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
-                    const tx = await contractInstance.stockerDocument(matricule, nom, filiere, timestamp);
-                    await tx.wait();
-                    alert("Ancrage Blockchain réussi !");
-                } catch (err) {
-                    console.error(err);
-                    alert("Échec de l'ancrage Blockchain, mais l'enregistrement Firebase continue.");
-                }
-            }
-
-            // 2. ENREGISTREMENT FIREBASE REALTIME DATABASE
-            db.ref('archives/' + matricule).set({
-                MATRICULE: matricule,
-                NOM: nom,
-                FACULTE: faculte,
-                FILIERE: filiere,
-                SEXE: sexe,
-                PDFURL: fileDataUrl,
-                TIMESTAMP: timestamp
-            }).then(() => {
-                alert("Enregistrement Firebase réussi !");
-                currentActiveDocUrl = fileDataUrl;
-                currentActiveMatricule = matricule;
-                currentActiveDocName = "Diplome_" + matricule;
-                document.getElementById('docActions').style.display = 'grid';
-                document.getElementById('statusTag').innerHTML = `DOCUMENT SCÈLLÉ : ${matricule} <i class='fas fa-check-circle' style='color:var(--success);'></i>`;
-                genererQrCode(matricule);
-            }).catch(err => {
-                alert("Erreur Firebase : " + err.message);
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                qrCodeMessage => {
+                    stopScan();
+                    // Extraction automatique de la matricule si c'est un lien URL
+                    if(qrCodeMessage.includes("?mat=")) {
+                        const urlParams = new URLSearchParams(qrCodeMessage.split('?')[1]);
+                        const matriculeId = urlParams.get('mat');
+                        selectDocument(matriculeId);
+                    } else {
+                        selectDocument(qrCodeMessage.trim().toUpperCase());
+                    }
+                },
+                errorMessage => { /* Ne pas surcharger la console */ }
+            ).catch(err => {
+                alert("Impossible d'accéder à la caméra : " + err);
+                stopScan();
             });
         }
-    </script>
+
+        function stopScan() {
+            if(html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('reader').style.display = 'none';
+                    document.getElementById('btnStart').style.display = 'block';
+                    document.getElementById('btnStop').style.display = 'none';
+                }).catch(err => console.log(err));
+            }
+        }
+    async function connectWallet() {
+    try {
+        if (!window.ethereum) {
+            alert("MetaMask n'est pas installé.");
+            return;
+        }
+
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        await provider.send("eth_requestAccounts", []);
+
+        signer = provider.getSigner();
+
+        const address = await signer.getAddress();
+
+        contractInstance = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+        );
+
+        document.getElementById("walletAddr").innerText = address;
+
+        alert("✅ Portefeuille connecté");
+    }
+    catch(error) {
+        console.error(error);
+        alert(error.message);
+    }
+}
+</script>
 </body>
 </html>
