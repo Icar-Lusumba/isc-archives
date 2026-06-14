@@ -295,51 +295,105 @@
         </div>
     </div>
 
-    <script>
-        // Fonction pour simuler visuellement le scan QR Code
-        function simulerScan() {
-            const qrBox = document.getElementById('qrBox');
-            const qrText = document.getElementById('qrText');
-            const input = document.getElementById('matriculeInput');
-            
-            qrBox.classList.add('scanning');
-            qrText.innerText = "Lecture du QR Code en cours...";
-            
-            setTimeout(() => {
-                qrBox.classList.remove('scanning');
-                qrText.innerText = "QR Code détecté avec succès !";
-                input.value = "ISC-2026-897"; // Auto-complétion du matricule simulé
-            }, 1500);
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCaG6CBeHeF3C--qhmfw8_hwiEnBitHmqQ",
+    authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
+    databaseURL: "https://lgt-hub-archivage-isc-default-rtdb.firebaseio.com",
+    projectId: "lgt-hub-archivage-isc",
+    storageBucket: "lgt-hub-archivage-isc.firebasestorage.app",
+    messagingSenderId: "355077255297",
+    appId: "1:355077255297:web:cbc97343febd93edbcdd80"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+function simulerScan() {
+    const qrBox = document.getElementById('qrBox');
+    const qrText = document.getElementById('qrText');
+    const input = document.getElementById('matriculeInput');
+
+    qrBox.classList.add('scanning');
+    qrText.innerText = "Lecture du QR Code en cours...";
+
+    setTimeout(() => {
+        qrBox.classList.remove('scanning');
+        qrText.innerText = "QR Code détecté avec succès !";
+        input.value = "ISC-2026-897";
+    }, 1500);
+}
+
+function interrogerBlockchain() {
+
+    const mat = document
+        .getElementById("matriculeInput")
+        .value
+        .trim()
+        .toUpperCase();
+
+    if (!mat) {
+        alert("Veuillez saisir un matricule.");
+        return;
+    }
+
+    db.ref("archives/" + mat)
+    .once("value")
+    .then(snapshot => {
+
+        const data = snapshot.val();
+
+        if (!data) {
+            alert("Diplôme introuvable.");
+            return;
         }
 
-        // Fonction pour afficher le résultat blockchain complet
-        function interrogerBlockchain() {
-            const input = document.getElementById('matriculeInput').value;
-            const resultCard = document.getElementById('resultCard');
-            
-            if(input.trim() === "") {
-                alert("Veuillez saisir un matricule ou scanner un diplôme.");
-                return;
-            }
-            
-            // Affiche la carte des résultats et des actions
-            resultCard.style.display = "block";
-            resultCard.scrollIntoView({ behavior: 'smooth' });
-        }
+        document.querySelector(".result-details").innerHTML = `
+            <p><strong>Étudiant :</strong> ${data.NOM}</p>
+            <p><strong>Faculté :</strong> ${data.FACULTE}</p>
+            <p><strong>Filière :</strong> ${data.FILIERE}</p>
+            <p><strong>Sexe :</strong> ${data.SEXE}</p>
+            <p><strong>Statut :</strong> Diplôme authentifié</p>
+            <p style="font-family: monospace; font-size:11px;">
+                <strong>Hash :</strong> ${data.HASH}
+            </p>
+        `;
 
-        // Logique des trois boutons d'action demandés
-        function voirDocument() {
-            alert("Ouverture du diplôme scellé original sous format sécurisé PDF...");
-            // Ici tu pourras lier vers l'ouverture de ton PDF de démonstration
-        }
+        document.getElementById("resultCard").style.display = "block";
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Erreur Firebase : " + error.message);
+    });
+}
 
-        function telechargerDiplome() {
-            alert("Téléchargement de la copie certifiée conforme par la Blockchain...");
-        }
+function voirDocument() {
+    alert("Ouverture du diplôme...");
+}
 
-        function imprimerAttestation() {
-            window.print(); // Lance directement l'impression native Windows pour le jury
-        }
-    </script>
+function telechargerDiplome() {
+    alert("Téléchargement...");
+}
+
+function imprimerAttestation() {
+    window.print();
+}
+
+window.onload = function () {
+
+    const params = new URLSearchParams(window.location.search);
+    const mat = params.get("mat");
+
+    if (mat) {
+        document.getElementById("matriculeInput").value = mat;
+        interrogerBlockchain();
+    }
+};
+ </script>
 </body>
 </html>
