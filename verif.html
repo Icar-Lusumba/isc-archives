@@ -339,15 +339,21 @@ html5QrCode.start(
 
         html5QrCode.stop();
 
-        const url = new URL(decodedText);
+        let mat = decodedText;
 
-        const mat = url.searchParams.get("mat");
+        if (decodedText.startsWith("http")) {
+            const url = new URL(decodedText);
+            mat = url.searchParams.get("mat");
+        }
 
         document.getElementById("matriculeInput").value = mat;
 
         interrogerBlockchain();
     }
-);
+)
+.catch(err => {
+    console.error("Erreur caméra :", err);
+});
 function interrogerBlockchain() {
 
     const mat = document
@@ -366,6 +372,7 @@ function interrogerBlockchain() {
     .then(snapshot => {
 
        const data = snapshot.val();
+       console.log(data);
 
 if (!data) {
     alert("Diplôme introuvable.");
@@ -391,6 +398,8 @@ currentPdfUrl = data.PDFURL;
 }
 
 function voirDocument() {
+
+    console.log(currentPdfUrl);
 
     if(!currentPdfUrl){
         alert("Document introuvable.");
