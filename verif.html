@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portail Public de Vérification - Blockchain ISC</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Portail Public de Vérification - Blockchain ISC</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -247,10 +252,16 @@
                 Scannez le QR Code du diplôme ou saisissez manuellement le matricule de l'étudiant pour interroger le registre Blockchain.
             </p>
 
-            <div class="qr-scanner-box" id="qrBox" onclick="simulerScan()">
-                <i class="fas fa-qrcode"></i>
-                <p id="qrText" style="font-size: 14px; color: #94a3b8;">Cliquez ici pour simuler le scan du QR Code</p>
-            </div>
+            <div class="qr-scanner-box" id="qrBox" >
+    <i class="fas fa-qrcode"></i>
+    <p id="qrText">
+        Cliquez pour scanner un QR Code
+    </p>
+</div>
+
+<div id="reader"
+     style="width:300px;margin:15px auto;">
+</div>
 
             <div class="input-group">
                 <i class="fas fa-search"></i>
@@ -314,21 +325,29 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 
-function simulerScan() {
-    const qrBox = document.getElementById('qrBox');
-    const qrText = document.getElementById('qrText');
-    const input = document.getElementById('matriculeInput');
+let currentPdfUrl = "";
 
-    qrBox.classList.add('scanning');
-    qrText.innerText = "Lecture du QR Code en cours...";
+const html5QrCode = new Html5Qrcode("reader");
 
-    setTimeout(() => {
-        qrBox.classList.remove('scanning');
-        qrText.innerText = "QR Code détecté avec succès !";
-        input.value = "ISC-2026-897";
-    }, 1500);
-}
+html5QrCode.start(
+    { facingMode: "environment" },
+    {
+        fps: 10,
+        qrbox: 250
+    },
+    (decodedText) => {
 
+        html5QrCode.stop();
+
+        const url = new URL(decodedText);
+
+        const mat = url.searchParams.get("mat");
+
+        document.getElementById("matriculeInput").value = mat;
+
+        interrogerBlockchain();
+    }
+);
 function interrogerBlockchain() {
 
     const mat = document
@@ -346,23 +365,22 @@ function interrogerBlockchain() {
     .once("value")
     .then(snapshot => {
 
-        const data = snapshot.val();
+       const data = snapshot.val();
 
-        if (!data) {
-            alert("Diplôme introuvable.");
-            return;
-        }
+if (!data) {
+    alert("Diplôme introuvable.");
+    return;
+}
+
+currentPdfUrl = data.PDFURL;
 
         document.querySelector(".result-details").innerHTML = `
-            <p><strong>Étudiant :</strong> ${data.NOM}</p>
-            <p><strong>Faculté :</strong> ${data.FACULTE}</p>
-            <p><strong>Filière :</strong> ${data.FILIERE}</p>
-            <p><strong>Sexe :</strong> ${data.SEXE}</p>
-            <p><strong>Statut :</strong> Diplôme authentifié</p>
-            <p style="font-family: monospace; font-size:11px;">
-                <strong>Hash :</strong> ${data.HASH}
-            </p>
-        `;
+<p><strong>Étudiant :</strong> ${data.NOM}</p>
+<p><strong>Faculté :</strong> ${data.FACULTE}</p>
+<p><strong>Filière :</strong> ${data.FILIERE}</p>
+<p><strong>Matricule :</strong> ${data.MATRICULE}</p>
+<p><strong>Statut :</strong> Diplôme authentifié</p>
+`;
 
         document.getElementById("resultCard").style.display = "block";
     })
@@ -373,15 +391,52 @@ function interrogerBlockchain() {
 }
 
 function voirDocument() {
-    alert("Ouverture du diplôme...");
+
+    if(!currentPdfUrl){
+        alert("Document introuvable.");
+        return;
+    }
+
+    window.open(currentPdfUrl, "_blank");
 }
 
 function telechargerDiplome() {
-    alert("Téléchargement...");
+
+    if(!currentPdfUrl){
+        alert("Document introuvable.");
+        return;
+    }
+
+    const a = document.createElement("a");
+
+    a.href = currentPdfUrl;
+    a.download = "Diplome.pdf";
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
 }
 
 function imprimerAttestation() {
-    window.print();
+
+    if(!currentPdfUrl){
+        alert("Document introuvable.");
+        return;
+    }
+
+    const frame = document.createElement("iframe");
+
+    frame.style.display = "none";
+
+    frame.src = currentPdfUrl;
+
+    document.body.appendChild(frame);
+
+    frame.onload = () => {
+        frame.contentWindow.print();
+    };
 }
 
 window.onload = function () {
