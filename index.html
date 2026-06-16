@@ -601,22 +601,21 @@ const contractABI = [
         }
 
         function genererQrCode(matricule) {
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = "";
-            
-            // Lien absolu de ton portail public Vercel avec paramètre de recherche direct
-            const lienVerification = `https://lgt-hub-archivage-isc.vercel.app/?mat=${matricule}`;
-            
-            qrcodeInstance = new QRCode(qrContainer, {
-                text: lienVerification,
-                width: 100,
-                height: 100,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            document.getElementById('qrWrapper').classList.add('qr-glow-active');
-        }
+
+    const qrContainer =
+    document.getElementById('qrcode');
+
+    qrContainer.innerHTML = "";
+
+    const lienVerification =
+    `https://isc-archives.vercel.app/verif.html?mat=${matricule}`;
+
+    new QRCode(qrContainer,{
+        text:lienVerification,
+        width:100,
+        height:100
+    });
+}
 
         function supprimerDiplomeSelectionne() {
             if (!currentActiveMatricule) return alert("Aucun diplôme sélectionné à supprimer.");
@@ -739,13 +738,14 @@ document.getElementById('statusTag').innerText =
 await tx.wait();
 
 // Sauvegarde Firebase
+console.log("URL PDF =", downloadURL);
 await db.ref('archives/' + mat).set({
     MATRICULE: mat,
     NOM: nom,
     FACULTE: fac,
     FILIERE: fil,
     SEXE: sexe,
-    PDFURL: fileDataUrl,
+    PDFURL: downloadURL,
     HASH: docHash,
     DATE: new Date().toISOString(),
     TXHASH: tx.hash
