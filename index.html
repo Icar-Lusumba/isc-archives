@@ -730,6 +730,11 @@ const diplome = {
 };
 
 // Envoi Blockchain
+console.log("Adresse utilisée :", contractAddress);
+
+const code = await signer.provider.getCode(contractAddress);
+
+console.log("Code du contrat :", code);
 const tx = await contractInstance.scellerDiplome(diplome);
 
 document.getElementById('statusTag').innerText =
