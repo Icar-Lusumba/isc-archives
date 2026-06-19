@@ -420,6 +420,7 @@
                 <span style="font-size: 0.62rem; background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-weight: 800;">SGA AUTHENTIFIÉ</span>
                 <h4 id="displayAdminName" style="margin: 10px 0 4px; text-transform: uppercase; font-size: 0.95rem; font-weight: 800;">ADMINISTRATEUR</h4>
                 <p id="displayAdminEmail" style="font-size: 0.72rem; margin: 0; color: var(--primary); font-weight: 600;"></p>
+                <button class="btn btn-danger" style="width:100%; margin-top:12px; font-size: 0.75rem;" onclick="deconnecterAdmin()"><i class="fas fa-sign-out-alt"></i> DÉCONNEXION</button>
             </div>
         </div>
 
@@ -447,6 +448,7 @@
 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
+        const storage = firebase.storage(); // CORRECTION: Initialisation de Firebase Storage
 
         let html5QrCode;
         let fileDataUrl = "";
@@ -454,7 +456,6 @@
         let currentActiveDocName = "diplome";
         let currentActiveMatricule = "";
         let isAdminConnected = false;
-        let qrcodeInstance = null;
 
         let provider;
         let signer;
@@ -462,43 +463,43 @@
 
         const contractAddress = "0x805466c788D249d7186D81831Fd60F706921e595";
 
-const contractABI = [
-{
-"inputs":[{"components":[
-{"internalType":"string","name":"nom","type":"string"},
-{"internalType":"string","name":"mat","type":"string"},
-{"internalType":"string","name":"fac","type":"string"},
-{"internalType":"string","name":"fil","type":"string"},
-{"internalType":"string","name":"promo","type":"string"},
-{"internalType":"string","name":"mention","type":"string"},
-{"internalType":"string","name":"sexe","type":"string"},
-{"internalType":"string","name":"docHash","type":"string"}
-],"internalType":"struct LGT_HUB_Archives.DiplomeInput","name":"d","type":"tuple"}],
-"name":"scellerDiplome",
-"outputs":[],
-"stateMutability":"nonpayable",
-"type":"function"
-},
-{
-"inputs":[{"internalType":"string","name":"_mat","type":"string"}],
-"name":"verifierDiplome",
-"outputs":[{"components":[
-{"internalType":"string","name":"nomEtudiant","type":"string"},
-{"internalType":"string","name":"matricule","type":"string"},
-{"internalType":"string","name":"faculte","type":"string"},
-{"internalType":"string","name":"filiere","type":"string"},
-{"internalType":"string","name":"promotion","type":"string"},
-{"internalType":"string","name":"mention","type":"string"},
-{"internalType":"string","name":"sexe","type":"string"},
-{"internalType":"string","name":"documentHash","type":"string"},
-{"internalType":"uint256","name":"dateEnregistrement","type":"uint256"},
-{"internalType":"address","name":"auteurAction","type":"address"},
-{"internalType":"bool","name":"estValide","type":"bool"}
-],"internalType":"struct LGT_HUB_Archives.Diplome","name":"","type":"tuple"}],
-"stateMutability":"view",
-"type":"function"
-}
-];
+        const contractABI = [
+        {
+        "inputs":[{"components":[
+        {"internalType":"string","name":"nom","type":"string"},
+        {"internalType":"string","name":"mat","type":"string"},
+        {"internalType":"string","name":"fac","type":"string"},
+        {"internalType":"string","name":"fil","type":"string"},
+        {"internalType":"string","name":"promo","type":"string"},
+        {"internalType":"string","name":"mention","type":"string"},
+        {"internalType":"string","name":"sexe","type":"string"},
+        {"internalType":"string","name":"docHash","type":"string"}
+        ],"internalType":"struct LGT_HUB_Archives.DiplomeInput","name":"d","type":"tuple"}],
+        "name":"scellerDiplome",
+        "outputs":[],
+        "stateMutability":"nonpayable",
+        "type":"function"
+        },
+        {
+        "inputs":[{"internalType":"string","name":"_mat","type":"string"}],
+        "name":"verifierDiplome",
+        "outputs":[{"components":[
+        {"internalType":"string","name":"nomEtudiant","type":"string"},
+        {"internalType":"string","name":"matricule","type":"string"},
+        {"internalType":"string","name":"faculte","type":"string"},
+        {"internalType":"string","name":"filiere","type":"string"},
+        {"internalType":"string","name":"promotion","type":"string"},
+        {"internalType":"string","name":"mention","type":"string"},
+        {"internalType":"string","name":"sexe","type":"string"},
+        {"internalType":"string","name":"documentHash","type":"string"},
+        {"internalType":"uint256","name":"dateEnregistrement","type":"uint256"},
+        {"internalType":"address","name":"auteurAction","type":"address"},
+        {"internalType":"bool","name":"estValide","type":"bool"}
+        ],"internalType":"struct LGT_HUB_Archives.Diplome","name":"","type":"tuple"}],
+        "stateMutability":"view",
+        "type":"function"
+        }
+        ];
 
         function startClock() {
             setInterval(() => {
@@ -536,6 +537,17 @@ const contractABI = [
             document.getElementById('displayAdminEmail').innerText = email;
         }
 
+        // CORRECTION: Ajout de la fonction de déconnexion
+        function deconnecterAdmin() {
+            isAdminConnected = false;
+            document.getElementById('adminForm').style.display = 'block';
+            document.getElementById('adminProfileActive').style.display = 'none';
+            document.getElementById('adminName').value = '';
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('avatar').style.display = 'none';
+            document.getElementById('plus').style.display = 'block';
+        }
+
         function previewImg(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -547,8 +559,6 @@ const contractABI = [
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
-        
 
         // Ecouteur Realtime Database avec clés STRICTEMENT EN MAJUSCULES
         db.ref('archives').on('value', snapshot => {
@@ -602,21 +612,17 @@ const contractABI = [
         }
 
         function genererQrCode(matricule) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ""; // Nettoie l'ancien QR code
 
-    const qrContainer =
-    document.getElementById('qrcode');
+            const lienVerification = `https://isc-archives.vercel.app/verif.html?mat=${matricule}`;
 
-    qrContainer.innerHTML = "";
-
-    const lienVerification =
-    `https://isc-archives.vercel.app/verif.html?mat=${matricule}`;
-
-    new QRCode(qrContainer,{
-        text:lienVerification,
-        width:100,
-        height:100
-    });
-}
+            new QRCode(qrContainer,{
+                text:lienVerification,
+                width:100,
+                height:100
+            });
+        }
 
         function supprimerDiplomeSelectionne() {
             if (!currentActiveMatricule) return alert("Aucun diplôme sélectionné à supprimer.");
@@ -715,66 +721,65 @@ const contractABI = [
             try {
                 document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
                 
-                const docHash = ethers.utils.id(
-    nom + mat + fac + fil + sexe + Date.now()
-);
+                // CORRECTION: Hash basé sur le contenu du fichier pour garantir l'immuabilité
+                const docHash = ethers.utils.sha256(ethers.utils.toUtf8Bytes(fileDataUrl));
 
-const diplome = {
-    nom: nom,
-    mat: mat,
-    fac: fac,
-    fil: fil,
-    promo: "LMD",
-    mention: "SATISFAISANT",
-    sexe: sexe,
-    docHash: docHash
-};
+                const diplome = {
+                    nom: nom,
+                    mat: mat,
+                    fac: fac,
+                    fil: fil,
+                    promo: "LMD",
+                    mention: "SATISFAISANT",
+                    sexe: sexe,
+                    docHash: docHash
+                };
 
-// Envoi Blockchain
-console.log("Adresse utilisée :", contractAddress);
+                // Envoi Blockchain
+                console.log("Adresse utilisée :", contractAddress);
 
-const code = await signer.provider.getCode(contractAddress);
+                // CORRECTION: Suppression de la redéclaration de la variable 'code'
+                const contractCode = await provider.getCode(contractAddress);
+                console.log("CODE CONTRAT =", contractCode);
+                
+                const tx = await contractInstance.scellerDiplome(diplome);
 
-console.log("Code du contrat :", code);
-const code = await provider.getCode(contractAddress);
+                document.getElementById('statusTag').innerText = "Validation de la transaction Blockchain...";
 
-console.log("CODE CONTRAT =", code);
-const tx = await contractInstance.scellerDiplome(diplome);
+                await tx.wait();
 
-document.getElementById('statusTag').innerText =
-"Validation de la transaction Blockchain...";
+                // CORRECTION: Upload du fichier vers Firebase Storage pour obtenir downloadURL
+                document.getElementById('statusTag').innerText = "Sauvegarde du document...";
+                const storageRef = storage.ref();
+                const fileRef = storageRef.child(`diplomes/${mat}_${Date.now()}`);
+                await fileRef.putString(fileDataUrl, 'data_url');
+                const downloadURL = await fileRef.getDownloadURL();
 
-await tx.wait();
+                // Sauvegarde Firebase
+                console.log("URL PDF =", downloadURL);
+                await db.ref('archives/' + mat).set({
+                    MATRICULE: mat,
+                    NOM: nom,
+                    FACULTE: fac,
+                    FILIERE: fil,
+                    SEXE: sexe,
+                    PDFURL: downloadURL,
+                    HASH: docHash,
+                    DATE: new Date().toISOString(),
+                    TXHASH: tx.hash
+                });
 
-// Sauvegarde Firebase
-console.log("URL PDF =", downloadURL);
-await db.ref('archives/' + mat).set({
-    MATRICULE: mat,
-    NOM: nom,
-    FACULTE: fac,
-    FILIERE: fil,
-    SEXE: sexe,
-    PDFURL: downloadURL,
-    HASH: docHash,
-    DATE: new Date().toISOString(),
-    TXHASH: tx.hash
-});
+                document.getElementById('statusTag').innerText = "ANCRAGE REUSSI AVEC SUCCES !";
 
-document.getElementById('statusTag').innerText =
-"ANCRAGE REUSSI AVEC SUCCES !";
+                currentActiveMatricule = mat;
+                currentActiveDocUrl = downloadURL; // Utiliser l'URL distante
+                currentActiveDocName = "Diplome_" + mat;
 
-currentActiveMatricule = mat;
-currentActiveDocUrl = fileDataUrl;
-currentActiveDocName = "Diplome_" + mat;
+                genererQrCode(mat);
 
-genererQrCode(mat);
+                document.getElementById('docActions').style.display = 'grid';
 
-document.getElementById('docActions').style.display = 'grid';
-
-alert(
-"✅ Document enregistré dans Firebase et ancré sur la Blockchain.\n\nTX : "
-+ tx.hash
-);
+                alert("✅ Document enregistré dans Firebase et ancré sur la Blockchain.\n\nTX : " + tx.hash);
 
             } catch (error) {
                 console.error(error);
@@ -803,7 +808,10 @@ alert(
                         selectDocument(qrCodeMessage.trim().toUpperCase());
                     }
                 },
-                errorMessage => { /* Ne pas surcharger la console */ }
+                errorMessage => { 
+                    // CORRECTION: Afficher l'erreur dans la console pour le débogage
+                    console.error("Erreur scanner QR:", errorMessage); 
+                }
             ).catch(err => {
                 alert("Impossible d'accéder à la caméra : " + err);
                 stopScan();
@@ -819,36 +827,37 @@ alert(
                 }).catch(err => console.log(err));
             }
         }
-    async function connectWallet() {
-    try {
-        if (!window.ethereum) {
-            alert("MetaMask n'est pas installé.");
-            return;
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    alert("MetaMask n'est pas installé.");
+                    return;
+                }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+
+                await provider.send("eth_requestAccounts", []);
+
+                signer = provider.getSigner();
+
+                const address = await signer.getAddress();
+
+                contractInstance = new ethers.Contract(
+                    contractAddress,
+                    contractABI,
+                    signer
+                );
+
+                document.getElementById("walletAddr").innerText = address;
+
+                alert("✅ Portefeuille connecté");
+            }
+            catch(error) {
+                console.error(error);
+                alert(error.message);
+            }
         }
-
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-
-        await provider.send("eth_requestAccounts", []);
-
-        signer = provider.getSigner();
-
-        const address = await signer.getAddress();
-
-        contractInstance = new ethers.Contract(
-            contractAddress,
-            contractABI,
-            signer
-        );
-
-        document.getElementById("walletAddr").innerText = address;
-
-        alert("✅ Portefeuille connecté");
-    }
-    catch(error) {
-        console.error(error);
-        alert(error.message);
-    }
-}
-</script>
+    </script>
 </body>
 </html>
