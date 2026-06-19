@@ -263,6 +263,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
      style="width:300px;margin:15px auto;">
 </div>
 
+<button
+    onclick="stopScanner()"
+    class="btn-verify"
+    style="margin-top:10px;background:#ef4444;">
+    Fermer caméra
+</button>
+
+
             <div class="input-group">
                 <i class="fas fa-search"></i>
                 <input type="text" id="matriculeInput" placeholder="Saisir le matricule (Ex: ISC-2026-897)">
@@ -327,33 +335,50 @@ const db = firebase.database();
 
 let currentPdfUrl = "";
 
-const html5QrCode = new Html5Qrcode("reader");
+let html5QrCode;
+let scannerActif = false;
 
-html5QrCode.start(
-    { facingMode: "environment" },
-    {
-        fps: 10,
-        qrbox: 250
-    },
-    (decodedText) => {
+function startScanner() {
 
-        html5QrCode.stop();
+    if(scannerActif) return;
 
-        let mat = decodedText;
+    html5QrCode = new Html5Qrcode("reader");
 
-        if (decodedText.startsWith("http")) {
-            const url = new URL(decodedText);
-            mat = url.searchParams.get("mat");
+    html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        (decodedText) => {
+
+            stopScanner();
+
+            let mat = decodedText;
+
+            if(decodedText.startsWith("http")){
+                const url = new URL(decodedText);
+                mat = url.searchParams.get("mat");
+            }
+
+            document.getElementById("matriculeInput").value = mat;
+
+            interrogerBlockchain();
         }
+    );
+   
+    function stopScanner() {
 
-        document.getElementById("matriculeInput").value = mat;
+    if(!scannerActif) return;
 
-        interrogerBlockchain();
-    }
-)
-.catch(err => {
-    console.error("Erreur caméra :", err);
-});
+    html5QrCode.stop()
+    .then(() => {
+
+        document.getElementById("reader").innerHTML = "";
+
+        scannerActif = false;
+    });
+}
+
+    scannerActif = true;
+}
 function interrogerBlockchain() {
 
     const mat = document
@@ -399,14 +424,34 @@ currentPdfUrl = data.PDFURL;
 
 function voirDocument() {
 
-    console.log(currentPdfUrl);
-
     if(!currentPdfUrl){
         alert("Document introuvable.");
         return;
     }
 
-    window.open(currentPdfUrl, "_blank");
+    const nouvelleFenetre = window.open("");
+
+    nouvelleFenetre.document.write(`
+        <html>
+        <head>
+            <title>Diplôme ISC</title>
+            <style>
+                body{
+                    margin:0;
+                    overflow:hidden;
+                }
+                iframe{
+                    width:100%;
+                    height:100vh;
+                    border:none;
+                }
+            </style>
+        </head>
+        <body>
+            <iframe src="${currentPdfUrl}"></iframe>
+        </body>
+        </html>
+    `);
 }
 
 function telechargerDiplome() {
