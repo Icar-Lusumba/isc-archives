@@ -461,44 +461,94 @@
         let signer;
         let contractInstance = null;
 
-        const contractAddress = "0x7D3A7A7ebEa27A231061C96c0AECC83c6572211D";
+        const contractAddress = "0x8468E33f81016A99A29466860086006424b63cd97";
 
         const contractABI = [
-        {
-        "inputs":[{"components":[
-        {"internalType":"string","name":"nom","type":"string"},
-        {"internalType":"string","name":"mat","type":"string"},
-        {"internalType":"string","name":"fac","type":"string"},
-        {"internalType":"string","name":"fil","type":"string"},
-        {"internalType":"string","name":"promo","type":"string"},
-        {"internalType":"string","name":"mention","type":"string"},
-        {"internalType":"string","name":"sexe","type":"string"},
-        {"internalType":"string","name":"docHash","type":"string"}
-        ],"internalType":"struct LGT_HUB_Archives.DiplomeInput","name":"d","type":"tuple"}],
-        "name":"scellerDiplome",
-        "outputs":[],
-        "stateMutability":"nonpayable",
-        "type":"function"
-        },
-        {
-        "inputs":[{"internalType":"string","name":"_mat","type":"string"}],
-        "name":"verifierDiplome",
-        "outputs":[{"components":[
-        {"internalType":"string","name":"nomEtudiant","type":"string"},
-        {"internalType":"string","name":"matricule","type":"string"},
-        {"internalType":"string","name":"faculte","type":"string"},
-        {"internalType":"string","name":"filiere","type":"string"},
-        {"internalType":"string","name":"promotion","type":"string"},
-        {"internalType":"string","name":"mention","type":"string"},
-        {"internalType":"string","name":"sexe","type":"string"},
-        {"internalType":"string","name":"documentHash","type":"string"},
-        {"internalType":"uint256","name":"dateEnregistrement","type":"uint256"},
-        {"internalType":"address","name":"auteurAction","type":"address"},
-        {"internalType":"bool","name":"estValide","type":"bool"}
-        ],"internalType":"struct LGT_HUB_Archives.Diplome","name":"","type":"tuple"}],
-        "stateMutability":"view",
-        "type":"function"
-        }
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    { "indexed": true, "internalType": "string", "name": "matricule", "type": "string" },
+                    { "indexed": false, "internalType": "string", "name": "nom", "type": "string" },
+                    { "indexed": false, "internalType": "address", "name": "auteur", "type": "address" }
+                ],
+                "name": "DiplomeScelle",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "adminSGA",
+                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getToutesLesArchives",
+                "outputs": [{ "internalType": "string[]", "name": "", "type": "string[]" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "components": [
+                            { "internalType": "string", "name": "nom", "type": "string" },
+                            { "internalType": "string", "name": "mat", "type": "string" },
+                            { "internalType": "string", "name": "fac", "type": "string" },
+                            { "internalType": "string", "name": "fil", "type": "string" },
+                            { "internalType": "string", "name": "promo", "type": "string" },
+                            { "internalType": "string", "name": "mention", "type": "string" },
+                            { "internalType": "string", "name": "sexe", "type": "string" },
+                            { "internalType": "string", "name": "docHash", "type": "string" }
+                        ],
+                        "internalType": "struct LGT_HUB_Archives.DiplomeInput",
+                        "name": "d",
+                        "type": "tuple"
+                    }
+                ],
+                "name": "scellerDiplome",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalDiplomes",
+                "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }],
+                "name": "verifierDiplome",
+                "outputs": [
+                    {
+                        "components": [
+                            { "internalType": "string", "name": "nomEtudiant", "type": "string" },
+                            { "internalType": "string", "name": "matricule", "type": "string" },
+                            { "internalType": "string", "name": "faculte", "type": "string" },
+                            { "internalType": "string", "name": "filiere", "type": "string" },
+                            { "internalType": "string", "name": "promotion", "type": "string" },
+                            { "internalType": "string", "name": "mention", "type": "string" },
+                            { "internalType": "string", "name": "sexe", "type": "string" },
+                            { "internalType": "string", "name": "documentHash", "type": "string" },
+                            { "internalType": "uint256", "name": "dateEnregistrement", "type": "uint256" },
+                            { "internalType": "address", "name": "auteurAction", "type": "address" },
+                            { "internalType": "bool", "name": "estValide", "type": "bool" }
+                        ],
+                        "internalType": "struct LGT_HUB_Archives.Diplome",
+                        "name": "",
+                        "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
         ];
 
         function startClock() {
