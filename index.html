@@ -852,6 +852,16 @@
                 document.getElementById("walletAddr").innerText = address;
 
                 alert("✅ Portefeuille connecté");
+
+                // CORRECTION: Vérifier le Chain ID pour s'assurer que c'est le bon réseau (Sepolia)
+                const network = await provider.getNetwork();
+                const sepoliaChainId = 11155111; // Chain ID de Sepolia
+
+                if (network.chainId !== sepoliaChainId) {
+                    alert(`🛑 ERREUR DE RÉSEAU : Veuillez vous connecter au réseau Sepolia (Chain ID: ${sepoliaChainId}) dans MetaMask.`);
+                    contractInstance = null; // Empêcher les interactions si le mauvais réseau est sélectionné
+                    return;
+                }
             }
             catch(error) {
                 console.error(error);
