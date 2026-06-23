@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LGT HUB | Admin Blockchain ISC</title>
-
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
@@ -45,15 +45,15 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0;
-            display: grid;
+            margin: 0; 
+            display: grid; 
             height: 100vh;
             grid-template-columns: 310px 1fr 340px;
             background: linear-gradient(rgba(248, 250, 252, 0.35), rgba(248, 250, 252, 0.45)), var(--bg-image);
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
-            color: var(--text);
+            color: var(--text); 
             transition: background 0.3s ease, color 0.3s ease;
             overflow: hidden;
         }
@@ -65,31 +65,26 @@
         }
 
         .col-left, .col-right {
-            background: var(--sidebar-bg);
+            background: var(--sidebar-bg); 
             -webkit-backdrop-filter: blur(30px);
             backdrop-filter: blur(30px);
-            padding: 24px;
+            padding: 24px; 
             border-right: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
+            display: flex; 
+            flex-direction: column; 
             gap: 18px;
             z-index: 5;
             box-shadow: 4px 0 24px var(--shadow-glow);
             transition: background 0.3s ease, border-color 0.3s ease;
         }
+        .col-right { border-right: none; border-left: 1px solid var(--glass-border); box-shadow: -4px 0 24px var(--shadow-glow); }
 
-        .col-right {
-            border-right: none;
-            border-left: 1px solid var(--glass-border);
-            box-shadow: -4px 0 24px var(--shadow-glow);
-        }
-
-        .col-mid {
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .col-mid { 
+            padding: 24px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
             position: relative;
             align-items: center;
         }
@@ -104,7 +99,7 @@
             padding: 12px;
             margin-bottom: 5px;
         }
-
+        
         .brand-title {
             text-align: center;
             font-size: 0.95rem;
@@ -114,11 +109,11 @@
         }
 
         .glass-card {
-            background: var(--glass-bg);
+            background: var(--glass-bg); 
             -webkit-backdrop-filter: blur(20px);
             backdrop-filter: blur(20px);
-            border-radius: 18px;
-            padding: 22px;
+            border-radius: 18px; 
+            padding: 22px; 
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px var(--shadow-glow);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -126,93 +121,49 @@
             box-sizing: border-box;
         }
 
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            width: 100%;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        label {
-            font-size: 0.72rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input, select {
-            padding: 11px 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: rgba(255,255,255,0.85);
-            font-size: 0.85rem;
-            color: #000;
-            outline: none;
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 0.72rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input, select { 
+            padding: 11px 14px; 
+            border-radius: 10px; 
+            border: 1px solid rgba(0, 0, 0, 0.08); 
+            background: rgba(255,255,255,0.85); 
+            font-size: 0.85rem; 
+            color: #000; 
+            outline: none; 
             font-weight: 600;
             transition: all 0.2s;
         }
-
         .dark-mode input, .dark-mode select {
-            background: rgba(15, 23, 42, 0.8) !important;
-            color: #fff !important;
+            background: rgba(15, 23, 42, 0.8) !important; 
+            color: #fff !important; 
             border: 1px solid rgba(255,255,255,0.15);
         }
-
-        input:focus, select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
-        }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15); }
 
         .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
+            background: var(--primary); 
+            color: white; 
+            border: none; 
             padding: 12px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 700;
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 700; 
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
             font-size: 0.88rem;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.25);
-        }
-
-        .btn-accent {
-            background: var(--accent);
-        }
-
-        .btn-accent:hover {
-            box-shadow: 0 6px 20px rgba(246, 133, 27, 0.25);
-        }
-
-        .btn-secondary {
-            background: rgba(0,0,0,0.05);
-            color: var(--text);
-            border: 1px solid var(--glass-border);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.25);
-        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30, 58, 138, 0.25); }
+        .btn-accent { background: var(--accent); }
+        .btn-accent:hover { box-shadow: 0 6px 20px rgba(246, 133, 27, 0.25); }
+        .btn-secondary { background: rgba(0,0,0,0.05); color: var(--text); border: 1px solid var(--glass-border); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { box-shadow: 0 6px 20px rgba(239, 68, 68, 0.25); }
 
         .profile-pic-container {
             position: relative;
@@ -220,25 +171,21 @@
             height: 95px;
             margin: 0 auto 12px;
         }
-
         .profile-pic-box {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
             border: 3px solid var(--primary);
-            overflow: hidden;
-            background: rgba(255,255,255,0.5);
+            overflow: hidden; 
+            background: rgba(255,255,255,0.5); 
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
             box-shadow: 0 8px 20px var(--shadow-glow);
             transition: transform 0.3s ease;
         }
-
-        .profile-pic-box:hover {
-            transform: scale(1.04);
-        }
+        .profile-pic-box:hover { transform: scale(1.04); }
 
         .qr-display-center {
             margin-top: auto;
@@ -249,7 +196,6 @@
             gap: 12px;
             width: 100%;
         }
-
         .qr-halo-wrapper {
             background: white;
             padding: 14px;
@@ -258,7 +204,6 @@
             transition: all 0.5s ease;
             display: inline-block;
         }
-
         .qr-glow-active {
             --qr-glow: rgba(16, 185, 129, 0.65);
             box-shadow: 0 0 25px 6px var(--qr-glow), 0 10px 30px var(--shadow-glow) !important;
@@ -279,7 +224,6 @@
             gap: 12px;
             width: 100%;
         }
-
         .faculty-card {
             background: rgba(255,255,255,0.3);
             border: 1px solid var(--glass-border);
@@ -287,29 +231,9 @@
             border-radius: 14px;
             text-align: center;
         }
-
-        .faculty-card h4 {
-            margin: 0;
-            font-size: 1.15rem;
-            color: var(--primary);
-            font-weight: 800;
-        }
-
-        .faculty-card p {
-            margin: 3px 0 0 0;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-
-        .faculty-subtext {
-            font-size: 0.58rem;
-            opacity: 0.6;
-            display: block;
-            margin-top: 2px;
-            font-style: italic;
-        }
+        .faculty-card h4 { margin: 0; font-size: 1.15rem; color: var(--primary); font-weight: 800; }
+        .faculty-card p { margin: 3px 0 0 0; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
+        .faculty-subtext { font-size: 0.58rem; opacity: 0.6; display: block; margin-top: 2px; font-style: italic; }
 
         .live-clock-box {
             margin-top: auto;
@@ -323,64 +247,30 @@
             gap: 8px;
         }
 
-        #registreSection {
-            display: none;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
-            z-index: 100;
-            background: var(--glass-bg);
+        #registreSection { 
+            display: none; 
+            position: absolute; 
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
+            z-index: 100; 
+            background: var(--glass-bg); 
             -webkit-backdrop-filter: blur(35px);
             backdrop-filter: blur(35px);
-            border-radius: 25px;
-            border: 2px solid var(--primary);
-            padding: 25px;
+            border-radius: 25px; 
+            border: 2px solid var(--primary); 
+            padding: 25px; 
             overflow-y: auto;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background: rgba(255,255,255,0.85);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .dark-mode table {
-            background: rgba(30, 41, 59, 0.85);
-        }
-
-        th, td {
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-            font-size: 0.82rem;
-            color: var(--text);
-        }
-
-        th {
-            background: var(--primary);
-            color: white;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(255,255,255,0.85); border-radius: 12px; overflow: hidden; }
+        .dark-mode table { background: rgba(30, 41, 59, 0.85); }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 0.82rem; color: var(--text); }
+        th { background: var(--primary); color: white; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
 
         @media print {
             body * { visibility: hidden; }
             #printFrame, #printFrame * { visibility: visible; }
-            #printFrame {
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                border: none;
-            }
+            #printFrame { position: fixed; left: 0; top: 0; width: 100%; height: 100%; border: none; }
         }
     </style>
 </head>
@@ -388,45 +278,26 @@
 
     <div class="col-left">
         <div class="brand-header">
-            <div style="text-align: center;">
-                <i class="fas fa-cubes" style="font-size: 24px; color: var(--accent);"></i>
-                <div style="font-size:0.55rem; font-weight:800;">LGT HUB</div>
-            </div>
+            <div style="text-align: center;"><i class="fas fa-cubes" style="font-size: 24px; color: var(--accent);"></i><div style="font-size:0.55rem; font-weight:800;">LGT HUB</div></div>
             <div style="width: 1px; height: 30px; background: var(--glass-border);"></div>
             <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="35" height="35" alt="Logo ISC" style="border-radius: 6px; object-fit: cover;">
         </div>
-
         <div class="brand-title">SYSTEME DE SCELLAGE NUMERIQUE</div>
-
-        <button class="btn btn-secondary" onclick="toggleTheme()">
-            <i class="fas fa-moon" id="themeIcon"></i>
-            <span id="themeText">Mode Sombre</span>
-        </button>
-
+        
+        <button class="btn btn-secondary" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i> <span id="themeText">Mode Sombre</span></button>
         <hr style="width:100%; border:none; height:1px; background:var(--glass-border);">
 
-        <button class="btn btn-accent" onclick="document.getElementById('nom').focus();">
-            <i class="fas fa-plus-circle"></i> NOUVEAU SCELLAGE
-        </button>
-
-        <button class="btn btn-secondary" id="globalPrintBtn" onclick="printTargetedDoc()">
-            <i class="fas fa-print"></i> IMPRIMER LE DOCUMENT
-        </button>
+        <button class="btn btn-accent" onclick="document.getElementById('nom').focus();"><i class="fas fa-plus-circle"></i> NOUVEAU SCELLAGE</button>
+        <button class="btn btn-secondary" id="globalPrintBtn" onclick="printTargetedDoc()"><i class="fas fa-print"></i> IMPRIMER LE DOCUMENT</button>
 
         <div class="glass-card" style="padding: 14px; margin-top: 5px;">
             <label><i class="fas fa-camera"></i> Contrôle Caméra QR</label>
             <div id="reader" style="margin-top:8px; border-radius: 10px; overflow:hidden; display:none;"></div>
-            <button id="btnStart" class="btn" style="width:100%; margin-top:8px; font-size: 0.8rem;" onclick="startScan()">
-                <i class="fas fa-video"></i> Activer Scanner
-            </button>
-            <button id="btnStop" class="btn btn-danger" style="width:100%; margin-top:5px; display:none; font-size: 0.8rem;" onclick="stopScan()">
-                <i class="fas fa-stop"></i> Arrêter
-            </button>
+            <button id="btnStart" class="btn" style="width:100%; margin-top:8px; font-size: 0.8rem;" onclick="startScan()"><i class="fas fa-video"></i> Activer Scanner</button>
+            <button id="btnStop" class="btn btn-danger" style="width:100%; margin-top:5px; display:none; font-size: 0.8rem;" onclick="stopScan()"><i class="fas fa-stop"></i> Arrêter</button>
         </div>
-
-        <button class="btn" style="background: rgba(30, 58, 138, 0.15); color: var(--primary);" onclick="toggleRegistre()">
-            <i class="fas fa-folder-open"></i> Registre Central (Firebase)
-        </button>
+        
+        <button class="btn" style="background: rgba(30, 58, 138, 0.15); color: var(--primary);" onclick="toggleRegistre()"><i class="fas fa-folder-open"></i> Registre Central (Firebase)</button>
 
         <div class="live-clock-box">
             <i class="far fa-clock"></i>
@@ -438,7 +309,7 @@
         <div style="text-align: center; margin-bottom: 5px;">
             <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="65" alt="Logo ISC" style="border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.15);">
         </div>
-
+        
         <div class="faculty-monitor">
             <div class="faculty-card">
                 <h4 id="countInfo">000</h4>
@@ -458,21 +329,16 @@
         </div>
 
         <div class="glass-card">
-            <h3 style="margin:0 0 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.1rem;">
-                ANCRAGE BLOCKCHAIN IMMUABLE
-            </h3>
-
+            <h3 style="margin:0 0 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.1rem;">ANCRAGE BLOCKCHAIN IMMUABLE</h3>
             <div class="input-grid">
                 <div class="input-group">
                     <label>Nom Complet de l'Étudiant</label>
                     <input type="text" id="nom" placeholder="Ex: Jean Mukendi">
                 </div>
-
                 <div class="input-group">
                     <label>Matricule Académique</label>
                     <input type="text" id="mat" placeholder="2026-ISC-001">
                 </div>
-
                 <div class="input-group">
                     <label>Faculté / Section</label>
                     <select id="fac" onchange="updateFiliere()">
@@ -481,12 +347,10 @@
                         <option value="Secrétariat de Direction">Secrétariat de Direction</option>
                     </select>
                 </div>
-
                 <div class="input-group">
                     <label>Filière / Option</label>
                     <select id="filiere"></select>
                 </div>
-
                 <div class="input-group" style="grid-column: span 2;">
                     <label>Sexe de l'Étudiant</label>
                     <select id="sexe">
@@ -495,50 +359,32 @@
                     </select>
                 </div>
             </div>
-
             <div class="input-group" style="margin-top:12px;">
                 <label>Diplôme Numérique Source (PDF ou Image)</label>
                 <input type="file" id="fileInput" accept="application/pdf,image/*">
             </div>
-
-            <button class="btn btn-accent" style="width:100%; margin-top:18px; padding:14px; font-size: 0.95rem;" onclick="scellerMaintenant()">
-                <i class="fas fa-link"></i> EFFECTUER L'ANCRAGE SECURISE
-            </button>
+            <button class="btn btn-accent" style="width:100%; margin-top:18px; padding:14px; font-size: 0.95rem;" onclick="scellerMaintenant()"><i class="fas fa-link"></i> EFFECTUER L'ANCRAGE SECURISE</button>
         </div>
 
         <div class="qr-display-center">
             <div class="qr-halo-wrapper" id="qrWrapper">
                 <div id="qrcode" style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; background: white;"></div>
             </div>
-
-            <div id="statusTag" style="font-size: 0.68rem; font-weight: 800; color: var(--text-secondary); letter-spacing: 0.5px;">
-                EN ATTENTE DE GENERATION
-            </div>
-
+            <div id="statusTag" style="font-size: 0.68rem; font-weight: 800; color: var(--text-secondary); letter-spacing: 0.5px;">EN ATTENTE DE GENERATION</div>
+            
             <div class="doc-actions-box" id="docActions">
-                <button class="btn" style="padding: 8px; font-size: 0.7rem;" onclick="actionVoir()">
-                    <i class="fas fa-eye"></i> Voir
-                </button>
-                <button class="btn btn-accent" style="padding: 8px; font-size: 0.7rem;" onclick="actionTelecharger()">
-                    <i class="fas fa-download"></i> Télécharger
-                </button>
-                <button class="btn btn-secondary" style="padding: 8px; font-size: 0.7rem;" onclick="printTargetedDoc()">
-                    <i class="fas fa-print"></i> Imprimer
-                </button>
-                <button class="btn btn-danger" id="btnDeleteCurrent" style="padding: 8px; font-size: 0.7rem;" onclick="supprimerDiplomeSelectionne()">
-                    <i class="fas fa-trash-alt"></i> Supprimer
-                </button>
+                <button class="btn" style="padding: 8px; font-size: 0.7rem;" onclick="actionVoir()"><i class="fas fa-eye"></i> Voir</button>
+                <button class="btn btn-accent" style="padding: 8px; font-size: 0.7rem;" onclick="actionTelecharger()"><i class="fas fa-download"></i> Télécharger</button>
+                <button class="btn btn-secondary" style="padding: 8px; font-size: 0.7rem;" onclick="printTargetedDoc()"><i class="fas fa-print"></i> Imprimer</button>
+                <button class="btn btn-danger" id="btnDeleteCurrent" style="padding: 8px; font-size: 0.7rem;" onclick="supprimerDiplomeSelectionne()"><i class="fas fa-trash-alt"></i> Supprimer</button>
             </div>
         </div>
 
         <div id="registreSection">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px;">
-                <h3 style="margin:0; color: var(--primary); font-weight: 800;">
-                    <i class="fas fa-database"></i> Registre Central Décentralisé ISC
-                </h3>
+                <h3 style="margin:0; color: var(--primary); font-weight: 800;"><i class="fas fa-database"></i> Registre Central Décentralisé ISC</h3>
                 <button class="btn btn-danger" style="padding: 6px 14px;" onclick="toggleRegistre()">Fermer</button>
             </div>
-
             <table>
                 <thead>
                     <tr>
@@ -559,45 +405,32 @@
             <div class="profile-pic-container">
                 <div class="profile-pic-box" onclick="document.getElementById('imgUp').click()">
                     <img id="avatar" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
-                    <span id="plus" style="font-size:1.5rem; color:var(--primary);">
-                        <i class="fas fa-user-shield"></i>
-                    </span>
+                    <span id="plus" style="font-size:1.5rem; color:var(--primary);"><i class="fas fa-user-shield"></i></span>
                 </div>
             </div>
-
             <input type="file" id="imgUp" hidden onchange="previewImg(this)">
-
+            
             <div id="adminForm">
                 <input type="text" id="adminName" placeholder="Nom de l'Administrateur" style="margin-bottom:8px; width: 100%; box-sizing: border-box;">
                 <input type="email" id="adminEmail" placeholder="Adresse Email ISC" style="width: 100%; box-sizing: border-box;">
-                <button class="btn" style="width:100%; margin-top:12px;" onclick="creerCompteAdmin()">
-                    <i class="fas fa-fingerprint"></i> SIGNER LA SESSION
-                </button>
+                <button class="btn" style="width:100%; margin-top:12px;" onclick="creerCompteAdmin()"><i class="fas fa-fingerprint"></i> SIGNER LA SESSION</button>
             </div>
-
+            
             <div id="adminProfileActive" style="display:none;">
                 <span style="font-size: 0.62rem; background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-weight: 800;">SGA AUTHENTIFIÉ</span>
                 <h4 id="displayAdminName" style="margin: 10px 0 4px; text-transform: uppercase; font-size: 0.95rem; font-weight: 800;">ADMINISTRATEUR</h4>
                 <p id="displayAdminEmail" style="font-size: 0.72rem; margin: 0; color: var(--primary); font-weight: 600;"></p>
-                <button class="btn btn-danger" style="width:100%; margin-top:12px; font-size: 0.75rem;" onclick="deconnecterAdmin()">
-                    <i class="fas fa-sign-out-alt"></i> DÉCONNEXION
-                </button>
+                <button class="btn btn-danger" style="width:100%; margin-top:12px; font-size: 0.75rem;" onclick="deconnecterAdmin()"><i class="fas fa-sign-out-alt"></i> DÉCONNEXION</button>
             </div>
         </div>
 
         <div class="glass-card">
             <label><i class="fab fa-ethereum"></i> Connecteur Web3 Node</label>
-            <button class="btn" style="width:100%; margin-top:8px; background:#0f172a; font-size: 0.8rem;" onclick="connectWallet()">
-                <i class="fas fa-wallet"></i> MetaMask Connection
-            </button>
-            <div id="walletAddr" style="font-size:0.62rem; margin-top:8px; color:var(--accent); word-break: break-all; font-family: monospace; text-align: center;">
-                0x000... Non synchronisé
-            </div>
+            <button class="btn" style="width:100%; margin-top:8px; background:#0f172a; font-size: 0.8rem;" onclick="connectWallet()"><i class="fas fa-wallet"></i> MetaMask Connection</button>
+            <div id="walletAddr" style="font-size:0.62rem; margin-top:8px; color:var(--accent); word-break: break-all; font-family: monospace; text-align: center;">0x000... Non synchronisé</div>
         </div>
 
-        <button class="btn btn-secondary" style="margin-top: auto; padding: 14px;" onclick="window.location.href='https://lgt-hub-archivage-isc.vercel.app/'">
-            <i class="fas fa-external-link-alt"></i> Ouvrir le portail public
-        </button>
+        <button class="btn btn-secondary" style="margin-top: auto; padding: 14px;" onclick="window.location.href='https://lgt-hub-archivage-isc.vercel.app/'"><i class="fas fa-external-link-alt"></i> Ouvrir le portail public</button>
     </div>
 
     <iframe id="printFrame" style="display:none;"></iframe>
@@ -613,127 +446,234 @@
             appId: "1:355077255297:web:cbc97343febd93edbcdd80"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
-        const storage = firebase.storage();
+        const storage = firebase.storage(); // CORRECTION: Initialisation de Firebase Storage
 
-        let html5QrCode = null;
-        let selectedFile = null;
+        let html5QrCode;
         let fileDataUrl = "";
-        let currentActiveDocUrl = "";
+        let currentActiveDocUrl = ""; 
         let currentActiveDocName = "diplome";
         let currentActiveMatricule = "";
         let isAdminConnected = false;
 
-        let provider = null;
-        let signer = null;
+        let provider;
+        let signer;
         let contractInstance = null;
 
-        // ⚠️ Cette adresse semble invalide dans ton ancien code.
-        // Remplace-la par la vraie adresse du smart contract déployé sur Sepolia.
-        const contractAddress = "0x8468E33f81016A99A29466860086006424b63cd97";
+        const contractAddress = "0x5015dEe165411D3fE1fbb7FB88F2403DC0cB377C";
 
         const contractABI = [
-            {
-                "inputs": [],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    { "indexed": true, "internalType": "string", "name": "matricule", "type": "string" },
-                    { "indexed": false, "internalType": "string", "name": "nom", "type": "string" },
-                    { "indexed": false, "internalType": "address", "name": "auteur", "type": "address" }
-                ],
-                "name": "DiplomeScelle",
-                "type": "event"
-            },
-            {
-                "inputs": [],
-                "name": "adminSGA",
-                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getToutesLesArchives",
-                "outputs": [{ "internalType": "string[]", "name": "", "type": "string[]" }],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "components": [
-                            { "internalType": "string", "name": "nom", "type": "string" },
-                            { "internalType": "string", "name": "mat", "type": "string" },
-                            { "internalType": "string", "name": "fac", "type": "string" },
-                            { "internalType": "string", "name": "fil", "type": "string" },
-                            { "internalType": "string", "name": "promo", "type": "string" },
-                            { "internalType": "string", "name": "mention", "type": "string" },
-                            { "internalType": "string", "name": "sexe", "type": "string" },
-                            { "internalType": "string", "name": "docHash", "type": "string" }
-                        ],
-                        "internalType": "struct LGT_HUB_Archives.DiplomeInput",
-                        "name": "d",
-                        "type": "tuple"
-                    }
-                ],
-                "name": "scellerDiplome",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "totalDiplomes",
-                "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }],
-                "name": "verifierDiplome",
-                "outputs": [
-                    {
-                        "components": [
-                            { "internalType": "string", "name": "nomEtudiant", "type": "string" },
-                            { "internalType": "string", "name": "matricule", "type": "string" },
-                            { "internalType": "string", "name": "faculte", "type": "string" },
-                            { "internalType": "string", "name": "filiere", "type": "string" },
-                            { "internalType": "string", "name": "promotion", "type": "string" },
-                            { "internalType": "string", "name": "mention", "type": "string" },
-                            { "internalType": "string", "name": "sexe", "type": "string" },
-                            { "internalType": "string", "name": "documentHash", "type": "string" },
-                            { "internalType": "uint256", "name": "dateEnregistrement", "type": "uint256" },
-                            { "internalType": "address", "name": "auteurAction", "type": "address" },
-                            { "internalType": "bool", "name": "estValide", "type": "bool" }
-                        ],
-                        "internalType": "struct LGT_HUB_Archives.Diplome",
-                        "name": "",
-                        "type": "tuple"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "matricule",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "nom",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "auteur",
+        "type": "address"
+      }
+    ],
+    "name": "DiplomeScelle",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "nom",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "mat",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "fac",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "fil",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "promo",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "mention",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "sexe",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "docHash",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct LGT_HUB_Archives.DiplomeInput",
+        "name": "d",
+        "type": "tuple"
+      }
+    ],
+    "name": "scellerDiplome",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "adminSGA",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getToutesLesArchives",
+    "outputs": [
+      {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalDiplomes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_mat",
+        "type": "string"
+      }
+    ],
+    "name": "verifierDiplome",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "nomEtudiant",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "matricule",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "faculte",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "filiere",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "promotion",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "mention",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "sexe",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "documentHash",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dateEnregistrement",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "auteurAction",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "estValide",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct LGT_HUB_Archives.Diplome",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
         function startClock() {
-            function refreshClock() {
+            setInterval(() => {
                 const now = new Date();
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 const dateStr = now.toLocaleDateString('fr-FR', options);
                 const timeStr = now.toLocaleTimeString('fr-FR');
                 document.getElementById('liveClock').innerText = `${dateStr} à ${timeStr}`;
-            }
-            refreshClock();
-            setInterval(refreshClock, 1000);
+            }, 1000);
         }
         startClock();
 
@@ -747,18 +687,19 @@
 
         function toggleRegistre() {
             const reg = document.getElementById('registreSection');
-            reg.style.display = (reg.style.display === 'block') ? 'none' : 'block';
+            if (reg.style.display === 'block') {
+                reg.style.display = 'none';
+            } else {
+                reg.style.display = 'block';
+                updateRegistre(); // Mettre à jour le registre quand il est ouvert
+            }
         }
 
         function creerCompteAdmin() {
             const name = document.getElementById('adminName').value.trim();
             const email = document.getElementById('adminEmail').value.trim();
-
-            if (!name || !email) {
-                alert("Veuillez remplir les informations administrateur.");
-                return;
-            }
-
+            if(!name || !email) return alert("Veuillez remplir les informations administrateur.");
+            
             isAdminConnected = true;
             document.getElementById('adminForm').style.display = 'none';
             document.getElementById('adminProfileActive').style.display = 'block';
@@ -766,14 +707,51 @@
             document.getElementById('displayAdminEmail').innerText = email;
         }
 
+        // CORRECTION: Ajout de la fonction de déconnexion
         function deconnecterAdmin() {
             isAdminConnected = false;
-            document.getElementById('adminForm').style.display = 'block';
-            document.getElementById('adminProfileActive').style.display = 'none';
-            document.getElementById('adminName').value = '';
-            document.getElementById('adminEmail').value = '';
-            document.getElementById('avatar').style.display = 'none';
-            document.getElementById('plus').style.display = 'block';
+            document.getElementById("adminForm").style.display = "block";
+            document.getElementById("adminProfileActive").style.display = "none";
+            document.getElementById("adminName").value = "";
+            document.getElementById("adminEmail").value = "";
+            document.getElementById("avatar").style.display = "none";
+            document.getElementById("plus").style.display = "block";
+        }
+
+        // Fonction pour mettre à jour le registre des diplômes
+        function updateRegistre() {
+            db.ref("archives/").on("value", (snapshot) => {
+                let infoCount = 0, comCount = 0, secCount = 0;
+                const tableBody = document.getElementById("tableBody");
+                tableBody.innerHTML = ""; // Nettoie le tableau avant de le remplir
+
+                snapshot.forEach((child) => {
+                    const data = child.val();
+
+                    // Sécurité antianomalie pour ignorer les lignes vides ou indéfinies dans Firebase
+                    if (!data.MATRICULE || data.MATRICULE === "undefined") return;
+
+                    if (data.FACULTE === "Informatique de Gestion") infoCount++;
+                    else if (data.FACULTE === "Sciences Commerciales et Financières") comCount++;
+                    else if (data.FACULTE === "Secrétariat de Direction") secCount++;
+
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${data.MATRICULE}</td>
+                        <td>${data.NOM}</td>
+                        <td>${data.SEXE}</td>
+                        <td>${data.FILIERE}</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.7rem;" onclick="actionVoir(\"${data.PDFURL}\")"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-accent" style="padding: 5px 10px; font-size: 0.7rem;" onclick="actionTelecharger(\"${data.PDFURL}\", \"Diplome_${data.MATRICULE}\")"><i class="fas fa-download"></i></button>
+                        </td>
+                    `;
+                });
+
+                document.getElementById("countInfo").innerText = String(infoCount).padStart(3, "0");
+                document.getElementById("countCom").innerText = String(comCount).padStart(3, "0");
+                document.getElementById("countSec").innerText = String(secCount).padStart(3, "0");
+            });
         }
 
         function previewImg(input) {
@@ -783,318 +761,142 @@
                     document.getElementById('avatar').src = e.target.result;
                     document.getElementById('avatar').style.display = 'block';
                     document.getElementById('plus').style.display = 'none';
-                };
+                }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function clearCurrentSelection() {
-            currentActiveMatricule = "";
-            currentActiveDocUrl = "";
-            currentActiveDocName = "diplome";
-            document.getElementById('qrcode').innerHTML = "";
-            document.getElementById('qrWrapper').classList.remove('qr-glow-active');
-            document.getElementById('docActions').style.display = 'none';
-            document.getElementById('statusTag').innerText = "EN ATTENTE DE GENERATION";
-        }
 
-        function updateFiliere() {
-            const fac = document.getElementById('fac').value;
-            const filiere = document.getElementById('filiere');
-            filiere.innerHTML = "";
-
-            if (fac === "Informatique de Gestion") {
-                filiere.innerHTML =
-                    "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option>" +
-                    "<option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
-            } else if (fac === "Sciences Commerciales et Financières") {
-                filiere.innerHTML =
-                    "<option value='Banque et Assurance'>Banque & Assurance</option>" +
-                    "<option value='Douane'>Douane</option>" +
-                    "<option value='Marketing'>Marketing</option>" +
-                    "<option value='Comptabilité'>Comptabilité</option>" +
-                    "<option value='Gestion Financière'>Gestion Financière</option>";
-            } else {
-                filiere.innerHTML =
-                    "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
-            }
-        }
-        updateFiliere();
-
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-
-            if (!file) {
-                selectedFile = null;
-                fileDataUrl = "";
-                currentActiveDocUrl = "";
-                return;
-            }
-
-            selectedFile = file;
-            currentActiveDocName = file.name;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                fileDataUrl = event.target.result;
-                currentActiveDocUrl = fileDataUrl;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function genererQrCode(matricule) {
-            const qrContainer = document.getElementById('qrcode');
-            const qrWrapper = document.getElementById('qrWrapper');
-
-            qrContainer.innerHTML = "";
-
-            if (typeof QRCode === "undefined") {
-                console.error("QRCode.js n'est pas chargé.");
-                document.getElementById('statusTag').innerText = "ERREUR : LIBRAIRIE QR NON CHARGÉE";
-                return;
-            }
-
-            const lienVerification = `https://isc-archives.vercel.app/verif.html?mat=${encodeURIComponent(matricule)}`;
-
-            new QRCode(qrContainer, {
-                text: lienVerification,
-                width: 100,
-                height: 100,
-                colorDark: "#0f172a",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            qrWrapper.classList.add('qr-glow-active');
-        }
 
         function selectDocument(matricule) {
             db.ref('archives/' + matricule).once('value').then(snapshot => {
                 const data = snapshot.val();
-
                 if (data && data.PDFURL) {
                     currentActiveDocUrl = data.PDFURL;
                     currentActiveMatricule = matricule;
-                    currentActiveDocName = data.FILENAME || ("Diplome_" + matricule);
-
+                    currentActiveDocName = "Diplome_" + matricule;
                     document.getElementById('docActions').style.display = 'grid';
-                    document.getElementById('statusTag').innerHTML =
-                        `DOCUMENT SÉLECTIONNÉ : ${matricule} <i class='fas fa-file-invoice' style='color:var(--accent);'></i>`;
-
+                    document.getElementById('statusTag').innerHTML = `DOCUMENT SÉLECTIONNÉ : ${matricule} <i class='fas fa-file-invoice' style='color:var(--accent);'></i>`;
+                    
+                    // Génération dynamique du QR Code pointant vers Vercel avec le paramètre ?mat=
                     genererQrCode(matricule);
-                    toggleRegistre();
-                } else {
-                    alert("Document introuvable.");
-                }
-            }).catch(error => {
-                console.error("Erreur selectDocument :", error);
-                alert("Erreur lors de la lecture du document.");
+                    toggleRegistre(); 
+                } else { alert("Document introuvable."); }
+            });
+        }
+
+        function genererQrCode(matricule) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ""; // Nettoie l'ancien QR code
+
+            const lienVerification = `https://isc-archives.vercel.app/verif.html?mat=${matricule}`;
+
+            new QRCode(qrContainer,{
+                text:lienVerification,
+                width:100,
+                height:100
             });
         }
 
         function supprimerDiplomeSelectionne() {
-            if (!currentActiveMatricule) {
-                alert("Aucun diplôme sélectionné à supprimer.");
-                return;
-            }
+            if (!currentActiveMatricule) return alert("Aucun diplôme sélectionné à supprimer.");
             supprimerDirectement(currentActiveMatricule);
         }
 
         function supprimerDirectement(matricule) {
-            if (!isAdminConnected) {
-                alert("🛑 ACTION REFUSÉE : Authentifiez-vous en tant qu'administrateur à droite.");
-                return;
-            }
-
+            if(!isAdminConnected) return alert("🛑 ACTION REFUSÉE : Authentifiez-vous en tant qu'administrateur à droite.");
+            
             const confirmation = confirm(`Supprimer définitivement le diplôme ${matricule} du registre central ?`);
-            if (!confirmation) return;
-
-            db.ref('archives/' + matricule).remove()
+            if (confirmation) {
+                db.ref('archives/' + matricule).remove()
                 .then(() => {
                     alert(`✅ Le diplôme lié au matricule ${matricule} a été supprimé.`);
                     if (currentActiveMatricule === matricule) {
-                        clearCurrentSelection();
+                        currentActiveMatricule = "";
+                        currentActiveDocUrl = "";
+                        document.getElementById('qrcode').innerHTML = "";
+                        document.getElementById('qrWrapper').classList.remove('qr-glow-active');
+                        document.getElementById('docActions').style.display = 'none';
+                        document.getElementById('statusTag').innerText = "EN ATTENTE DE GENERATION";
                     }
                 })
-                .catch((error) => {
-                    console.error("Erreur suppression :", error);
-                    alert("Erreur lors de la suppression : " + error.message);
-                });
+                .catch((error) => { alert("Erreur lors de la suppression : " + error.message); });
+            }
         }
 
         function actionVoir() {
-            if (!currentActiveDocUrl) {
-                alert("Aucun document chargé.");
-                return;
-            }
-
+            if (!currentActiveDocUrl) return alert("Aucun document chargé.");
             const w = window.open();
-            if (!w) {
-                alert("Le navigateur a bloqué l'ouverture de la fenêtre.");
-                return;
-            }
-
-            w.document.write(`
-                <iframe src="${currentActiveDocUrl}"
-                        frameborder="0"
-                        style="border:0; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%;"
-                        allowfullscreen>
-                </iframe>
-            `);
+            w.document.write(`<iframe src="${currentActiveDocUrl}" frameborder="0" style="border:0; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%;" allowfullscreen></iframe>`);
         }
 
         function actionTelecharger() {
-            if (!currentActiveDocUrl) {
-                alert("Aucun document chargé.");
-                return;
-            }
-
+            if (!currentActiveDocUrl) return alert("Aucun document chargé.");
             const a = document.createElement('a');
             a.href = currentActiveDocUrl;
-            a.download = currentActiveDocName || `Diplome_${currentActiveMatricule}`;
+            a.download = `${currentActiveDocName}.pdf`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
         function printTargetedDoc() {
-            if (!currentActiveDocUrl) {
-                alert("Sélectionnez ou scellez un document à imprimer.");
-                return;
-            }
-
+            if (!currentActiveDocUrl) return alert("Sélectionnez ou scellez un document à imprimer.");
             const pFrame = document.getElementById('printFrame');
             pFrame.src = currentActiveDocUrl;
             pFrame.onload = function() {
-                try {
-                    pFrame.contentWindow.focus();
-                    pFrame.contentWindow.print();
-                } catch (e) {
-                    console.error("Erreur impression :", e);
-                    alert("Impossible d'imprimer ce document depuis le navigateur.");
-                }
+                pFrame.contentWindow.focus();
+                pFrame.contentWindow.print();
             };
         }
 
-        db.ref('archives').on('value', snapshot => {
-            let infoCount = 0, comCount = 0, secCount = 0;
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = "";
-
-            snapshot.forEach(child => {
-                const data = child.val();
-
-                if (!data || !data.MATRICULE || data.MATRICULE === "undefined") return;
-
-                if (data.FACULTE === "Informatique de Gestion") infoCount++;
-                else if (data.FACULTE === "Sciences Commerciales et Financières") comCount++;
-                else if (data.FACULTE === "Secrétariat de Direction") secCount++;
-
-                const row = `
-                    <tr id="row-${data.MATRICULE}">
-                        <td style="font-weight:700; color:var(--primary);">${data.MATRICULE}</td>
-                        <td>${data.NOM || ''}</td>
-                        <td style="font-weight:bold;">${data.SEXE || 'M'}</td>
-                        <td><span style="font-size:0.75rem; opacity:0.8;">${data.FILIERE || 'N/A'}</span></td>
-                        <td style="display:flex; gap:5px;">
-                            <button class="btn" style="padding:5px 10px; font-size:0.75rem;" onclick="selectDocument('${data.MATRICULE}')">
-                                <i class="fas fa-check-circle"></i> Choisir
-                            </button>
-                            <button class="btn btn-danger" style="padding:5px 10px; font-size:0.75rem;" onclick="supprimerDirectement('${data.MATRICULE}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-
-                tableBody.insertAdjacentHTML('afterbegin', row);
-            });
-
-            document.getElementById('countInfo').innerText = infoCount.toString().padStart(3, '0');
-            document.getElementById('countCom').innerText = comCount.toString().padStart(3, '0');
-            document.getElementById('countSec').innerText = secCount.toString().padStart(3, '0');
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) { 
+                    fileDataUrl = event.target.result; 
+                    currentActiveDocUrl = fileDataUrl;
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
-        async function connectWallet() {
-            try {
-                if (!window.ethereum) {
-                    alert("MetaMask n'est pas installé.");
-                    return;
-                }
-
-                if (!ethers.utils.isAddress(contractAddress)) {
-                    alert("Adresse du smart contract invalide. Remplace contractAddress par la vraie adresse Sepolia.");
-                    return;
-                }
-
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-
-                const network = await provider.getNetwork();
-                const sepoliaChainId = 11155111;
-
-                if (network.chainId !== sepoliaChainId) {
-                    alert("🛑 Veuillez basculer MetaMask sur le réseau Sepolia.");
-                    contractInstance = null;
-                    return;
-                }
-
-                signer = provider.getSigner();
-                const address = await signer.getAddress();
-
-                const code = await provider.getCode(contractAddress);
-                if (!code || code === "0x") {
-                    alert("Aucun contrat déployé à cette adresse sur Sepolia.");
-                    contractInstance = null;
-                    return;
-                }
-
-                contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
-                document.getElementById("walletAddr").innerText = address;
-
-                alert("✅ Portefeuille connecté avec succès");
-            } catch (error) {
-                console.error("Erreur MetaMask :", error);
-                alert("Erreur connexion portefeuille : " + error.message);
+        function updateFiliere() {
+            const fac = document.getElementById('fac').value;
+            const filiere = document.getElementById('filiere');
+            filiere.innerHTML = "";
+            if (fac === "Informatique de Gestion") {
+                filiere.innerHTML = "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option><option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
+            } else if (fac === "Sciences Commerciales et Financières") {
+                filiere.innerHTML = "<option value='Banque et Assurance'>Banque & Assurance</option><option value='Douane'>Douane</option><option value='Marketing'>Marketing</option><option value='Comptabilité'>Comptabilité</option><option value='Gestion Financière'>Gestion Financière</option>";
+            } else {
+                filiere.innerHTML = "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
             }
         }
+        updateFiliere();
 
+        // ANCRAGE BLOCKCHAIN DOUBLE CORRIGÉ (Clés Firebase en MAJUSCULES)
         async function scellerMaintenant() {
-            if (!isAdminConnected) {
-                alert("🛑 ACCÈS ADM REFUSÉ : Validez votre profil d'administrateur à droite.");
-                return;
-            }
+            if(!isAdminConnected) return alert("🛑 ACCÈS ADM REFUSÉ : Validez votre profil d'administrateur à droite.");
+            if(!contractInstance) return alert("🛑 METAMASK REQUIS : Connectez votre portefeuille à droite.");
 
             const mat = document.getElementById('mat').value.trim().toUpperCase();
             const nom = document.getElementById('nom').value.trim();
             const fac = document.getElementById('fac').value;
             const fil = document.getElementById('filiere').value;
             const sexe = document.getElementById('sexe').value;
+            
+            if(!mat || !nom || !fileDataUrl) return alert("Champs ou fichier source manquant.");
 
-            if (!mat || !nom) {
-                alert("Veuillez remplir le nom et le matricule.");
-                return;
-            }
-
-            if (!selectedFile) {
-                alert("Veuillez choisir le diplôme numérique source.");
-                return;
-            }
-
-            if (mat === "UNDEFINED") {
-                alert("Matricule invalide.");
-                return;
-            }
+            // Sécurité anti-lignes corrompues
+            if(mat === "UNDEFINED" || mat === "") return alert("Matricule invalide.");
 
             try {
-                document.getElementById('statusTag').innerText = "CALCUL DU HASH DU DOCUMENT...";
-
-                const arrayBuffer = await selectedFile.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                const docHash = ethers.utils.sha256(uint8Array);
-
-                let txHash = "NON_ANCRE";
-                let blockchainOk = false;
+                document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
+                
+                // CORRECTION: Hash basé sur le contenu du fichier pour garantir l'immuabilité
+                const docHash = ethers.utils.sha256(ethers.utils.toUtf8Bytes(fileDataUrl));
 
                 const diplome = {
                     nom: nom,
@@ -1107,71 +909,83 @@
                     docHash: docHash
                 };
 
-                if (contractInstance && provider && ethers.utils.isAddress(contractAddress)) {
-                    try {
-                        document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
-                        await contractInstance.callStatic.scellerDiplome(diplome);
-                        const tx = await contractInstance.scellerDiplome(diplome);
-                        await tx.wait();
-                        txHash = tx.hash;
-                        blockchainOk = true;
-                    } catch (blockErr) {
-                        console.error("Erreur blockchain :", blockErr);
-                        blockchainOk = false;
-                    }
+                // Envoi Blockchain
+                console.log("Adresse utilisée :", contractAddress);
+
+                // CORRECTION: Suppression de la redéclaration de la variable 'code'
+                const contractCode = await provider.getCode(contractAddress);
+                console.log("CODE CONTRAT =", contractCode);
+                
+                const tx = await contractInstance.scellerDiplome(diplome);
+
+                document.getElementById('statusTag').innerText = "Validation de la transaction Blockchain...";
+
+                await tx.wait();
+
+                let downloadURL = "";
+                try {
+                    document.getElementById("statusTag").innerText = "Sauvegarde du document sur Firebase Storage...";
+                    const storageRef = storage.ref();
+                    const fileRef = storageRef.child(`diplomes/${mat}_${Date.now()}`);
+                    await fileRef.putString(fileDataUrl, 'data_url');
+                    downloadURL = await fileRef.getDownloadURL();
+                    console.log("URL PDF (Firebase Storage) =", downloadURL);
+                } catch (storageError) {
+                    console.error("Erreur lors de l'upload vers Firebase Storage:", storageError); alert("Vérifiez la console pour les détails de l'erreur Firebase Storage.");
+                    alert("ATTENTION: Erreur lors de l'upload du document vers Firebase Storage. Le diplôme sera ancré mais le fichier pourrait ne pas être accessible. Vérifiez vos règles Firebase Storage.");
+                    document.getElementById("statusTag").innerText = "Erreur d'upload Firebase Storage";
                 }
 
-                document.getElementById('statusTag').innerText = "UPLOAD DU DOCUMENT VERS FIREBASE...";
+                // Sauvegarde Firebase Realtime Database
+                document.getElementById("statusTag").innerText = "Enregistrement dans le registre Firebase...";
+                try {
+                    console.log("Tentative d'enregistrement dans Firebase Realtime Database pour matricule:", mat);
+                    await db.ref('archives/' + mat).set({
+                        MATRICULE: mat,
+                        NOM: nom,
+                        FACULTE: fac,
+                        FILIERE: fil,
+                        SEXE: sexe,
+                        PDFURL: downloadURL, // Peut être vide si l'upload a échoué
+                        HASH: docHash,
+                        DATE: new Date().toISOString(),
+                        TXHASH: tx.hash
+                    });
+                    console.log("Enregistrement Firebase Realtime Database réussi pour matricule:", mat);
+                } catch (dbError) {
+                    console.error("Erreur lors de l'enregistrement dans Firebase Realtime Database:", dbError); alert("Vérifiez la console pour les détails de l'erreur Firebase Realtime Database.");
+                    alert("ATTENTION: Erreur lors de l'enregistrement dans la base de données Firebase. Le diplôme a été ancré sur la blockchain, mais son enregistrement dans le registre central a échoué. Vérifiez vos règles Firebase Realtime Database.");
+                    document.getElementById("statusTag").innerText = "Erreur d'enregistrement Firebase DB";
+                }
 
-                const safeFileName = selectedFile.name.replace(/\s+/g, "_");
-                const storagePath = `diplomes/${mat}_${Date.now()}_${safeFileName}`;
-                const fileRef = storage.ref(storagePath);
-
-                const uploadSnapshot = await fileRef.put(selectedFile, {
-                    contentType: selectedFile.type || "application/octet-stream",
-                    customMetadata: {
-                        matricule: mat,
-                        nom: nom,
-                        hash: docHash
-                    }
-                });
-
-                const downloadURL = await uploadSnapshot.ref.getDownloadURL();
-
-                document.getElementById('statusTag').innerText = "ENREGISTREMENT DANS LA BASE DE DONNÉES...";
-
-                await db.ref('archives/' + mat).set({
-                    MATRICULE: mat,
-                    NOM: nom,
-                    FACULTE: fac,
-                    FILIERE: fil,
-                    SEXE: sexe,
-                    PDFURL: downloadURL,
-                    HASH: docHash,
-                    DATE: new Date().toISOString(),
-                    TXHASH: txHash,
-                    BLOCKCHAIN_STATUS: blockchainOk ? "ANCRE" : "NON_ANCRE",
-                    FILENAME: selectedFile.name,
-                    FILETYPE: selectedFile.type || "application/octet-stream"
-                });
+                document.getElementById('statusTag').innerText = "ANCRAGE REUSSI AVEC SUCCES !";
 
                 currentActiveMatricule = mat;
-                currentActiveDocUrl = downloadURL;
-                currentActiveDocName = selectedFile.name || ("Diplome_" + mat);
+                currentActiveDocUrl = downloadURL; // Utiliser l'URL distante
+                currentActiveDocName = "Diplome_" + mat;
 
-                genererQrCode(mat);
-                document.getElementById('docActions').style.display = 'grid';
-
-                if (blockchainOk) {
-                    document.getElementById('statusTag').innerText = "✅ SAUVEGARDE FIREBASE + ANCRAGE BLOCKCHAIN RÉUSSIS";
-                    alert("✅ Diplôme enregistré dans Firebase et ancré sur la Blockchain.\n\nTX HASH : " + txHash);
+                console.log("Tentative de génération du QR Code pour matricule:", mat);
+                // Toujours tenter de générer le QR Code si le matricule est disponible
+                if (mat) {
+                    if (typeof QRCode !== 'undefined') {
+                        genererQrCode(mat);
+                        console.log("QR Code généré pour matricule:", mat);
+                    } else {
+                        console.error("La bibliothèque QRCode.js n'est pas chargée. Le QR Code ne peut pas être généré.");
+                        alert("Erreur: La bibliothèque QRCode.js n'est pas chargée. Le QR Code ne peut pas être généré.");
+                    }
                 } else {
-                    document.getElementById('statusTag').innerText = "✅ SAUVEGARDE FIREBASE RÉUSSIE - BLOCKCHAIN NON ACTIVE";
-                    alert("✅ Diplôme enregistré dans Firebase et QR généré.\n⚠️ L'ancrage blockchain n'a pas été exécuté. Vérifie MetaMask, Sepolia et l'adresse du contrat.");
+                    console.warn("Matricule non disponible, impossible de générer le QR Code.");
                 }
+                document.getElementById('qrWrapper').classList.add('qr-glow-active'); // Activer l'effet de glow pour le QR code
+                document.getElementById('docActions').style.display = 'grid';
+                document.getElementById('qrcode').style.display = 'block'; // S'assurer que le conteneur QR est visible
+
+                alert("✅ Document ancré sur la Blockchain et enregistré dans Firebase.\n\nTX : " + tx.hash + "\n\nSi le document n'apparaît pas dans le registre, vérifiez les règles de sécurité de votre Firebase Realtime Database et Storage.");
+
             } catch (error) {
-                console.error("Erreur scellerMaintenant :", error);
-                document.getElementById('statusTag').innerText = "❌ ERREUR D'ANCRAGE / SAUVEGARDE";
+                console.error(error);
+                document.getElementById('statusTag').innerText = "ERREUR D'ANCRAGE";
                 alert("Erreur lors de l'exécution : " + error.message);
             }
         }
@@ -1182,55 +996,84 @@
             document.getElementById('btnStop').style.display = 'block';
 
             html5QrCode = new Html5Qrcode("reader");
-
             html5QrCode.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: 250 },
                 qrCodeMessage => {
                     stopScan();
-
-                    try {
-                        if (qrCodeMessage.includes("?mat=")) {
-                            const url = new URL(qrCodeMessage);
-                            const matriculeId = url.searchParams.get('mat');
-                            if (matriculeId) {
-                                selectDocument(matriculeId.trim().toUpperCase());
-                                return;
-                            }
-                        }
-
-                        selectDocument(qrCodeMessage.trim().toUpperCase());
-                    } catch (e) {
-                        console.error("Erreur lecture QR :", e);
+                    // Extraction automatique de la matricule si c'est un lien URL
+                    if(qrCodeMessage.includes("?mat=")) {
+                        const urlParams = new URLSearchParams(qrCodeMessage.split('?')[1]);
+                        const matriculeId = urlParams.get('mat');
+                        selectDocument(matriculeId);
+                    } else {
                         selectDocument(qrCodeMessage.trim().toUpperCase());
                     }
                 },
-                errorMessage => {
-                    console.error("Erreur scanner QR :", errorMessage);
+                errorMessage => { 
+                    // CORRECTION: Afficher l'erreur dans la console pour le débogage
+                    console.error("Erreur scanner QR:", errorMessage); 
                 }
             ).catch(err => {
-                console.error("Impossible d'accéder à la caméra :", err);
                 alert("Impossible d'accéder à la caméra : " + err);
                 stopScan();
             });
         }
 
         function stopScan() {
-            if (html5QrCode) {
+            if(html5QrCode) {
                 html5QrCode.stop().then(() => {
                     document.getElementById('reader').style.display = 'none';
                     document.getElementById('btnStart').style.display = 'block';
                     document.getElementById('btnStop').style.display = 'none';
-                }).catch(err => {
-                    console.log(err);
-                    document.getElementById('reader').style.display = 'none';
-                    document.getElementById('btnStart').style.display = 'block';
-                    document.getElementById('btnStop').style.display = 'none';
-                });
-            } else {
-                document.getElementById('reader').style.display = 'none';
-                document.getElementById('btnStart').style.display = 'block';
-                document.getElementById('btnStop').style.display = 'none';
+                }).catch(err => { console.error(err); });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            updateFiliere();
+            startClock();
+            updateRegistre(); // Appel de updateRegistre au chargement de la page
+        });
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    alert("MetaMask n'est pas installé.");
+                    return;
+                }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+
+                await provider.send("eth_requestAccounts", []);
+
+                signer = provider.getSigner();
+
+                const address = await signer.getAddress();
+
+                contractInstance = new ethers.Contract(
+                    contractAddress,
+                    contractABI,
+                    signer
+                );
+
+                document.getElementById("walletAddr").innerText = address;
+
+                alert("✅ Portefeuille connecté");
+
+                // CORRECTION: Vérifier le Chain ID pour s'assurer que c'est le bon réseau (Sepolia)
+                const network = await provider.getNetwork();
+                const sepoliaChainId = 11155111; // Chain ID de Sepolia
+
+                if (network.chainId !== sepoliaChainId) {
+                    alert(`🛑 ERREUR DE RÉSEAU : Veuillez vous connecter au réseau Sepolia (Chain ID: ${sepoliaChainId}) dans MetaMask.`);
+                    contractInstance = null; // Empêcher les interactions si le mauvais réseau est sélectionné
+                    return;
+                }
+            }
+            catch(error) {
+                console.error(error);
+                alert(error.message);
             }
         }
     </script>
