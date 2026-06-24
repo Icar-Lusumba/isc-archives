@@ -920,7 +920,7 @@
 
                 document.getElementById('statusTag').innerText = "Validation de la transaction Blockchain...";
 
-                await tx.wait();
+                const receipt = await tx.wait(1);
 
                 let downloadURL = "";
                 try {
@@ -928,8 +928,16 @@
                     const storageRef = storage.ref();
                     const fileRef = storageRef.child(`diplomes/${mat}_${Date.now()}`);
                     await fileRef.putString(fileDataUrl, 'data_url');
+
+console.log("UPLOAD OK");
+                    console.log("Upload terminé");
+console.log("Chemin =", fileRef.fullPath);
+
                     downloadURL = await fileRef.getDownloadURL();
+
+console.log("URL =", downloadURL);
                     console.log("URL PDF (Firebase Storage) =", downloadURL);
+                    console.log("Récupération URL...");
                 } catch (storageError) {
                     console.error("Erreur lors de l'upload vers Firebase Storage:", storageError); alert("Vérifiez la console pour les détails de l'erreur Firebase Storage.");
                     alert("ATTENTION: Erreur lors de l'upload du document vers Firebase Storage. Le diplôme sera ancré mais le fichier pourrait ne pas être accessible. Vérifiez vos règles Firebase Storage.");
