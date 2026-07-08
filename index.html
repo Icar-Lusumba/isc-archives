@@ -76,6 +76,7 @@
             z-index: 5;
             box-shadow: 4px 0 24px var(--shadow-glow);
             transition: background 0.3s ease, border-color 0.3s ease;
+            overflow-y: auto;
         }
         .col-right { border-right: none; border-left: 1px solid var(--glass-border); box-shadow: -4px 0 24px var(--shadow-glow); }
 
@@ -119,9 +120,15 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
             box-sizing: border-box;
+            flex-shrink: 0;
         }
 
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
+        .input-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 14px; 
+            width: 100%; 
+        }
         .input-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 0.72rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
         
@@ -472,7 +479,6 @@
         let signer;
         let contractInstance = null;
 
-        // ADRESSE DU CONTRAT (Doit être un Smart Contract, pas un portefeuille)
         const contractAddress = "0x5015dEe165411D3fE1fbb7FB88F2403DC0cB377C";
 
         const contractABI = [
@@ -579,7 +585,6 @@
             document.getElementById('displayAdminName').innerText = name;
             document.getElementById('displayAdminEmail').innerText = email;
             
-            // Copier l'avatar
             const avatarSrc = document.getElementById('avatar').src;
             if(avatarSrc) {
                 document.getElementById('displayAvatar').src = avatarSrc;
@@ -744,24 +749,16 @@
 
                 const diplome = { nom, mat, fac, fil, promo: "LMD", mention: "SATISFAISANT", sexe, docHash };
 
+                const admin = await contractInstance.adminSGA();
+                const user = await signer.getAddress();
+                
+                if (user.toLowerCase() !== admin.toLowerCase()) {
+                    throw new Error("Vous n'utilisez pas le portefeuille administrateur.");
+                }
+
                 // 1. Blockchain
-                console.log("Adresse connectée :", await signer.getAddress());
-
-const admin = await contractInstance.adminSGA();
-console.log("Admin du contrat :", admin);
-
-const network = await provider.getNetwork();
-console.log("Chain :", network.chainId);
-
-console.log("Diplôme :", diplome);
-
-const user = await signer.getAddress();
-
-if (user.toLowerCase() !== admin.toLowerCase()) {
-    throw new Error(
-        "Vous n'utilisez pas le portefeuille administrateur."
-    );
-}
+                const tx = await contractInstance.scellerDiplome(diplome);
+                await tx.wait();
 
                 // 2. Firebase Storage
                 document.getElementById('statusTag').innerText = "SAUVEGARDE STORAGE...";
@@ -787,16 +784,75 @@ if (user.toLowerCase() !== admin.toLowerCase()) {
                 document.getElementById('docActions').style.display = 'grid';
 
                 alert("✅ Succès ! Document ancré et enregistré.");
-            } catch(error){
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusTag').innerText = "ERREUR D'ANCRAGE";
+                alert("Erreur : " + error.message);
+            }
+        }
 
-    console.error(error);
+        function startScan() {
+            document.getElementById('reader').style.display = 'block';
+            document.getElementById('btnStart').style.display = 'none';
+            document.getElementById('btnStop').style.display = 'block';
 
-    alert(
-        error.reason ||
-        error.data?.message ||
-        error.message
-    );
-}
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                qrCodeMessage => {
+                    stopScan();
+                    if(qrCodeMessage.includes("?mat=")) {
+                        const urlParams = new URLSearchParams(qrCodeMessage.split('?')[1]);
+                        const matriculeId = urlParams.get('mat');
+                        selectDocument(matriculeId);
+                    } else {
+                        selectDocument(qrCodeMessage.trim().toUpperCase());
+                    }
+                },
+                errorMessage => { console.error("Erreur scanner QR:", errorMessage); }
+            ).catch(err => {
+                alert("Impossible d'accéder à la caméra : " + err);
+                stopScan();
+            });
+        }
+
+        function stopScan() {
+            if(html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('reader').style.display = 'none';
+                    document.getElementById('btnStart').style.display = 'block';
+                    document.getElementById('btnStop').style.display = 'none';
+                }).catch(err => { console.error(err); });
+            }
+        }
+
+        function selectDocument(matricule) {
+            db.ref('archives/' + matricule).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (data && data.PDFURL) {
+                    currentActiveDocUrl = data.PDFURL;
+                    currentActiveMatricule = matricule;
+                    currentActiveDocName = "Diplome_" + matricule;
+                    document.getElementById('docActions').style.display = 'grid';
+                    genererQrCode(matricule);
+                } else { alert("Document introuvable."); }
+            });
+        }
+
+        function supprimerDiplomeSelectionne() {
+            if (!currentActiveMatricule) return alert("Aucun diplôme sélectionné.");
+            if(!isAdminConnected) return alert("🛑 ACCÈS REFUSÉ.");
+            
+            if (confirm(`Supprimer définitivement ${currentActiveMatricule} ?`)) {
+                db.ref('archives/' + currentActiveMatricule).remove()
+                .then(() => {
+                    alert("✅ Supprimé.");
+                    location.reload();
+                })
+                .catch(error => { alert("Erreur : " + error.message); });
+            }
+        }
 
         document.addEventListener("DOMContentLoaded", () => {
             updateFiliere();
