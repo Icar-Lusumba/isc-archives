@@ -268,10 +268,19 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(255,255,255,0.85); border-radius: 12px; overflow: hidden; }
+        .search-box {
+            margin-bottom: 15px;
+            width: 100%;
+            display: flex;
+            gap: 10px;
+        }
+        .search-box input { flex: 1; padding: 12px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; background: rgba(255,255,255,0.85); border-radius: 12px; overflow: hidden; }
         .dark-mode table { background: rgba(30, 41, 59, 0.85); }
         th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 0.82rem; color: var(--text); }
         th { background: var(--primary); color: white; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        tr:hover { background: rgba(30, 58, 138, 0.05); cursor: pointer; }
 
         @media print {
             body * { visibility: hidden; }
@@ -384,10 +393,10 @@
                 <div id="qrcode"></div>
             </div>
             <div class="doc-actions-box" id="docActions">
-                <button class="btn btn-secondary" onclick="actionVoir()"><i class="fas fa-eye"></i></button>
-                <button class="btn btn-accent" onclick="actionTelecharger()"><i class="fas fa-download"></i></button>
-                <button class="btn btn-secondary" onclick="printTargetedDoc()"><i class="fas fa-print"></i></button>
-                <button class="btn btn-danger" onclick="supprimerDiplomeSelectionne()"><i class="fas fa-trash"></i></button>
+                <button class="btn btn-secondary" title="Voir le PDF" onclick="actionVoir()"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-accent" title="Télécharger" onclick="actionTelecharger()"><i class="fas fa-download"></i></button>
+                <button class="btn btn-secondary" title="Imprimer" onclick="printTargetedDoc()"><i class="fas fa-print"></i></button>
+                <button class="btn btn-danger" title="Supprimer du registre" onclick="supprimerDiplomeSelectionne()"><i class="fas fa-trash"></i></button>
             </div>
         </div>
     </div>
@@ -427,13 +436,17 @@
             <div id="walletAddr" style="font-size:0.55rem; color:var(--accent); margin-top:8px; font-family:monospace; text-align:center;">0x000... Non synchronisé</div>
         </div>
 
-        <button class="btn btn-secondary" style="margin-top: auto; padding: 14px;" onclick="window.location.href='https://lgt-hub-archivage-isc.vercel.app/'"><i class="fas fa-external-link-alt"></i> Ouvrir le portail public</button>
+        <button class="btn btn-secondary" style="margin-top: auto; padding: 14px;" onclick="window.open('https://isc-archives-verif.vercel.app/', '_blank')"><i class="fas fa-external-link-alt"></i> Ouvrir le portail public</button>
     </div>
 
     <div id="registreSection" class="glass-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2 style="margin:0; color:var(--primary); font-weight:800;"><i class="fas fa-database"></i> REGISTRE CENTRAL ISC</h2>
             <button class="btn btn-danger" onclick="toggleRegistre()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher par nom ou matricule..." onkeyup="filterRegistre()">
+            <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
         </div>
         <table>
             <thead>
@@ -472,6 +485,7 @@
         let currentActiveDocName = "diplome";
         let currentActiveMatricule = "";
         let isAdminConnected = false;
+        let allArchives = [];
 
         let provider;
         let signer;
@@ -601,35 +615,55 @@
 
         function updateRegistre() {
             db.ref("archives/").on("value", (snapshot) => {
+                allArchives = [];
                 let infoCount = 0, comCount = 0, secCount = 0;
-                const tableBody = document.getElementById("tableBody");
-                tableBody.innerHTML = "";
-
+                
                 snapshot.forEach((child) => {
                     const data = child.val();
-                    if (!data.MATRICULE) return;
-
-                    if (data.FACULTE === "Informatique de Gestion") infoCount++;
-                    else if (data.FACULTE === "Sciences Commerciales et Financières") comCount++;
-                    else if (data.FACULTE === "Secrétariat de Direction") secCount++;
-
-                    const row = tableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${data.MATRICULE}</td>
-                        <td>${data.NOM}</td>
-                        <td>${data.SEXE}</td>
-                        <td>${data.FILIERE}</td>
-                        <td>
-                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.7rem;" onclick="actionVoirDirect('${data.PDFURL}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-accent" style="padding: 5px 10px; font-size: 0.7rem;" onclick="actionTelechargerDirect('${data.PDFURL}', 'Diplome_${data.MATRICULE}')"><i class="fas fa-download"></i></button>
-                        </td>
-                    `;
+                    if (data.MATRICULE) {
+                        allArchives.push(data);
+                        if (data.FACULTE === "Informatique de Gestion") infoCount++;
+                        else if (data.FACULTE === "Sciences Commerciales et Financières") comCount++;
+                        else if (data.FACULTE === "Secrétariat de Direction") secCount++;
+                    }
                 });
 
                 document.getElementById("countInfo").innerText = String(infoCount).padStart(3, "0");
                 document.getElementById("countCom").innerText = String(comCount).padStart(3, "0");
                 document.getElementById("countSec").innerText = String(secCount).padStart(3, "0");
+                
+                renderTable(allArchives);
             });
+        }
+
+        function renderTable(dataList) {
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = "";
+
+            dataList.forEach((data) => {
+                const row = tableBody.insertRow();
+                row.onclick = () => selectDocument(data.MATRICULE);
+                row.innerHTML = `
+                    <td>${data.MATRICULE}</td>
+                    <td>${data.NOM}</td>
+                    <td>${data.SEXE}</td>
+                    <td>${data.FILIERE}</td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.7rem;" onclick="event.stopPropagation(); actionVoirDirect('${data.PDFURL}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-accent" style="padding: 5px 10px; font-size: 0.7rem;" onclick="event.stopPropagation(); actionTelechargerDirect('${data.PDFURL}', 'Diplome_${data.MATRICULE}')"><i class="fas fa-download"></i></button>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="event.stopPropagation(); supprimerDiplome('${data.MATRICULE}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function filterRegistre() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const filtered = allArchives.filter(item => 
+                item.NOM.toLowerCase().includes(query) || 
+                item.MATRICULE.toLowerCase().includes(query)
+            );
+            renderTable(filtered);
         }
 
         function actionVoirDirect(url) {
@@ -662,7 +696,7 @@
         function genererQrCode(matricule) {
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = "";
-            const lienVerification = `https://isc-archives.vercel.app/verif.html?mat=${matricule}`;
+            const lienVerification = `https://isc-archives-verif.vercel.app/?mat=${matricule}`;
             new QRCode(qrContainer, { text: lienVerification, width: 100, height: 100 });
         }
 
@@ -844,22 +878,36 @@
                     currentActiveDocName = "Diplome_" + matricule;
                     document.getElementById('docActions').style.display = 'grid';
                     genererQrCode(matricule);
+                    
+                    // Remplir les champs pour info
+                    document.getElementById('nom').value = data.NOM;
+                    document.getElementById('mat').value = data.MATRICULE;
+                    document.getElementById('fac').value = data.FACULTE;
+                    updateFiliere();
+                    document.getElementById('filiere').value = data.FILIERE;
+                    document.getElementById('sexe').value = data.SEXE;
+                    
+                    document.getElementById('statusTag').innerText = "DOCUMENT SÉLECTIONNÉ";
+                    alert("Document de " + data.NOM + " chargé.");
                 } else { alert("Document introuvable."); }
             });
         }
 
+        function supprimerDiplome(matricule) {
+            if(!isAdminConnected) return alert("🛑 ACCÈS REFUSÉ.");
+            if (confirm(`Supprimer définitivement le diplôme ${matricule} du registre ?`)) {
+                db.ref('archives/' + matricule).remove()
+                .then(() => {
+                    alert("✅ Diplôme supprimé avec succès.");
+                    updateRegistre();
+                })
+                .catch(error => { alert("Erreur lors de la suppression : " + error.message); });
+            }
+        }
+
         function supprimerDiplomeSelectionne() {
             if (!currentActiveMatricule) return alert("Aucun diplôme sélectionné.");
-            if(!isAdminConnected) return alert("🛑 ACCÈS REFUSÉ.");
-            
-            if (confirm(`Supprimer définitivement ${currentActiveMatricule} ?`)) {
-                db.ref('archives/' + currentActiveMatricule).remove()
-                .then(() => {
-                    alert("✅ Supprimé.");
-                    location.reload();
-                })
-                .catch(error => { alert("Erreur : " + error.message); });
-            }
+            supprimerDiplome(currentActiveMatricule);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
