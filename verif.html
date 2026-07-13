@@ -1,508 +1,258 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Portail Public de Vérification - Blockchain ISC</title>
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<script src="https://unpkg.com/html5-qrcode"></script>
-
-<style>        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail Public de Vérification - Blockchain ISC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
             background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), url('assets/img/fond.webp');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
         }
-
         .verification-container {
-            background-color: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid #334155;
-            padding: 40px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 650px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background-color: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); border: 1px solid #334155;
+            padding: 40px; border-radius: 16px; width: 100%; max-width: 650px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-
-        /* Section Logo Institutionnel */
-        .logo-section {
-            text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 20px;
-        }
-
-        .logo-section img {
-            width: 90px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        .logo-section h2 {
-            font-size: 24px;
-            color: #f8fafc;
-            font-weight: 700;
-        }
-
-        .logo-section p {
-            color: #38bdf8;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 5px;
-        }
-
-        /* Zone de recherche et Scanner QR */
-        .search-container {
-            margin-top: 20px;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 15px;
-        }
-
+        .logo-section { text-align: center; margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 20px; }
+        .logo-section img { width: 90px; height: auto; margin-bottom: 10px; }
+        .logo-section h2 { font-size: 24px; color: #f8fafc; font-weight: 700; }
+        .logo-section p { color: #38bdf8; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 5px; }
+        .search-container { margin-top: 20px; }
+        .input-group { position: relative; margin-bottom: 15px; }
         .input-group input {
-            width: 100%;
-            padding: 16px 20px;
-            padding-left: 50px;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            color: #f8fafc;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s;
+            width: 100%; padding: 16px 20px; padding-left: 50px; background-color: #0f172a;
+            border: 1px solid #334155; border-radius: 10px; color: #f8fafc; font-size: 16px; outline: none; transition: all 0.3s;
         }
-
-        .input-group input:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
-        }
-
-        .input-group i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #64748b;
-            font-size: 18px;
-        }
-
-        /* Simulation Scanner QR Code pour la démo */
+        .input-group input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+        .input-group i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 18px; }
         .qr-scanner-box {
-            background-color: #0f172a;
-            border: 2px dashed #334155;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
+            background-color: #0f172a; border: 2px dashed #334155; border-radius: 10px;
+            padding: 20px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: all 0.3s;
         }
-
-        .qr-scanner-box:hover {
-            border-color: #38bdf8;
-            background-color: rgba(15, 23, 42, 0.6);
-        }
-
-        .qr-scanner-box i {
-            font-size: 40px;
-            color: #64748b;
-            margin-bottom: 10px;
-        }
-
-        .qr-scanner-box.scanning i {
-            color: #38bdf8;
-            animation: pulse 1.5s infinite;
-        }
-
-        /* Boutons principaux */
+        .qr-scanner-box:hover { border-color: #38bdf8; background-color: rgba(15, 23, 42, 0.6); }
+        .qr-scanner-box i { font-size: 40px; color: #64748b; margin-bottom: 10px; }
         .btn-verify {
-            width: 100%;
-            background-color: #38bdf8;
-            color: #0f172a;
-            padding: 16px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            width: 100%; background-color: #38bdf8; color: #0f172a; padding: 16px; border: none;
+            border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
         }
-
-        .btn-verify:hover {
-            background-color: #0ea5e9;
-        }
-
-        /* Bloc des résultats Blockchain (masqué par défaut, s'affiche après recherche) */
+        .btn-verify:hover { background-color: #0ea5e9; }
+        .btn-verify:disabled { background-color: #64748b; cursor: not-allowed; }
         .result-card {
-            display: none; /* Changé via JS lors de la démo */
-            background-color: #0f172a;
-            border: 1px solid #10b981;
-            border-radius: 12px;
-            padding: 25px;
-            margin-top: 25px;
-            text-align: left;
-            animation: fadeIn 0.5s ease-in-out;
+            display: none; background-color: #0f172a; border: 1px solid #10b981; border-radius: 12px;
+            padding: 25px; margin-top: 25px; text-align: left; animation: fadeIn 0.5s ease-in-out;
         }
-
-        .result-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #10b981;
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-
-        .result-details {
-            font-size: 14px;
-            color: #94a3b8;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .result-details strong {
-            color: #f8fafc;
-        }
-
-        /* Grille des boutons d'action (Télécharger, Imprimer, Voir) */
-        .action-buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
+        .result-header { display: flex; align-items: center; gap: 10px; color: #10b981; font-weight: bold; font-size: 18px; margin-bottom: 15px; }
+        .result-details { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px; }
+        .result-details strong { color: #f8fafc; }
+        .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .btn-action {
-            background-color: #334155;
-            color: #f8fafc;
-            padding: 12px;
-            border: 1px solid #475569;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
+            background-color: #334155; color: #f8fafc; padding: 12px; border: 1px solid #475569;
+            border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex;
+            flex-direction: column; align-items: center; gap: 8px; transition: all 0.3s;
         }
-
-        .btn-action:hover {
-            background-color: #475569;
-            border-color: #38bdf8;
-            color: #38bdf8;
-        }
-
-        .footer-text {
-            margin-top: 30px;
-            text-align: center;
-            color: #64748b;
-            font-size: 12px;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.6; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .btn-action:hover { background-color: #475569; border-color: #38bdf8; color: #38bdf8; }
+        .footer-text { margin-top: 30px; text-align: center; color: #64748b; font-size: 12px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-
     <div class="verification-container">
         <div class="logo-section">
-            <img src="assets/img/logo-isc.webp" alt="Logo Officiel ISC">
+            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" alt="Logo Officiel ISC">
             <h2>Portail Public de Vérification</h2>
             <p>Institut Supérieur de Commerce - Lubumbashi</p>
         </div>
-
         <div class="search-container">
             <p style="color: #94a3b8; font-size: 14px; text-align: center; margin-bottom: 20px;">
-                Scannez le QR Code du diplôme ou saisissez manuellement le matricule de l'étudiant pour interroger le registre Blockchain.
+                Scannez le QR Code du diplôme ou saisissez manuellement le matricule.
             </p>
-
-            <div class="qr-scanner-box" id="qrBox" >
-    <i class="fas fa-qrcode"></i>
-    <p id="qrText">
-        Cliquez pour scanner un QR Code
-    </p>
-</div>
-
-<div id="reader"
-     style="width:300px;margin:15px auto;">
-</div>
-
-<button
-    onclick="stopScanner()"
-    class="btn-verify"
-    style="margin-top:10px;background:#ef4444;">
-    Fermer caméra
-</button>
-
-
+            <div class="qr-scanner-box" id="qrBox" onclick="startScanner()">
+                <i class="fas fa-qrcode"></i>
+                <p id="qrText">Cliquez pour scanner un QR Code</p>
+            </div>
+            <div id="reader" style="width:100%; max-width: 400px; margin: 15px auto; display: none; border-radius: 10px; overflow: hidden;"></div>
+            <button id="btnStop" onclick="stopScanner()" class="btn-verify" style="margin-bottom:15px; background:#ef4444; display: none;">
+                <i class="fas fa-stop"></i> Fermer caméra
+            </button>
             <div class="input-group">
                 <i class="fas fa-search"></i>
-                <input type="text" id="matriculeInput" placeholder="Saisir le matricule (Ex: ISC-2026-897)">
+                <input type="text" id="matriculeInput" placeholder="Saisir le matricule (Ex: ISC-2026-077M)">
             </div>
-
-            <button class="btn-verify" onclick="interrogerBlockchain()">
+            <button id="btnVerify" class="btn-verify" onclick="interrogerBlockchain()">
                 <i class="fas fa-link"></i> Interroger la Blockchain
             </button>
         </div>
-
         <div class="result-card" id="resultCard">
-            <div class="result-header">
+            <div id="resHeader" class="result-header">
                 <i class="fas fa-check-circle"></i> Authentification Blockchain Réussie
             </div>
-            
-            <div class="result-details">
-                <p><strong>Étudiant :</strong> MUKENDI KABONGO Jean</p>
-                <p><strong>Option :</strong> Informatique de Gestion (IG)</p>
-                <p><strong>Grade :</strong> Licence</p>
-                <p><strong>Statut Blockchain :</strong> Scellé de manière permanente</p>
-                <p style="font-family: monospace; font-size: 11px; margin-top: 5px; color: #38bdf8;">
-                    <strong>Hash :</strong> 0x71c6291b7e15d7e5642e1281cb9f3f2256c1f034
-                </p>
+            <div class="result-details" id="resDetails">
+                <!-- Rempli par JS -->
             </div>
-
             <div class="action-buttons-grid">
-                <button class="btn-action" onclick="voirDocument()">
-                    <i class="fas fa-eye"></i> Voir le document
-                </button>
-                <button class="btn-action" onclick="telechargerDiplome()">
-                    <i class="fas fa-download"></i> Télécharger
-                </button>
-                <button class="btn-action" onclick="imprimerAttestation()">
-                    <i class="fas fa-print"></i> Imprimer
-                </button>
+                <button class="btn-action" onclick="voirDocument()"><i class="fas fa-eye"></i> Voir</button>
+                <button class="btn-action" onclick="telechargerDiplome()"><i class="fas fa-download"></i> Télécharger</button>
+                <button class="btn-action" onclick="imprimerAttestation()"><i class="fas fa-print"></i> Imprimer</button>
             </div>
         </div>
-
         <div class="footer-text">
             <p>© 2026 ISC Lubumbashi - Système Intègre Blockchain d'Ancrage</p>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfbXYFsxWMEGlswSsk13BFrdNj_WCAp-Y",
+            authDomain: "lgt-hub-archives-isc-59416.firebaseapp.com",
+            databaseURL: "https://lgt-hub-archives-isc-59416-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "lgt-hub-archives-isc-59416",
+            storageBucket: "lgt-hub-archives-isc-59416.firebasestorage.app",
+            messagingSenderId: "892573543683",
+            appId: "1:892573543683:web:0b8a05d7c2d4778c9ccd36"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-<script>
+        const contractAddress = "0x5015dEe165411D3fE1fbb7FB88F2403DC0cB377C";
+        const contractABI = [{
+            "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }],
+            "name": "verifierDiplome",
+            "outputs": [{
+                "components": [
+                    { "internalType": "string", "name": "nomEtudiant", "type": "string" },
+                    { "internalType": "string", "name": "matricule", "type": "string" },
+                    { "internalType": "string", "name": "faculte", "type": "string" },
+                    { "internalType": "string", "name": "filiere", "type": "string" },
+                    { "internalType": "string", "name": "promotion", "type": "string" },
+                    { "internalType": "string", "name": "mention", "type": "string" },
+                    { "internalType": "string", "name": "sexe", "type": "string" },
+                    { "internalType": "string", "name": "documentHash", "type": "string" },
+                    { "internalType": "uint256", "name": "dateEnregistrement", "type": "uint256" },
+                    { "internalType": "address", "name": "auteurAction", "type": "address" },
+                    { "internalType": "bool", "name": "estValide", "type": "bool" }
+                ],
+                "internalType": "struct LGT_HUB_Archives.Diplome", "name": "", "type": "tuple"
+            }],
+            "stateMutability": "view", "type": "function"
+        }];
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCaG6CBeHeF3C--qhmfw8_hwiEnBitHmqQ",
-    authDomain: "lgt-hub-archivage-isc.firebaseapp.com",
-    databaseURL: "https://lgt-hub-archivage-isc-default-rtdb.firebaseio.com",
-    projectId: "lgt-hub-archivage-isc",
-    storageBucket: "lgt-hub-archivage-isc.firebasestorage.app",
-    messagingSenderId: "355077255297",
-    appId: "1:355077255297:web:cbc97343febd93edbcdd80"
-};
+        let currentPdfUrl = "";
+        let html5QrCode;
+        let scannerActif = false;
 
-firebase.initializeApp(firebaseConfig);
-
-const db = firebase.database();
-
-let currentPdfUrl = "";
-
-let html5QrCode;
-let scannerActif = false;
-
-function startScanner() {
-
-    if(scannerActif) return;
-
-    html5QrCode = new Html5Qrcode("reader");
-
-    html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        (decodedText) => {
-
-            stopScanner();
-
-            let mat = decodedText;
-
-            if(decodedText.startsWith("http")){
-                const url = new URL(decodedText);
-                mat = url.searchParams.get("mat");
-            }
-
-            document.getElementById("matriculeInput").value = mat;
-
-            interrogerBlockchain();
+        function startScanner() {
+            if(scannerActif) return;
+            document.getElementById("reader").style.display = "block";
+            document.getElementById("btnStop").style.display = "flex";
+            document.getElementById("qrBox").style.display = "none";
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+                stopScanner();
+                let mat = decodedText;
+                if(decodedText.includes("mat=")){
+                    const url = new URL(decodedText);
+                    mat = url.searchParams.get("mat");
+                }
+                document.getElementById("matriculeInput").value = mat;
+                interrogerBlockchain();
+            }).catch(err => { alert("Erreur caméra : " + err); stopScanner(); });
+            scannerActif = true;
         }
-    );
-   
-    function stopScanner() {
 
-    if(!scannerActif) return;
+        function stopScanner() {
+            if(!scannerActif) return;
+            html5QrCode.stop().then(() => {
+                document.getElementById("reader").style.display = "none";
+                document.getElementById("btnStop").style.display = "none";
+                document.getElementById("qrBox").style.display = "block";
+                scannerActif = false;
+            });
+        }
 
-    html5QrCode.stop()
-    .then(() => {
+        async function interrogerBlockchain() {
+            const mat = document.getElementById("matriculeInput").value.trim().toUpperCase();
+            if (!mat) return alert("Veuillez saisir un matricule.");
+            const btn = document.getElementById("btnVerify");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification en cours...';
 
-        document.getElementById("reader").innerHTML = "";
+            try {
+                // 1. Firebase Check
+                const snapshot = await db.ref("archives/" + mat).once("value");
+                const firebaseData = snapshot.val();
+                if (!firebaseData) throw new Error("Diplôme introuvable dans le registre.");
 
-        scannerActif = false;
-    });
-}
+                // 2. Blockchain Check (via RPC public)
+                const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_sepolia");
+                const contract = new ethers.Contract(contractAddress, contractABI, provider);
+                const bcData = await contract.verifierDiplome(mat);
 
-    scannerActif = true;
-}
-function interrogerBlockchain() {
+                if (!bcData.estValide) throw new Error("Authenticité blockchain non confirmée.");
 
-    const mat = document
-        .getElementById("matriculeInput")
-        .value
-        .trim()
-        .toUpperCase();
+                currentPdfUrl = firebaseData.PDFURL;
+                document.getElementById("resHeader").innerHTML = '<i class="fas fa-check-circle"></i> Authentification Blockchain Réussie';
+                document.getElementById("resHeader").style.color = "#10b981";
+                document.getElementById("resCard").style.borderColor = "#10b981";
+                document.getElementById("resDetails").innerHTML = `
+                    <p><strong>Étudiant :</strong> ${firebaseData.NOM}</p>
+                    <p><strong>Matricule :</strong> ${firebaseData.MATRICULE}</p>
+                    <p><strong>Filière :</strong> ${firebaseData.FILIERE}</p>
+                    <p><strong>Date d'Ancrage :</strong> ${new Date(firebaseData.DATE).toLocaleDateString('fr-FR')}</p>
+                    <p style="font-family: monospace; font-size: 10px; color: #38bdf8; word-break: break-all; margin-top: 10px;">
+                        <strong>Blockchain Hash :</strong> ${bcData.documentHash}
+                    </p>
+                `;
+                document.getElementById("resultCard").style.display = "block";
+            } catch (error) {
+                alert(error.message);
+                document.getElementById("resultCard").style.display = "none";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-link"></i> Interroger la Blockchain';
+            }
+        }
 
-    if (!mat) {
-        alert("Veuillez saisir un matricule.");
-        return;
-    }
+        function voirDocument() {
+            if(!currentPdfUrl) return alert("Document introuvable.");
+            // Utilisation de Google Docs Viewer pour contourner les erreurs 401 si Cloudinary est capricieux
+            window.open(currentPdfUrl, '_blank');
+        }
 
-    db.ref("archives/" + mat)
-    .once("value")
-    .then(snapshot => {
+        function telechargerDiplome() {
+            if(!currentPdfUrl) return alert("Document introuvable.");
+            const a = document.createElement("a");
+            a.href = currentPdfUrl;
+            a.download = "Diplome.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
 
-       const data = snapshot.val();
-       console.log(data);
+        function imprimerAttestation() {
+            if(!currentPdfUrl) return alert("Document introuvable.");
+            const frame = document.createElement("iframe");
+            frame.style.display = "none";
+            frame.src = currentPdfUrl;
+            document.body.appendChild(frame);
+            frame.onload = () => { frame.contentWindow.print(); };
+        }
 
-if (!data) {
-    alert("Diplôme introuvable.");
-    return;
-}
-
-currentPdfUrl = data.PDFURL;
-
-        document.querySelector(".result-details").innerHTML = `
-<p><strong>Étudiant :</strong> ${data.NOM}</p>
-<p><strong>Faculté :</strong> ${data.FACULTE}</p>
-<p><strong>Filière :</strong> ${data.FILIERE}</p>
-<p><strong>Matricule :</strong> ${data.MATRICULE}</p>
-<p><strong>Statut :</strong> Diplôme authentifié</p>
-`;
-
-        document.getElementById("resultCard").style.display = "block";
-    })
-    .catch(error => {
-        console.error(error);
-        alert("Erreur Firebase : " + error.message);
-    });
-}
-
-function voirDocument() {
-
-    if(!currentPdfUrl){
-        alert("Document introuvable.");
-        return;
-    }
-
-    const nouvelleFenetre = window.open("");
-
-    nouvelleFenetre.document.write(`
-        <html>
-        <head>
-            <title>Diplôme ISC</title>
-            <style>
-                body{
-                    margin:0;
-                    overflow:hidden;
-                }
-                iframe{
-                    width:100%;
-                    height:100vh;
-                    border:none;
-                }
-            </style>
-        </head>
-        <body>
-            <iframe src="${currentPdfUrl}"></iframe>
-        </body>
-        </html>
-    `);
-}
-
-function telechargerDiplome() {
-
-    if(!currentPdfUrl){
-        alert("Document introuvable.");
-        return;
-    }
-
-    const a = document.createElement("a");
-
-    a.href = currentPdfUrl;
-    a.download = "Diplome.pdf";
-
-    document.body.appendChild(a);
-
-    a.click();
-
-    document.body.removeChild(a);
-}
-
-function imprimerAttestation() {
-
-    if(!currentPdfUrl){
-        alert("Document introuvable.");
-        return;
-    }
-
-    const frame = document.createElement("iframe");
-
-    frame.style.display = "none";
-
-    frame.src = currentPdfUrl;
-
-    document.body.appendChild(frame);
-
-    frame.onload = () => {
-        frame.contentWindow.print();
-    };
-}
-
-window.onload = function () {
-
-    const params = new URLSearchParams(window.location.search);
-    const mat = params.get("mat");
-
-    if (mat) {
-        document.getElementById("matriculeInput").value = mat;
-        interrogerBlockchain();
-    }
-};
- </script>
+        window.onload = function () {
+            const params = new URLSearchParams(window.location.search);
+            const mat = params.get("mat");
+            if(mat) {
+                document.getElementById("matriculeInput").value = mat;
+                interrogerBlockchain();
+            }
+        }
+    </script>
 </body>
 </html>
