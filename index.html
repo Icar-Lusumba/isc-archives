@@ -736,9 +736,14 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
-                db.ref('roles/' + user.uid).once('value').then(snap => {
-                    const data = snap.val();
-                    currentRole = data ? data.role : 'lecteur';
+                console.log("UID connecté :", user.uid);
+
+db.ref('roles/' + user.uid).once('value').then(snap => {
+    const data = snap.val();
+
+    console.log("Données Firebase :", data);
+
+    currentRole = data ? data.role : 'lecteur';
                     document.getElementById('displayAdminName').innerText = (data && data.nom) || user.email;
                     document.getElementById('displayAdminEmail').innerText = user.email;
                     const badge = document.getElementById('roleBadge');
@@ -1028,8 +1033,13 @@
 
         // ---------- Scellage ----------
         async function scellerMaintenant() {
-            if (!currentUser) return toast("🛑 Connectez-vous d'abord.", "error");
-            if (currentRole !== 'admin' && currentRole !== 'superadmin') return toast("🛑 Accès refusé : rôle Admin requis.", "error");
+    if (!currentUser) return toast("🛑 Connectez-vous d'abord.", "error");
+
+    console.log("Utilisateur :", currentUser);
+    console.log("Rôle :", currentRole);
+
+    if (currentRole !== 'admin' && currentRole !== 'superadmin')
+        return toast("🛑 Accès refusé : rôle Admin requis.", "error");
             if (!contractInstance) return toast("🛑 Connectez MetaMask avant de sceller.", "error");
 
             const mat = document.getElementById('mat').value.trim().toUpperCase();
