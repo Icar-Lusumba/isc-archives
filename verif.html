@@ -191,7 +191,24 @@
                 if (!firebaseData) throw new Error("Diplôme introuvable dans le registre.");
 
                 // 2. Blockchain Check (via RPC public)
-                const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_sepolia");
+                const rpcUrls = [
+                    "https://rpc.ankr.com/eth_sepolia",
+                    "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID", // REMPLACER PAR VOTRE ID DE PROJET INFURA
+                    "https://eth-sepolia.public.blastapi.io",
+                    "https://endpoints.omniatech.io/v1/eth/sepolia/public"
+                ];
+                let provider;
+                for (const url of rpcUrls) {
+                    try {
+                        provider = new ethers.providers.JsonRpcProvider(url);
+                        await provider.getNetwork(); // Test the connection
+                        console.log(`Connecté à Sepolia via ${url}`);
+                        break; // If successful, use this provider
+                    } catch (e) {
+                        console.warn(`Échec de la connexion à ${url}: ${e.message}`);
+                    }
+                }
+                if (!provider) throw new Error("Impossible de se connecter au réseau Sepolia via tous les nœuds RPC disponibles.");
                 const contract = new ethers.Contract(contractAddress, contractABI, provider);
                 const bcData = await contract.verifierDiplome(mat);
 
@@ -212,7 +229,7 @@
                 `;
                 document.getElementById("resultCard").style.display = "block";
             } catch (error) {
-                alert(error.message);
+                alert(error.code === 'NETWORK_ERROR' ? 'Problème de connexion au réseau blockchain. Veuillez vérifier votre connexion internet ou réessayer.' : error.message);
                 document.getElementById("resultCard").style.display = "none";
             } finally {
                 btn.disabled = false;
@@ -223,7 +240,10 @@
         function voirDocument() {
             if(!currentPdfUrl) return alert("Document introuvable.");
             // Utilisation de Google Docs Viewer pour contourner les erreurs 401 si Cloudinary est capricieux
-            window.open(currentPdfUrl, '_blank');
+            // Utilisation de Google Docs Viewer pour une meilleure compatibilité avec les PDF Cloudinary
+            window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(currentPdfUrl)}&embedded=true`, 
+                        '_blank', 
+                        'toolbar=0,location=0,menubar=0');
         }
 
         function telechargerDiplome() {
