@@ -22,7 +22,7 @@
             --danger: #ef4444;
             --warn: #f59e0b;
             --bg-body: #f8fafc;
-            --bg-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070');
+            --bg-image: url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070");
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text: #0f172a;
@@ -301,8 +301,8 @@
         <div class="glass-card">
             <div style="text-align:center; margin-bottom: 14px;">
                 <i class="fas fa-cubes" style="font-size: 30px; color: var(--accent);"></i>
-                <div style="font-weight:800; margin-top:6px; color: var(--primary);">LGT HUB &mdash; ADMIN ISC</div>
-                <div style="font-size:0.72rem; color: var(--text-secondary); margin-top:4px;">Accès réservé au personnel autorisé</div>
+                <div style="font-weight:800; margin-top:6px; color: var(--primary);">LGT HUB</div>
+                <p style="font-size:0.7rem; color:var(--text-secondary); margin: 4px 0 0;">Admin Blockchain ISC</p>
             </div>
 
             <div class="auth-tabs">
@@ -311,192 +311,177 @@
             </div>
 
             <div id="loginPane">
-                <input type="email" id="loginEmail" placeholder="Email professionnel" style="margin-bottom:10px;">
-                <input type="password" id="loginPass" placeholder="Mot de passe" style="margin-bottom:14px;">
-                <button class="btn" style="width:100%;" onclick="doLogin()"><i class="fas fa-right-to-bracket"></i> SE CONNECTER</button>
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="votre@email.com">
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label for="loginPass">Mot de passe</label>
+                    <input type="password" id="loginPass" placeholder="********">
+                </div>
+                <button class="btn" onclick="doLogin()">Se connecter</button>
             </div>
 
             <div id="signupPane" style="display:none;">
-                <input type="text" id="signupName" placeholder="Nom complet" style="margin-bottom:10px;">
-                <input type="email" id="signupEmail" placeholder="Email professionnel" style="margin-bottom:10px;">
-                <input type="password" id="signupPass" placeholder="Mot de passe (min. 6 caractères)" style="margin-bottom:14px;">
-                <button class="btn btn-accent" style="width:100%;" onclick="doSignup()"><i class="fas fa-user-plus"></i> CRÉER UN COMPTE</button>
-                <div style="font-size:0.62rem; color:var(--text-secondary); margin-top:10px; text-align:center;">
-                    Les nouveaux comptes reçoivent le rôle "Lecteur" par défaut. Un Super Admin doit valider les droits d'écriture depuis la Gestion des Accès.
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <label for="signupName">Nom Complet</label>
+                    <input type="text" id="signupName" placeholder="John Doe">
                 </div>
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" placeholder="votre@email.com">
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label for="signupPass">Mot de passe</label>
+                    <input type="password" id="signupPass" placeholder="Minimum 6 caractères">
+                </div>
+                <button class="btn btn-accent" onclick="doSignup()">S'inscrire</button>
             </div>
 
-            <div id="authError" style="color:var(--danger); font-size:0.72rem; font-weight:700; text-align:center; margin-top:12px; display:none;"></div>
-        </div>
-    </div>
-
-    <!-- ===================== TOASTS ===================== -->
-    <div id="toastContainer"></div>
-
-    <!-- ===================== PDF MODAL ===================== -->
-    <div id="pdfModalOverlay">
-        <div id="pdfModalBox">
-            <div id="pdfModalHead">
-                <h3 id="pdfModalTitle"><i class="fas fa-file-pdf"></i> Diplôme</h3>
-                <button class="btn btn-danger btn-sm" onclick="closePdfModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <iframe id="pdfModalFrame" src=""></iframe>
+            <p id="authError" style="color:var(--danger); font-size:0.75rem; text-align:center; margin-top:15px; display:none;"></p>
         </div>
     </div>
 
     <div id="appRoot">
 
+    <!-- ===================== COL LEFT ===================== -->
     <div class="col-left">
         <div class="brand-header">
-            <div style="text-align: center;"><i class="fas fa-cubes" style="font-size: 24px; color: var(--accent);"></i><div style="font-size:0.55rem; font-weight:800;">LGT HUB</div></div>
-            <div style="width: 1px; height: 30px; background: var(--glass-border);"></div>
-            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="35" height="35" alt="Logo ISC" style="border-radius: 6px; object-fit: cover;">
-        </div>
-        <div class="brand-title">SYSTEME DE SCELLAGE NUMERIQUE</div>
-
-        <button class="btn btn-secondary" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i> <span id="themeText">Mode Sombre</span></button>
-        <hr style="width:100%; border:none; height:1px; background:var(--glass-border);">
-
-        <button class="btn btn-accent" id="btnNouveau" onclick="document.getElementById('nom').focus();"><i class="fas fa-plus-circle"></i> NOUVEAU SCELLAGE</button>
-        <button class="btn btn-secondary" id="globalPrintBtn" onclick="printTargetedDoc()"><i class="fas fa-print"></i> IMPRIMER LE DOCUMENT</button>
-
-        <div class="glass-card" style="padding: 14px; margin-top: 5px;">
-            <label><i class="fas fa-camera"></i> Contrôle Caméra QR</label>
-            <div id="reader" style="margin-top:8px; border-radius: 10px; overflow:hidden; display:none;"></div>
-            <button id="btnStart" class="btn" style="width:100%; margin-top:8px; font-size: 0.8rem;" onclick="startScan()"><i class="fas fa-video"></i> Activer Scanner</button>
-            <button id="btnStop" class="btn btn-danger" style="width:100%; margin-top:5px; display:none; font-size: 0.8rem;" onclick="stopScan()"><i class="fas fa-stop"></i> Arrêter</button>
+            <i class="fas fa-cubes" style="font-size: 24px; color: var(--accent);"></i>
+            <div class="brand-title">LGT HUB</div>
+            <i class="fas fa-fingerprint" style="font-size: 24px; color: var(--primary);"></i>
         </div>
 
-        <button class="btn" style="background: rgba(30, 58, 138, 0.15); color: var(--primary);" onclick="toggleOverlay('registreSection')"><i class="fas fa-folder-open"></i> Registre Central</button>
-        <button class="btn" style="background: rgba(246,133,27,0.15); color: var(--accent);" onclick="toggleOverlay('verifSection')"><i class="fas fa-shield-halved"></i> Vérifier un Hash</button>
-        <button class="btn" style="background: rgba(16,185,129,0.15); color: var(--success);" onclick="toggleOverlay('auditSection')"><i class="fas fa-clipboard-list"></i> Journal d'Audit</button>
-        <button class="btn" id="btnGestionAcces" style="background: rgba(148,163,184,0.2); color: var(--text-secondary); display:none;" onclick="toggleOverlay('accessSection')"><i class="fas fa-user-shield"></i> Gestion des Accès</button>
-
-        <div class="live-clock-box">
-            <i class="far fa-clock"></i>
-            <span id="liveClock">Chargement date...</span>
-        </div>
-    </div>
-
-    <div class="col-mid">
-        <div style="text-align: center; margin-bottom: 5px;">
-            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="65" alt="Logo ISC" style="border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.15);">
-        </div>
-
-        <div class="faculty-monitor">
-            <div class="faculty-card">
-                <h4 id="countInfo">000</h4>
-                <p>Informatique</p>
-                <span class="faculty-subtext">CSI & Réseaux</span>
+        <div class="glass-card" style="text-align:center;">
+            <div class="profile-pic-container">
+                <div class="profile-pic-box">
+                    <i class="fas fa-user-tie" style="font-size: 40px; color: var(--primary); opacity: 0.7;"></i>
+                </div>
             </div>
-            <div class="faculty-card">
-                <h4 id="countCom">000</h4>
-                <p>Sc. Commerciales</p>
-                <span class="faculty-subtext">Compta, Mkt, Douane, Banque</span>
-            </div>
-            <div class="faculty-card">
-                <h4 id="countSec">000</h4>
-                <p>Secrétariat</p>
-                <span class="faculty-subtext">SGA Ass. de Direction</span>
-            </div>
+            <h3 id="displayAdminName" style="margin: 0 0 5px; font-size: 1.1rem; color: var(--text);">Nom Admin</h3>
+            <p id="displayAdminEmail" style="margin: 0 0 8px; font-size: 0.75rem; color: var(--text-secondary);"></p>
+            <span id="roleBadge" class="badge badge-lecteur">LECTEUR</span>
+            <button class="btn btn-danger btn-sm" style="margin-top: 15px;" onclick="deconnecterAdmin()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
         </div>
 
         <div class="glass-card">
-            <h3 style="margin:0 0 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.05rem;">ANCRAGE BLOCKCHAIN IMMUABLE</h3>
+            <h3 style="margin-top:0; font-size: 1rem; color: var(--primary);"><i class="fas fa-wallet"></i> Portefeuille MetaMask</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom: 10px;">Connectez votre portefeuille pour interagir avec la blockchain.</p>
+            <button class="btn btn-accent" onclick="connectWallet()"><i class="fas fa-link"></i> Connecter MetaMask</button>
+            <p id="walletAddr" style="font-size:0.7rem; word-break: break-all; margin-top: 10px; color: var(--text-secondary); opacity: 0.8;">Non connecté</p>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="margin-top:0; font-size: 1rem; color: var(--primary);"><i class="fas fa-cogs"></i> Outils</h3>
+            <button class="btn" style="margin-bottom: 10px;" onclick="toggleOverlay('registreSection')"><i class="fas fa-database"></i> Registre Central</button>
+            <button class="btn" style="margin-bottom: 10px;" onclick="toggleOverlay('verifSection')"><i class="fas fa-shield-halved"></i> Vérification Intégrité</button>
+            <button class="btn" style="margin-bottom: 10px;" onclick="toggleOverlay('auditSection')"><i class="fas fa-clipboard-list"></i> Journal d'Audit</button>
+            <button class="btn" id="btnGestionAcces" style="display:none;" onclick="toggleOverlay('accessSection')"><i class="fas fa-user-shield"></i> Gestion des Accès</button>
+        </div>
+
+        <div class="live-clock-box">
+            <i class="fas fa-clock"></i>
+            <span id="liveClock"></span>
+        </div>
+    </div>
+
+    <!-- ===================== COL MID ===================== -->
+    <div class="col-mid">
+        <div class="glass-card" style="width: min(700px, 100%);">
+            <h2 style="margin-top:0; color: var(--primary); text-align: center;"><i class="fas fa-file-signature"></i> Sceller un nouveau diplôme</h2>
+            <p style="font-size:0.8rem; color:var(--text-secondary); text-align: center; max-width: 600px; margin: 0 auto 20px;">Remplissez les informations du diplôme et chargez le fichier PDF/Image. L'empreinte numérique (hash SHA-256) sera calculée et ancrée sur la blockchain.</p>
+
             <div class="input-grid">
                 <div class="input-group">
-                    <label>Nom Complet de l'Étudiant</label>
-                    <input type="text" id="nom" placeholder="Ex: Jean Mukendi">
+                    <label for="nom">Nom Complet de l'Étudiant</label>
+                    <input type="text" id="nom" placeholder="Ex: Jean Dupont">
                 </div>
                 <div class="input-group">
-                    <label>Matricule Académique</label>
-                    <input type="text" id="mat" placeholder="2026-ISC-001">
+                    <label for="mat">Matricule</label>
+                    <input type="text" id="mat" placeholder="Ex: 2026-ISC-001">
                 </div>
                 <div class="input-group">
-                    <label>Faculté / Section</label>
+                    <label for="fac">Faculté</label>
                     <select id="fac" onchange="updateFiliere()">
-                        <option value="Informatique de Gestion">Informatique de Gestion</option>
-                        <option value="Sciences Commerciales et Financières">Sciences Commerciales et Financières</option>
-                        <option value="Secrétariat de Direction">Secrétariat de Direction</option>
+                        <option value="Informatique">Informatique</option>
+                        <option value="Gestion">Gestion</option>
+                        <option value="SGA">Secrétariat Général Académique</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>Filière / Option</label>
-                    <select id="filiere"></select>
+                    <label for="filiere">Filière</label>
+                    <select id="filiere">
+                        <!-- Options will be populated by JS -->
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label>Sexe de l'étudiant</label>
+                    <label for="sexe">Sexe</label>
                     <select id="sexe">
-                        <option value="Masculin (M)">Masculin (M)</option>
-                        <option value="Féminin (F)">Féminin (F)</option>
+                        <option value="M">Masculin</option>
+                        <option value="F">Féminin</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>Diplôme Numérique Source (PDF ou Image)</label>
+                    <label for="fileInput">Fichier du Diplôme (PDF/Image)</label>
                     <input type="file" id="fileInput" accept=".pdf,image/*">
                 </div>
             </div>
-            <button class="btn btn-accent" style="width:100%; margin-top:18px; padding:15px; font-size:1rem;" onclick="scellerMaintenant()">
-                <i class="fas fa-link"></i> EFFECTUER L'ANCRAGE SECURISE
-            </button>
-            <div id="statusTag" style="text-align: center; margin-top: 12px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 1px;">
-                PRÊT POUR LE SCELLAGE
-            </div>
+
+            <button class="btn btn-accent" style="margin-top: 20px;" onclick="scellerMaintenant()" id="btnNouveau"><i class="fas fa-stamp"></i> ANCRER LE DIPLÔME</button>
+            <p id="statusTag" style="text-align:center; font-size:0.8rem; color:var(--text-secondary); margin-top:15px;">En attente...</p>
         </div>
 
-        <div class="qr-display-center">
-            <div class="qr-halo-wrapper" id="qrWrapper">
+        <div class="glass-card qr-display-center" style="width: min(400px, 100%);">
+            <h3 style="margin-top:0; color: var(--primary); text-align: center;"><i class="fas fa-qrcode"></i> QR Code du Diplôme</h3>
+            <div id="qrWrapper" class="qr-halo-wrapper">
                 <div id="qrcode"></div>
             </div>
-            <div class="doc-actions-box" id="docActions">
-                <button class="btn btn-secondary" title="Voir le PDF" onclick="actionVoir()"><i class="fas fa-eye"></i></button>
-                <button class="btn btn-accent" title="Télécharger" onclick="actionTelecharger()"><i class="fas fa-download"></i></button>
-                <button class="btn btn-secondary" title="Imprimer" onclick="printTargetedDoc()"><i class="fas fa-print"></i></button>
-                <button class="btn btn-danger" title="Supprimer du registre" onclick="supprimerDiplomeSelectionne()"><i class="fas fa-trash"></i></button>
+            <p style="font-size:0.75rem; color:var(--text-secondary); text-align: center; margin-top: 10px;">Scannez pour vérifier l'authenticité.</p>
+            <div id="docActions" class="doc-actions-box">
+                <button class="btn btn-sm" onclick="voirDocument()"><i class="fas fa-eye"></i> Voir</button>
+                <button class="btn btn-sm" onclick="telechargerDocument()"><i class="fas fa-download"></i> Télécharger</button>
+                <button class="btn btn-sm btn-danger" onclick="supprimerDiplomeSelectionne()"><i class="fas fa-trash"></i> Supprimer</button>
+                <button class="btn btn-sm btn-secondary" onclick="genererQrCode(currentActiveMatricule)"><i class="fas fa-sync-alt"></i> Regénérer QR</button>
             </div>
         </div>
+
     </div>
 
+    <!-- ===================== COL RIGHT ===================== -->
     <div class="col-right">
-        <div class="glass-card" style="text-align: center;">
-            <div class="profile-pic-container">
-                <div class="profile-pic-box" onclick="document.getElementById('adminPic').click()">
-                    <img id="displayAvatar" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
-                    <i id="plus" class="fas fa-user" style="font-size:24px; color:var(--primary);"></i>
+        <div class="glass-card">
+            <h3 style="margin-top:0; font-size: 1rem; color: var(--primary);"><i class="fas fa-chart-line"></i> Statistiques Blockchain</h3>
+            <div class="faculty-monitor">
+                <div class="faculty-card">
+                    <h4><span id="totalDiplomes">0</span></h4>
+                    <p>Diplômes Ancrés</p>
                 </div>
-                <input type="file" id="adminPic" style="display:none;" onchange="previewImg(this)">
+                <div class="faculty-card">
+                    <h4><span id="totalAdmins">0</span></h4>
+                    <p>Admins Actifs</p>
+                </div>
+                <div class="faculty-card">
+                    <h4><span id="totalLecteurs">0</span></h4>
+                    <p>Lecteurs</p>
+                </div>
             </div>
-            <div id="roleBadgeWrap" style="margin-bottom:8px;"><span class="badge badge-lecteur" id="roleBadge">LECTEUR</span></div>
-            <h2 id="displayAdminName" style="margin:0; font-size:1.05rem; font-weight:800;">ADMIN</h2>
-            <p id="displayAdminEmail" style="margin:4px 0 15px 0; font-size:0.72rem; color:var(--primary); font-weight:600;"></p>
-            <button class="btn btn-danger" style="width:100%;" onclick="deconnecterAdmin()"><i class="fas fa-sign-out-alt"></i> DÉCONNEXION</button>
         </div>
 
         <div class="glass-card">
-            <label><i class="fas fa-chart-simple"></i> TABLEAU DE BORD</label>
-            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.78rem; font-weight:700;">
-                <span>Total diplômes</span><span id="dashTotal" style="color:var(--primary);">0</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.78rem; font-weight:700;">
-                <span>Scellés (7 derniers jours)</span><span id="dashWeek" style="color:var(--success);">0</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.78rem; font-weight:700;">
-                <span>Actions au journal</span><span id="dashAudit" style="color:var(--accent);">0</span>
-            </div>
+            <h3 style="margin-top:0; font-size: 1rem; color: var(--primary);"><i class="fas fa-camera"></i> Scanner QR</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom: 10px;">Scannez un QR code de diplôme pour charger ses informations.</p>
+            <div id="reader" style="width:100%; display:none;"></div>
+            <button class="btn btn-accent" id="btnStart" onclick="startScan()"><i class="fas fa-qrcode"></i> Démarrer le scan</button>
+            <button class="btn btn-danger" id="btnStop" style="display:none;" onclick="stopScan()"><i class="fas fa-stop-circle"></i> Arrêter le scan</button>
         </div>
 
-        <div class="glass-card" style="margin-top: auto;">
-            <label><i class="fas fa-network-wired"></i> CONNECTEUR WEB3 NODE</label>
-            <button class="btn" style="width:100%; margin-top:10px; background:#161b22; border:1px solid #30363d;" onclick="connectWallet()">
-                <i class="fas fa-wallet"></i> MetaMask Connection
-            </button>
-            <div id="walletAddr" style="font-size:0.55rem; color:var(--accent); margin-top:8px; font-family:monospace; text-align:center; word-break: break-all;">0x000... Non synchronisé</div>
+        <div class="glass-card">
+            <h3 style="margin-top:0; font-size: 1rem; color: var(--primary);"><i class="fas fa-adjust"></i> Apparence</h3>
+            <button class="btn btn-secondary" onclick="toggleTheme()"><i id="themeIcon" class="fas fa-moon"></i> <span id="themeText">Mode Sombre</span></button>
         </div>
-
-        <button class="btn btn-secondary" style="padding: 14px;" onclick="window.open('https://isc-archives.vercel.app/verif.html', '_blank')"><i class="fas fa-external-link-alt"></i> Ouvrir le portail public</button>
     </div>
 
-    <!-- ===================== REGISTRE ===================== -->
+    <!-- ===================== REGISTRE CENTRAL ===================== -->
     <div id="registreSection" class="overlay-panel">
         <div class="overlay-head">
             <h2><i class="fas fa-database"></i> REGISTRE CENTRAL ISC</h2>
@@ -576,7 +561,20 @@
 
     </div><!-- /appRoot -->
 
+    <!-- PDF Modal -->
+    <div id="pdfModalOverlay">
+        <div id="pdfModalBox">
+            <div id="pdfModalHead">
+                <h3 id="pdfModalTitle">Visualisation du document</h3>
+                <button class="btn btn-danger btn-sm" onclick="document.getElementById('pdfModalOverlay').style.display='none';"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe id="pdfModalFrame" src=""></iframe>
+        </div>
+    </div>
+
     <iframe id="printFrame" style="display:none;"></iframe>
+
+    <div id="toastContainer"></div>
 
     <script>
         const firebaseConfig = {
@@ -738,12 +736,16 @@
                 currentUser = user;
                 console.log("UID connecté :", user.uid);
 
-db.ref('roles/' + user.uid).once('value').then(snap => {
-    const data = snap.val();
+                db.ref('roles/' + user.uid).once('value').then(snap => {
+                    const data = snap.val();
 
-    console.log("Données Firebase :", data);
+                    console.log("Données Firebase :", data);
 
-    currentRole = data ? data.role : 'lecteur';
+                    // MODIFICATION: Assurez-vous qu'un rôle est toujours défini. Pour le test, vous pouvez forcer 'admin' ici.
+                    currentRole = (data && data.role) ? data.role : 'lecteur'; // Ou 'admin' pour le test
+                    // Pour tester avec un rôle admin, décommentez la ligne ci-dessous et commentez la précédente
+                    // currentRole = 'admin'; 
+
                     document.getElementById('displayAdminName').innerText = (data && data.nom) || user.email;
                     document.getElementById('displayAdminEmail').innerText = user.email;
                     const badge = document.getElementById('roleBadge');
@@ -757,6 +759,7 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
                     toast("Bienvenue, " + ((data && data.nom) || user.email), "success");
                     updateRegistre();
                     updateAudit();
+                    updateStats(); // Ajout pour mettre à jour les stats au login
                 });
             } else {
                 currentUser = null;
@@ -775,232 +778,204 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
         function logAudit(action, matricule, details) {
             if (!currentUser) return;
             db.ref('audit').push({
+                date: new Date().toISOString(),
                 action: action,
-                matricule: matricule || "-",
+                matricule: matricule,
                 effectuePar: currentUser.email,
-                uid: currentUser.uid,
-                details: details || "",
-                date: new Date().toISOString()
+                details: details
             });
         }
 
+        let auditCurrentPage = 1;
         function updateAudit() {
-            db.ref('audit').orderByChild('date').limitToLast(300).on('value', snapshot => {
+            db.ref('audit').orderByChild('date').once('value', snapshot => {
                 allAudit = [];
-                snapshot.forEach(child => allAudit.push(child.val()));
-                allAudit.reverse();
-                document.getElementById('dashAudit').innerText = allAudit.length;
-                auditPage = 1;
-                renderAuditTable();
-            });
-        }
-
-        function renderAuditTable() {
-            const body = document.getElementById('auditTableBody');
-            const start = (auditPage - 1) * PAGE_SIZE;
-            const pageItems = allAudit.slice(start, start + PAGE_SIZE);
-            body.innerHTML = "";
-            const colors = { "SCELLAGE": "var(--success)", "SUPPRESSION": "var(--danger)", "CONNEXION": "var(--primary)" };
-            pageItems.forEach(a => {
-                const row = body.insertRow();
-                const dateStr = a.date ? new Date(a.date).toLocaleString('fr-FR') : "-";
-                const color = colors[a.action] || "var(--text-secondary)";
-                row.innerHTML = `
-                    <td>${dateStr}</td>
-                    <td><span class="audit-row-action" style="background:${color};">${a.action}</span></td>
-                    <td>${a.matricule || '-'}</td>
-                    <td>${a.effectuePar || '-'}</td>
-                `;
-            });
-            renderPagination('auditPagination', allAudit.length, auditPage, p => { auditPage = p; renderAuditTable(); });
-        }
-
-        // ---------- Access management ----------
-        function loadAccessTable() {
-            if (currentRole !== 'superadmin') { toast("Accès réservé aux Super Admins.", "error"); return; }
-            db.ref('roles').once('value').then(snapshot => {
-                const body = document.getElementById('accessTableBody');
-                body.innerHTML = "";
-                snapshot.forEach(child => {
-                    const uid = child.key;
-                    const d = child.val();
-                    const row = body.insertRow();
-                    row.innerHTML = `
-                        <td>${d.nom || '-'}</td>
-                        <td>${d.email || '-'}</td>
-                        <td><span class="badge ${d.role === 'superadmin' ? 'badge-super' : d.role === 'admin' ? 'badge-admin' : 'badge-lecteur'}">${(d.role || 'lecteur').toUpperCase()}</span></td>
-                        <td>
-                            <select onchange="changerRole('${uid}', this.value)">
-                                <option value="lecteur" ${d.role === 'lecteur' ? 'selected' : ''}>Lecteur</option>
-                                <option value="admin" ${d.role === 'admin' ? 'selected' : ''}>Admin</option>
-                                <option value="superadmin" ${d.role === 'superadmin' ? 'selected' : ''}>Super Admin</option>
-                            </select>
-                        </td>
-                    `;
+                snapshot.forEach(childSnapshot => {
+                    allAudit.push(childSnapshot.val());
                 });
+                allAudit.reverse(); // Most recent first
+                renderAuditTable(auditCurrentPage);
             });
         }
 
-        function changerRole(uid, newRole) {
-            db.ref('roles/' + uid + '/role').set(newRole).then(() => toast("Rôle mis à jour.", "success"));
-        }
+        function renderAuditTable(page) {
+            const tableBody = document.getElementById('auditTableBody');
+            tableBody.innerHTML = '';
+            const start = (page - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const paginatedItems = allAudit.slice(start, end);
 
-        // ---------- Pagination helper ----------
-        function renderPagination(containerId, totalItems, page, onChange) {
-            const container = document.getElementById(containerId);
-            const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
-            container.innerHTML = "";
-            const prev = document.createElement('button');
-            prev.className = 'btn btn-secondary btn-sm';
-            prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            prev.disabled = page <= 1;
-            prev.onclick = () => onChange(Math.max(1, page - 1));
-            const next = document.createElement('button');
-            next.className = 'btn btn-secondary btn-sm';
-            next.innerHTML = '<i class="fas fa-chevron-right"></i>';
-            next.disabled = page >= totalPages;
-            next.onclick = () => onChange(Math.min(totalPages, page + 1));
-            const label = document.createElement('span');
-            label.innerText = `Page ${page} / ${totalPages}`;
-            container.appendChild(prev);
-            container.appendChild(label);
-            container.appendChild(next);
-        }
-
-        // ---------- Registre ----------
-        function updateRegistre() {
-            db.ref("archives/").on("value", (snapshot) => {
-                allArchives = [];
-                let infoCount = 0, comCount = 0, secCount = 0, weekCount = 0;
-                const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-                snapshot.forEach((child) => {
-                    const data = child.val();
-                    if (data.MATRICULE) {
-                        allArchives.push(data);
-                        if (data.FACULTE === "Informatique de Gestion") infoCount++;
-                        else if (data.FACULTE === "Sciences Commerciales et Financières") comCount++;
-                        else if (data.FACULTE === "Secrétariat de Direction") secCount++;
-                        if (data.DATE && new Date(data.DATE).getTime() >= weekAgo) weekCount++;
-                    }
-                });
-
-                document.getElementById("countInfo").innerText = String(infoCount).padStart(3, "0");
-                document.getElementById("countCom").innerText = String(comCount).padStart(3, "0");
-                document.getElementById("countSec").innerText = String(secCount).padStart(3, "0");
-                document.getElementById("dashTotal").innerText = allArchives.length;
-                document.getElementById("dashWeek").innerText = weekCount;
-
-                registrePage = 1;
-                renderTable(allArchives);
-            });
-        }
-
-        function renderTable(dataList) {
-            const start = (registrePage - 1) * PAGE_SIZE;
-            const pageItems = dataList.slice(start, start + PAGE_SIZE);
-            const tableBody = document.getElementById("tableBody");
-            tableBody.innerHTML = "";
-
-            pageItems.forEach((data) => {
+            paginatedItems.forEach(item => {
                 const row = tableBody.insertRow();
-                row.onclick = () => selectDocument(data.MATRICULE);
-                row.innerHTML = `
-                    <td>${data.MATRICULE}</td>
-                    <td>${data.NOM}</td>
-                    <td>${data.SEXE}</td>
-                    <td>${data.FILIERE}</td>
-                    <td>
-                        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openPdfModal('${data.PDFURL}', '${data.MATRICULE}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); actionTelechargerDirect('${data.PDFURL}', 'Diplome_${data.MATRICULE}')"><i class="fas fa-download"></i></button>
-                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); supprimerDiplome('${data.MATRICULE}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
+                row.insertCell().innerText = new Date(item.date).toLocaleString('fr-FR');
+                row.insertCell().innerHTML = `<span class="audit-row-action" style="background:${item.action === 'SCELLAGE' ? 'var(--success)' : item.action === 'SUPPRESSION' ? 'var(--danger)' : 'var(--primary)'};">${item.action}</span>`;
+                row.insertCell().innerText = item.matricule;
+                row.insertCell().innerText = item.effectuePar;
             });
-
-            renderPagination('registrePagination', dataList.length, registrePage, p => {
-                registrePage = p;
-                renderTable(currentFilteredList || allArchives);
-            });
+            renderAuditPagination(page);
         }
 
-        let currentFilteredList = null;
-        function filterRegistre() {
-            const query = document.getElementById("searchInput").value.toLowerCase();
-            currentFilteredList = allArchives.filter(item =>
-                item.NOM.toLowerCase().includes(query) || item.MATRICULE.toLowerCase().includes(query)
-            );
-            registrePage = 1;
-            renderTable(currentFilteredList);
-        }
+        function renderAuditPagination(currentPage) {
+            const paginationDiv = document.getElementById('auditPagination');
+            paginationDiv.innerHTML = '';
+            const totalPages = Math.ceil(allAudit.length / PAGE_SIZE);
 
-        function actionTelechargerDirect(url, name) {
-            if (!url) return toast("URL non disponible.", "error");
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = name + ".pdf";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // ---------- Profile picture ----------
-        function previewImg(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    document.getElementById('displayAvatar').src = e.target.result;
-                    document.getElementById('displayAvatar').style.display = 'block';
-                    document.getElementById('plus').style.display = 'none';
-                };
-                reader.readAsDataURL(input.files[0]);
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-secondary'}`;
+                btn.innerText = i;
+                btn.onclick = () => { auditCurrentPage = i; renderAuditTable(i); };
+                paginationDiv.appendChild(btn);
             }
         }
 
-        // ---------- QR ----------
+        // ---------- Registre ----------
+        let registreCurrentPage = 1;
+        function updateRegistre() {
+            db.ref('archives').once('value', snapshot => {
+                allArchives = [];
+                snapshot.forEach(childSnapshot => {
+                    allArchives.push(childSnapshot.val());
+                });
+                renderRegistreTable(registreCurrentPage);
+            });
+        }
+
+        function filterRegistre() {
+            registreCurrentPage = 1; // Reset page on filter
+            renderRegistreTable(registreCurrentPage);
+        }
+
+        function renderRegistreTable(page) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            const filteredArchives = allArchives.filter(item => {
+                return item.NOM.toLowerCase().includes(searchInput) || item.MATRICULE.toLowerCase().includes(searchInput);
+            });
+
+            const start = (page - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const paginatedItems = filteredArchives.slice(start, end);
+
+            paginatedItems.forEach(item => {
+                const row = tableBody.insertRow();
+                row.insertCell().innerText = item.MATRICULE;
+                row.insertCell().innerText = item.NOM;
+                row.insertCell().innerText = item.SEXE;
+                row.insertCell().innerText = item.FILIERE;
+                const actionsCell = row.insertCell();
+                actionsCell.innerHTML = `
+                    <button class="btn btn-sm" onclick="selectDocument('${item.MATRICULE}')"><i class="fas fa-folder-open"></i> Sélectionner</button>
+                    <button class="btn btn-sm btn-danger" onclick="supprimerDiplome('${item.MATRICULE}')"><i class="fas fa-trash"></i> Supprimer</button>
+                `;
+            });
+            renderRegistrePagination(page, filteredArchives.length);
+        }
+
+        function renderRegistrePagination(currentPage, totalItems) {
+            const paginationDiv = document.getElementById('registrePagination');
+            paginationDiv.innerHTML = '';
+            const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-secondary'}`;
+                btn.innerText = i;
+                btn.onclick = () => { registreCurrentPage = i; renderRegistreTable(i); };
+                paginationDiv.appendChild(btn);
+            }
+        }
+
+        // ---------- Access Management ----------
+        function loadAccessTable() {
+            if (currentRole !== 'superadmin') { toast("Accès refusé. Super Admin requis.", "error"); return; }
+            const tableBody = document.getElementById('accessTableBody');
+            tableBody.innerHTML = '';
+
+            db.ref('roles').once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const user = childSnapshot.val();
+                    const uid = childSnapshot.key;
+                    const row = tableBody.insertRow();
+                    row.insertCell().innerText = user.nom || 'N/A';
+                    row.insertCell().innerText = user.email;
+                    row.insertCell().innerText = user.role;
+                    const actionCell = row.insertCell();
+                    if (uid !== currentUser.uid) { // Prevent changing own role
+                        actionCell.innerHTML = `
+                            <select onchange="changeUserRole('${uid}', this.value)">
+                                <option value="lecteur" ${user.role === 'lecteur' ? 'selected' : ''}>Lecteur</option>
+                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                <option value="superadmin" ${user.role === 'superadmin' ? 'selected' : ''}>Super Admin</option>
+                            </select>
+                        `;
+                    } else {
+                        actionCell.innerText = "(Vous)";
+                    }
+                });
+            });
+        }
+
+        function changeUserRole(uid, newRole) {
+            if (currentRole !== 'superadmin') { toast("Accès refusé. Super Admin requis.", "error"); return; }
+            db.ref('roles/' + uid).update({ role: newRole })
+                .then(() => { toast(`Rôle mis à jour pour ${uid}.`, "success"); loadAccessTable(); })
+                .catch(error => toast("Erreur de mise à jour du rôle : " + error.message, "error"));
+        }
+
+        // ---------- Stats ----------
+        function updateStats() {
+            db.ref('archives').once('value', snapshot => {
+                document.getElementById('totalDiplomes').innerText = snapshot.numChildren();
+            });
+            db.ref('roles').once('value', snapshot => {
+                let admins = 0;
+                let lecteurs = 0;
+                snapshot.forEach(childSnapshot => {
+                    const role = childSnapshot.val().role;
+                    if (role === 'admin' || role === 'superadmin') admins++;
+                    else if (role === 'lecteur') lecteurs++;
+                });
+                document.getElementById('totalAdmins').innerText = admins;
+                document.getElementById('totalLecteurs').innerText = lecteurs;
+            });
+        }
+
+        // ---------- QR Code Generation ----------
         function genererQrCode(matricule) {
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = "";
-            const lienVerification = `https://isc-archives.vercel.app/verif.html?mat=${matricule}`;
-            new QRCode(qrContainer, { text: lienVerification, width: 100, height: 100 });
+            document.getElementById('qrcode').innerHTML = ''; // Clear previous QR
+            new QRCode(document.getElementById('qrcode'), {
+                text: `https://lgt-hub-archives-isc-59416.web.app/verify.html?mat=${matricule}`,
+                width: 128,
+                height: 128,
+                colorDark : "#1e3a8a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
         }
 
-        // ---------- PDF modal & print/download ----------
-        function openPdfModal(url, label) {
-            if (!url) return toast("Aucun document disponible.", "error");
-            document.getElementById('pdfModalTitle').innerHTML = `<i class="fas fa-file-pdf"></i> Diplôme ${label || ''}`;
-            document.getElementById('pdfModalFrame').src = url;
-            document.getElementById('pdfModalOverlay').style.display = 'flex';
-        }
-        function closePdfModal() {
-            document.getElementById('pdfModalOverlay').style.display = 'none';
-            document.getElementById('pdfModalFrame').src = '';
-        }
-
-        function actionVoir() { openPdfModal(currentActiveDocUrl, currentActiveMatricule); }
-        function actionTelecharger() {
-            if (!currentActiveDocUrl) return toast("Aucun document chargé.", "error");
-            actionTelechargerDirect(currentActiveDocUrl, currentActiveDocName);
-        }
-
-        function printTargetedDoc() {
-            if (!currentActiveDocUrl) return toast("Sélectionnez ou scellez un document à imprimer.", "warn");
-            const pFrame = document.getElementById('printFrame');
-            pFrame.src = currentActiveDocUrl;
-            pFrame.onload = function() { pFrame.contentWindow.focus(); pFrame.contentWindow.print(); };
-        }
-
-        // ---------- Filiere ----------
+        // ---------- Filiere Update ----------
         function updateFiliere() {
             const fac = document.getElementById('fac').value;
             const filiere = document.getElementById('filiere');
-            filiere.innerHTML = "";
-            if (fac === "Informatique de Gestion") {
-                filiere.innerHTML = "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option><option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
-            } else if (fac === "Sciences Commerciales et Financières") {
-                filiere.innerHTML = "<option value='Banque et Assurance'>Banque & Assurance</option><option value='Douane'>Douane</option><option value='Marketing'>Marketing</option><option value='Comptabilité'>Comptabilité</option><option value='Gestion Financière'>Gestion Financière</option>";
+            filiere.innerHTML = ''; // Clear existing options
+
+            if (fac === 'Informatique') {
+                filiere.innerHTML = `
+                    <option value="Genie Logiciel">Génie Logiciel</option>
+                    <option value="Reseaux">Réseaux</option>
+                    <option value="Securite Informatique">Sécurité Informatique</option>
+                `;
+            } else if (fac === 'Gestion') {
+                filiere.innerHTML = `
+                    <option value="Comptabilite">Comptabilité</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Marketing">Marketing</option>
+                `;
             } else {
-                filiere.innerHTML = "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
+                filiere.innerHTML = "<option value='Secretariat de Direction'>Assistant de Direction (SGA)</option>";
             }
         }
 
@@ -1033,13 +1008,13 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
 
         // ---------- Scellage ----------
         async function scellerMaintenant() {
-    if (!currentUser) return toast("🛑 Connectez-vous d'abord.", "error");
+            if (!currentUser) return toast("🛑 Connectez-vous d'abord.", "error");
 
-    console.log("Utilisateur :", currentUser);
-    console.log("Rôle :", currentRole);
+            console.log("Utilisateur :", currentUser);
+            console.log("Rôle :", currentRole);
 
-    if (currentRole !== 'admin' && currentRole !== 'superadmin')
-        return toast("🛑 Accès refusé : rôle Admin requis.", "error");
+            if (currentRole !== 'admin' && currentRole !== 'superadmin')
+                return toast("🛑 Accès refusé : rôle Admin requis.", "error");
             if (!contractInstance) return toast("🛑 Connectez MetaMask avant de sceller.", "error");
 
             const mat = document.getElementById('mat').value.trim().toUpperCase();
@@ -1069,6 +1044,8 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("upload_preset", "diplomes_upload");
+                // MODIFICATION: Cloudinary upload preset should be configured for unsigned uploads or signed uploads with appropriate security.
+                // For public access, ensure 'diplomes_upload' preset is set to 'Unsigned' and 'Access mode' is 'Public' in Cloudinary settings.
                 const response = await fetch("https://api.cloudinary.com/v1_1/vuzn106k/auto/upload", { method: "POST", body: formData });
                 if (!response.ok) throw new Error("Échec de l'envoi vers Cloudinary.");
                 const result = await response.json();
@@ -1093,11 +1070,40 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
                 document.getElementById('docActions').style.display = 'grid';
 
                 toast("Document ancré et enregistré avec succès.", "success");
+                updateRegistre(); // Mettre à jour le registre après un scellage réussi
+                updateStats(); // Mettre à jour les stats après un scellage réussi
             } catch (error) {
                 console.error(error);
                 document.getElementById('statusTag').innerText = "ERREUR D'ANCRAGE";
                 toast("Erreur : " + error.message, "error");
             }
+        }
+
+        // MODIFICATION: Implémentation de la fonction voirDocument
+        function voirDocument() {
+            if (!currentActiveDocUrl) {
+                toast("Aucun document sélectionné à visualiser.", "warn");
+                return;
+            }
+            document.getElementById('pdfModalTitle').innerText = `Visualisation : ${currentActiveDocName}`;
+            document.getElementById('pdfModalFrame').src = currentActiveDocUrl;
+            document.getElementById('pdfModalOverlay').style.display = 'flex';
+        }
+
+        // MODIFICATION: Implémentation de la fonction telechargerDocument
+        function telechargerDocument() {
+            if (!currentActiveDocUrl) {
+                toast("Aucun document sélectionné à télécharger.", "warn");
+                return;
+            }
+            // Crée un lien temporaire et clique dessus pour déclencher le téléchargement
+            const link = document.createElement('a');
+            link.href = currentActiveDocUrl;
+            link.download = currentActiveDocName + (currentActiveDocUrl.includes('.pdf') ? '.pdf' : '.png'); // Tente de deviner l'extension
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast("Téléchargement lancé.", "info");
         }
 
         // ---------- Vérification d'intégrité ----------
@@ -1211,6 +1217,18 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
                 db.ref('archives/' + matricule).remove().then(() => {
                     logAudit("SUPPRESSION", matricule, "Diplôme retiré du registre central");
                     toast("Diplôme supprimé avec succès.", "success");
+                    updateRegistre(); // Mettre à jour le registre après suppression
+                    updateStats(); // Mettre à jour les stats après suppression
+                    // Réinitialiser les infos du document actif si c'est celui qui a été supprimé
+                    if (currentActiveMatricule === matricule) {
+                        currentActiveMatricule = "";
+                        currentActiveDocUrl = "";
+                        currentActiveDocName = "diplome";
+                        document.getElementById('docActions').style.display = 'none';
+                        document.getElementById('qrWrapper').classList.remove('qr-glow-active');
+                        document.getElementById('qrcode').innerHTML = '';
+                        document.getElementById('statusTag').innerText = "En attente...";
+                    }
                 }).catch(error => toast("Erreur lors de la suppression : " + error.message, "error"));
             }
         }
