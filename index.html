@@ -607,7 +607,7 @@
         const PAGE_SIZE = 8;
 
         let provider, signer, contractInstance = null;
-        const contractAddress = "0xc5B54A1941d0C8902BA578561Ae4101a3A75F423";
+        const contractAddress = "0xAA95c2D9A2F9CD30391ecFf7a61c66142140a10c";
         const contractABI = [
             { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
             { "anonymous": false, "inputs": [
@@ -1022,6 +1022,14 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
                 if (network.chainId !== 11155111) return toast("🛑 Réseau incorrect : connectez-vous à Sepolia.", "error");
 
                 contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
+                console.log("Adresse du contrat :", contractAddress);
+
+try {
+    const admin = await contractInstance.adminSGA();
+    console.log("Admin du contrat :", admin);
+} catch(e){
+    console.error("Impossible de lire adminSGA :", e);
+}
                 document.getElementById("walletAddr").innerText = address;
                 toast("Portefeuille connecté sur Sepolia.", "success");
             } catch (error) {
