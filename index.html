@@ -737,6 +737,11 @@
             if (user) {
                 currentUser = user;
                 console.log("UID connecté :", user.uid);
+                console.log("Chemin recherché :", "roles/" + user.uid);
+
+db.ref("roles/" + user.uid).once("value").then(s=>{
+    console.log("Valeur brute :", s.val());
+});
 
 db.ref('roles/' + user.uid).once('value').then(snap => {
     const data = snap.val();
