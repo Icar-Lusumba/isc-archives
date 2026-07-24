@@ -3,112 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portail Public de Vérification - Blockchain ISC</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <title>LGT HUB | Vérification Blockchain ISC</title>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root {
+            --primary: #1e3a8a;
+            --accent: #f6851b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --bg-body: #f8fafc;
+            --bg-image: url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070");
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --shadow-glow: rgba(30, 58, 138, 0.08);
+            --card-radius: 24px;
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --accent: #f6851b;
+            --bg-body: #090d16;
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --shadow-glow: rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), url('assets/img/fond.webp');
-            background-size: cover; background-position: center; background-attachment: fixed;
-            color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(248, 250, 252, 0.35), rgba(248, 250, 252, 0.45)), var(--bg-image);
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: var(--text);
+            transition: all 0.4s ease;
+            padding: 20px;
         }
-        .verification-container {
-            background-color: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); border: 1px solid #334155;
-            padding: 40px; border-radius: 16px; width: 100%; max-width: 650px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+        .dark-mode-body {
+            background: linear-gradient(rgba(9, 13, 22, 0.88), rgba(9, 13, 22, 0.92)), var(--bg-image) !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
         }
-        .logo-section { text-align: center; margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 20px; }
-        .logo-section img { width: 90px; height: auto; margin-bottom: 10px; }
-        .logo-section h2 { font-size: 24px; color: #f8fafc; font-weight: 700; }
-        .logo-section p { color: #38bdf8; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 5px; }
-        .search-container { margin-top: 20px; }
-        .input-group { position: relative; margin-bottom: 15px; }
-        .input-group input {
-            width: 100%; padding: 16px 20px; padding-left: 50px; background-color: #0f172a;
-            border: 1px solid #334155; border-radius: 10px; color: #f8fafc; font-size: 16px; outline: none; transition: all 0.3s;
+
+        .main-container {
+            width: 100%;
+            max-width: 650px;
+            perspective: 1000px;
+            animation: fadeIn 0.8s ease-out;
         }
-        .input-group input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
-        .input-group i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 18px; }
-        .qr-scanner-box {
-            background-color: #0f172a; border: 2px dashed #334155; border-radius: 10px;
-            padding: 20px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: all 0.3s;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .qr-scanner-box:hover { border-color: #38bdf8; background-color: rgba(15, 23, 42, 0.6); }
-        .qr-scanner-box i { font-size: 40px; color: #64748b; margin-bottom: 10px; }
-        .btn-verify {
-            width: 100%; background-color: #38bdf8; color: #0f172a; padding: 16px; border: none;
-            border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
+
+        .glass-card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(25px);
+            border-radius: var(--card-radius);
+            padding: 40px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px var(--shadow-glow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .btn-verify:hover { background-color: #0ea5e9; }
-        .btn-verify:disabled { background-color: #64748b; cursor: not-allowed; }
+
+        .brand-section {
+            margin-bottom: 30px;
+        }
+
+        .brand-logo {
+            font-size: 45px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 10px rgba(246, 133, 27, 0.3));
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-tagline {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            text-align: left;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+            padding-left: 5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        input {
+            padding: 14px 14px 14px 45px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            color: var(--text);
+            outline: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .dark-mode input {
+            background: rgba(15, 23, 42, 0.6) !important;
+            color: #fff !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+            background: white;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 1rem;
+            width: 100%;
+            box-shadow: 0 10px 20px rgba(30, 58, 138, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(30, 58, 138, 0.3);
+        }
+
+        .btn:active { transform: translateY(-1px); }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #ff9a3d);
+            box-shadow: 0 10px 20px rgba(246, 133, 27, 0.2);
+        }
+
+        .btn-accent:hover {
+            box-shadow: 0 15px 30px rgba(246, 133, 27, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        #qr-reader-container {
+            display: none;
+            margin-top: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+
+        #qr-reader {
+            width: 100% !important;
+            border: none !important;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-secondary);
+        }
+
+        .status-online { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .status-offline { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        #verifResult {
+            margin-top: 30px;
+            text-align: left;
+        }
+
         .result-card {
-            display: none; background-color: #0f172a; border: 1px solid #10b981; border-radius: 12px;
-            padding: 25px; margin-top: 25px; text-align: left; animation: fadeIn 0.5s ease-in-out;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 25px;
+            border-left: 6px solid var(--success);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.5s ease-out;
         }
-        .result-header { display: flex; align-items: center; gap: 10px; color: #10b981; font-weight: bold; font-size: 18px; margin-bottom: 15px; }
-        .result-details { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px; }
-        .result-details strong { color: #f8fafc; }
-        .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .btn-action {
-            background-color: #334155; color: #f8fafc; padding: 12px; border: 1px solid #475569;
-            border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex;
-            flex-direction: column; align-items: center; gap: 8px; transition: all 0.3s;
+
+        .dark-mode .result-card {
+            background: rgba(30, 41, 59, 0.6);
         }
-        .btn-action:hover { background-color: #475569; border-color: #38bdf8; color: #38bdf8; }
-        .footer-text { margin-top: 30px; text-align: center; color: #64748b; font-size: 12px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .result-header {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .hash-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .live-clock-box {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--glass-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .theme-toggle-box {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .theme-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .theme-btn:hover { transform: rotate(30deg) scale(1.1); }
+
+        #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.success { background: rgba(16, 185, 129, 0.9); }
+        .toast.error { background: rgba(239, 68, 68, 0.9); }
+        .toast.info { background: rgba(30, 58, 138, 0.9); }
+
+        @keyframes toastIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media (max-width: 500px) {
+            .glass-card { padding: 25px; }
+            .action-grid { grid-template-columns: 1fr; }
+            .brand-name { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="verification-container">
-        <div class="logo-section">
-            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" alt="Logo Officiel ISC">
-            <h2>Portail Public de Vérification</h2>
-            <p>Institut Supérieur de Commerce - Lubumbashi</p>
-        </div>
-        <div class="search-container">
-            <p style="color: #94a3b8; font-size: 14px; text-align: center; margin-bottom: 20px;">
-                Scannez le QR Code du diplôme ou saisissez manuellement le matricule.
-            </p>
-            <div class="qr-scanner-box" id="qrBox" onclick="startScanner()">
-                <i class="fas fa-qrcode"></i>
-                <p id="qrText">Cliquez pour scanner un QR Code</p>
+
+    <div class="main-container">
+        <div class="glass-card">
+            <div class="brand-section">
+                <i class="fas fa-shield-halved brand-logo"></i>
+                <h1 class="brand-name">LGT HUB VERIFY</h1>
+                <p class="brand-tagline">Vérification de Diplômes ISC via Blockchain</p>
             </div>
-            <div id="reader" style="width:100%; max-width: 400px; margin: 15px auto; display: none; border-radius: 10px; overflow: hidden;"></div>
-            <button id="btnStop" onclick="stopScanner()" class="btn-verify" style="margin-bottom:15px; background:#ef4444; display: none;">
-                <i class="fas fa-stop"></i> Fermer caméra
-            </button>
-            <div class="input-group">
-                <i class="fas fa-search"></i>
-                <input type="text" id="matriculeInput" placeholder="Saisir le matricule (Ex: ISC-2026-077M)">
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="verifMat">Matricule Étudiant</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="verifMat" placeholder="Ex: 2026-ISC-001">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="verifFile">Document Source (Optionnel)</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-file-pdf"></i>
+                        <input type="file" id="verifFile" accept=".pdf,image/*">
+                    </div>
+                </div>
+
+                <button class="btn btn-accent" onclick="verifierIntegrite()" id="btnVerifier">
+                    <i class="fas fa-magnifying-glass"></i>
+                    VÉRIFIER L'AUTHENTICITÉ
+                </button>
+
+                <div class="action-grid">
+                    <button class="btn btn-outline" onclick="toggleQRScanner()" id="btnQR">
+                        <i class="fas fa-qrcode"></i>
+                        SCANNER QR
+                    </button>
+                    <button class="btn btn-outline" onclick="initBlockchainConnection()">
+                        <i class="fas fa-sync"></i>
+                        RECONNECTER
+                    </button>
+                </div>
             </div>
-            <button id="btnVerify" class="btn-verify" onclick="interrogerBlockchain()">
-                <i class="fas fa-link"></i> Interroger la Blockchain
-            </button>
-        </div>
-        <div class="result-card" id="resultCard">
-            <div id="resHeader" class="result-header">
-                <i class="fas fa-check-circle"></i> Authentification Blockchain Réussie
+
+            <div id="qr-reader-container">
+                <div id="qr-reader"></div>
+                <button class="btn btn-danger" style="border-radius: 0; padding: 10px;" onclick="stopQRScanner()">
+                    FERMER LE SCANNER
+                </button>
             </div>
-            <div class="result-details" id="resDetails">
-                <!-- Rempli par JS -->
+
+            <div class="status-badge" id="statusBadge">
+                <i class="fas fa-circle-nodes"></i>
+                <span id="connectionStatus">Connexion au réseau...</span>
             </div>
-            <div class="action-buttons-grid">
-                <button class="btn-action" onclick="voirDocument()"><i class="fas fa-eye"></i> Voir</button>
-                <button class="btn-action" onclick="telechargerDiplome()"><i class="fas fa-download"></i> Télécharger</button>
-                <button class="btn-action" onclick="imprimerAttestation()"><i class="fas fa-print"></i> Imprimer</button>
-            </div>
-        </div>
-        <div class="footer-text">
-            <p>© 2026 ISC Lubumbashi - Système Intègre Blockchain d'Ancrage</p>
+
+            <div id="verifResult"></div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <div class="live-clock-box">
+        <i class="fas fa-clock"></i>
+        <span id="liveClock">Chargement...</span>
+    </div>
+
+    <div class="theme-toggle-box">
+        <div class="theme-btn" onclick="toggleTheme()">
+            <i id="themeIcon" class="fas fa-moon"></i>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
     <script>
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDfbXYFsxWMEGlswSsk13BFrdNj_WCAp-Y",
             authDomain: "lgt-hub-archives-isc-59416.firebaseapp.com",
@@ -116,163 +468,259 @@
             projectId: "lgt-hub-archives-isc-59416",
             storageBucket: "lgt-hub-archives-isc-59416.firebasestorage.app",
             messagingSenderId: "892573543683",
-            appId: "1:892573543683:web:0b8a05d7c2d4778c9ccd36"
+            appId: "1:892573543683:web:0b8a05d7c2d4778c9ccd36",
+            measurementId: "G-XJZ9EEQFQM"
         };
-        firebase.initializeApp(firebaseConfig);
+
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        const contractAddress = "0x5015dEe165411D3fE1fbb7FB88F2403DC0cB377C";
-        const contractABI = [{
-            "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }],
-            "name": "verifierDiplome",
-            "outputs": [{
-                "components": [
-                    { "internalType": "string", "name": "nomEtudiant", "type": "string" },
-                    { "internalType": "string", "name": "matricule", "type": "string" },
-                    { "internalType": "string", "name": "faculte", "type": "string" },
-                    { "internalType": "string", "name": "filiere", "type": "string" },
-                    { "internalType": "string", "name": "promotion", "type": "string" },
-                    { "internalType": "string", "name": "mention", "type": "string" },
-                    { "internalType": "string", "name": "sexe", "type": "string" },
-                    { "internalType": "string", "name": "documentHash", "type": "string" },
-                    { "internalType": "uint256", "name": "dateEnregistrement", "type": "uint256" },
-                    { "internalType": "address", "name": "auteurAction", "type": "address" },
-                    { "internalType": "bool", "name": "estValide", "type": "bool" }
-                ],
-                "internalType": "struct LGT_HUB_Archives.Diplome", "name": "", "type": "tuple"
-            }],
-            "stateMutability": "view", "type": "function"
-        }];
+        // Configuration Blockchain
+        let provider, contractInstance = null;
+        const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+        const contractABI = [
+            { "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }], "name": "verifierDiplome",
+              "outputs": [ { "components": [
+                { "internalType": "string", "name": "nomEtudiant", "type": "string" },
+                { "internalType": "string", "name": "matricule", "type": "string" },
+                { "internalType": "string", "name": "faculte", "type": "string" },
+                { "internalType": "string", "name": "filiere", "type": "string" },
+                { "internalType": "string", "name": "promotion", "type": "string" },
+                { "internalType": "string", "name": "mention", "type": "string" },
+                { "internalType": "string", "name": "sexe", "type": "string" },
+                { "internalType": "string", "name": "documentHash", "type": "string" },
+                { "internalType": "uint256", "name": "dateEnregistrement", "type": "uint256" },
+                { "internalType": "address", "name": "auteurAction", "type": "address" },
+                { "internalType": "bool", "name": "estValide", "type": "bool" }
+              ], "internalType": "struct LGT_HUB_Archives.Diplome", "name": "", "type": "tuple" } ],
+              "stateMutability": "view", "type": "function" }
+        ];
 
-        let currentPdfUrl = "";
-        let html5QrCode;
-        let scannerActif = false;
-
-        function startScanner() {
-            if(scannerActif) return;
-            document.getElementById("reader").style.display = "block";
-            document.getElementById("btnStop").style.display = "flex";
-            document.getElementById("qrBox").style.display = "none";
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
-                stopScanner();
-                let mat = decodedText;
-                if(decodedText.includes("mat=")){
-                    const url = new URL(decodedText);
-                    mat = url.searchParams.get("mat");
-                }
-                document.getElementById("matriculeInput").value = mat;
-                interrogerBlockchain();
-            }).catch(err => { alert("Erreur caméra : " + err); stopScanner(); });
-            scannerActif = true;
+        // --- Fonctions Utilitaires ---
+        function toast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const el = document.createElement("div");
+            el.className = `toast ${type}`;
+            const icon = type === "success" ? "fa-check-circle" : type === "error" ? "fa-exclamation-circle" : "fa-info-circle";
+            el.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = "0";
+                el.style.transform = "translateX(50px)";
+                el.style.transition = "all 0.4s ease";
+                setTimeout(() => el.remove(), 400);
+            }, 4000);
         }
 
-        function stopScanner() {
-            if(!scannerActif) return;
-            html5QrCode.stop().then(() => {
-                document.getElementById("reader").style.display = "none";
-                document.getElementById("btnStop").style.display = "none";
-                document.getElementById("qrBox").style.display = "block";
-                scannerActif = false;
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('liveClock').innerText = now.toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            }, 1000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode-body');
+            document.documentElement.classList.toggle('dark-mode');
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            document.getElementById('themeIcon').className = isDark ? "fas fa-sun" : "fas fa-moon";
+        }
+
+        // --- Connexion Blockchain avec Fallback ---
+        async function initBlockchainConnection() {
+            const statusText = document.getElementById('connectionStatus');
+            const statusBadge = document.getElementById('statusBadge');
+            
+            try {
+                statusText.innerText = "Connexion en cours...";
+                
+                // 1. Essayer MetaMask
+                if (window.ethereum) {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    const network = await provider.getNetwork();
+                    
+                    if (network.chainId === 11155111) { // Sepolia
+                        contractInstance = new ethers.Contract(contractAddress, contractABI, provider);
+                        statusText.innerText = "Connecté : MetaMask (Sepolia)";
+                        statusBadge.className = "status-badge status-online";
+                        toast("Blockchain connectée via MetaMask", "success");
+                        return;
+                    }
+                }
+
+                // 2. Fallback : RPC Public (Sepolia)
+                // Note: Utilisez un RPC public stable pour Sepolia
+                const publicRPC = "https://ethereum-sepolia-rpc.publicnode.com";
+                provider = new ethers.providers.JsonRpcProvider(publicRPC);
+                contractInstance = new ethers.Contract(contractAddress, contractABI, provider);
+                
+                statusText.innerText = "Connecté : RPC Public (Sepolia)";
+                statusBadge.className = "status-badge status-online";
+                toast("Blockchain connectée via RPC Public", "info");
+                
+            } catch (error) {
+                console.error(error);
+                statusText.innerText = "Erreur de connexion";
+                statusBadge.className = "status-badge status-offline";
+                toast("Échec de connexion blockchain", "error");
+            }
+        }
+
+        // --- Scanner QR ---
+        let html5QrCode;
+        function toggleQRScanner() {
+            const container = document.getElementById('qr-reader-container');
+            if (container.style.display === 'block') {
+                stopQRScanner();
+            } else {
+                startQRScanner();
+            }
+        }
+
+        function startQRScanner() {
+            document.getElementById('qr-reader-container').style.display = 'block';
+            html5QrCode = new Html5Qrcode("qr-reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                // Analyse de l'URL du QR
+                let matricule = decodedText;
+                if (decodedText.includes('mat=')) {
+                    const url = new URL(decodedText);
+                    matricule = url.searchParams.get('mat');
+                }
+                document.getElementById('verifMat').value = matricule;
+                stopQRScanner();
+                toast("Matricule scanné : " + matricule, "success");
+                verifierIntegrite();
+            }).catch(err => {
+                toast("Erreur caméra : " + err, "error");
+                stopQRScanner();
             });
         }
 
-        async function interrogerBlockchain() {
-            const mat = document.getElementById("matriculeInput").value.trim().toUpperCase();
-            if (!mat) return alert("Veuillez saisir un matricule.");
-            const btn = document.getElementById("btnVerify");
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification en cours...';
+        function stopQRScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('qr-reader-container').style.display = 'none';
+                }).catch(err => console.error(err));
+            } else {
+                document.getElementById('qr-reader-container').style.display = 'none';
+            }
+        }
+
+        // --- Logique de Vérification ---
+        async function hashFile(file) {
+            const buffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function verifierIntegrite() {
+            const mat = document.getElementById('verifMat').value.trim().toUpperCase();
+            const file = document.getElementById('verifFile').files[0];
+            const resultBox = document.getElementById('verifResult');
+            const btn = document.getElementById('btnVerifier');
+
+            if (!mat) return toast("Veuillez entrer un matricule", "error");
+            if (!contractInstance) return toast("Blockchain non connectée", "error");
 
             try {
-                // 1. Firebase Check
-                const snapshot = await db.ref("archives/" + mat).once("value");
-                const firebaseData = snapshot.val();
-                if (!firebaseData) throw new Error("Diplôme introuvable dans le registre.");
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> VÉRIFICATION...';
+                resultBox.innerHTML = '';
 
-                // 2. Blockchain Check (via RPC public)
-                const rpcUrls = [
-                    "https://rpc.ankr.com/eth_sepolia",
-                    "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID", // REMPLACER PAR VOTRE ID DE PROJET INFURA
-                    "https://eth-sepolia.public.blastapi.io",
-                    "https://endpoints.omniatech.io/v1/eth/sepolia/public"
-                ];
-                let provider;
-                for (const url of rpcUrls) {
-                    try {
-                        provider = new ethers.providers.JsonRpcProvider(url);
-                        await provider.getNetwork(); // Test the connection
-                        console.log(`Connecté à Sepolia via ${url}`);
-                        break; // If successful, use this provider
-                    } catch (e) {
-                        console.warn(`Échec de la connexion à ${url}: ${e.message}`);
-                    }
+                // Interrogation Blockchain
+                const data = await contractInstance.verifierDiplome(mat);
+
+                if (!data.estValide) {
+                    resultBox.innerHTML = `
+                        <div class="result-card" style="border-left-color: var(--danger);">
+                            <div class="result-header" style="color: var(--danger);">
+                                <i class="fas fa-times-circle"></i> DIPLÔME NON TROUVÉ
+                            </div>
+                            <p>Aucun enregistrement blockchain ne correspond au matricule <strong>${mat}</strong>.</p>
+                        </div>
+                    `;
+                    toast("Diplôme invalide ou non répertorié", "error");
+                    return;
                 }
-                if (!provider) throw new Error("Impossible de se connecter au réseau Sepolia via tous les nœuds RPC disponibles.");
-                const contract = new ethers.Contract(contractAddress, contractABI, provider);
-                const bcData = await contract.verifierDiplome(mat);
 
-                if (!bcData.estValide) throw new Error("Authenticité blockchain non confirmée.");
+                // Vérification du fichier si présent
+                let fileMatch = true;
+                let fileStatusHtml = '';
+                
+                if (file) {
+                    const localHash = await hashFile(file);
+                    fileMatch = localHash.toLowerCase() === data.documentHash.toLowerCase();
+                    
+                    fileStatusHtml = `
+                        <div class="result-item">
+                            <span class="result-label">Intégrité du Fichier</span>
+                            <span class="result-value" style="color: ${fileMatch ? 'var(--success)' : 'var(--danger)'}">
+                                <i class="fas ${fileMatch ? 'fa-check-double' : 'fa-warning'}"></i>
+                                ${fileMatch ? 'Authenticité du document confirmée' : 'Le document a été modifié !'}
+                            </span>
+                        </div>
+                    `;
+                }
 
-                currentPdfUrl = firebaseData.PDFURL;
-                document.getElementById("resHeader").innerHTML = '<i class="fas fa-check-circle"></i> Authentification Blockchain Réussie';
-                document.getElementById("resHeader").style.color = "#10b981";
-                document.getElementById("resCard").style.borderColor = "#10b981";
-                document.getElementById("resDetails").innerHTML = `
-                    <p><strong>Étudiant :</strong> ${firebaseData.NOM}</p>
-                    <p><strong>Matricule :</strong> ${firebaseData.MATRICULE}</p>
-                    <p><strong>Filière :</strong> ${firebaseData.FILIERE}</p>
-                    <p><strong>Date d'Ancrage :</strong> ${new Date(firebaseData.DATE).toLocaleDateString('fr-FR')}</p>
-                    <p style="font-family: monospace; font-size: 10px; color: #38bdf8; word-break: break-all; margin-top: 10px;">
-                        <strong>Blockchain Hash :</strong> ${bcData.documentHash}
-                    </p>
+                const dateStr = new Date(data.dateEnregistrement.toNumber() * 1000).toLocaleDateString('fr-FR', {
+                    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                resultBox.innerHTML = `
+                    <div class="result-card" style="border-left-color: ${fileMatch ? 'var(--success)' : 'var(--danger)'}">
+                        <div class="result-header" style="color: ${fileMatch ? 'var(--success)' : 'var(--danger)'}">
+                            <i class="fas ${fileMatch ? 'fa-certificate' : 'fa-triangle-exclamation'}"></i>
+                            ${fileMatch ? 'DIPLÔME AUTHENTIFIÉ' : 'ALERTE : DISCORDANCE'}
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Étudiant</span>
+                            <span class="result-value">${data.nomEtudiant}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Faculté / Filière</span>
+                            <span class="result-value">${data.faculte} — ${data.filiere}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Date d'Ancrage</span>
+                            <span class="result-value">${dateStr}</span>
+                        </div>
+                        ${fileStatusHtml}
+                        <div class="result-item">
+                            <span class="result-label">Empreinte Numérique (Hash)</span>
+                            <div class="hash-value">${data.documentHash}</div>
+                        </div>
+                    </div>
                 `;
-                document.getElementById("resultCard").style.display = "block";
+
+                if (fileMatch) toast("Diplôme authentifié avec succès", "success");
+                else toast("Attention : Le fichier ne correspond pas !", "error");
+
             } catch (error) {
-                alert(error.code === 'NETWORK_ERROR' ? 'Problème de connexion au réseau blockchain. Veuillez vérifier votre connexion internet ou réessayer.' : error.message);
-                document.getElementById("resultCard").style.display = "none";
+                console.error(error);
+                toast("Erreur lors de la vérification", "error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-link"></i> Interroger la Blockchain';
+                btn.innerHTML = '<i class="fas fa-magnifying-glass"></i> VÉRIFIER L\'AUTHENTICITÉ';
             }
         }
 
-        function voirDocument() {
-            if(!currentPdfUrl) return alert("Document introuvable.");
-            // Utilisation de Google Docs Viewer pour contourner les erreurs 401 si Cloudinary est capricieux
-            // Utilisation de Google Docs Viewer pour une meilleure compatibilité avec les PDF Cloudinary
-            window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(currentPdfUrl)}&embedded=true`, 
-                        '_blank', 
-                        'toolbar=0,location=0,menubar=0');
-        }
-
-        function telechargerDiplome() {
-            if(!currentPdfUrl) return alert("Document introuvable.");
-            const a = document.createElement("a");
-            a.href = currentPdfUrl;
-            a.download = "Diplome.pdf";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function imprimerAttestation() {
-            if(!currentPdfUrl) return alert("Document introuvable.");
-            const frame = document.createElement("iframe");
-            frame.style.display = "none";
-            frame.src = currentPdfUrl;
-            document.body.appendChild(frame);
-            frame.onload = () => { frame.contentWindow.print(); };
-        }
-
-        window.onload = function () {
-            const params = new URLSearchParams(window.location.search);
-            const mat = params.get("mat");
-            if(mat) {
-                document.getElementById("matriculeInput").value = mat;
-                interrogerBlockchain();
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            startClock();
+            initBlockchainConnection();
+            
+            // Auto-fill from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const mat = urlParams.get('mat');
+            if (mat) {
+                document.getElementById('verifMat').value = mat;
+                setTimeout(verifierIntegrite, 1500);
             }
-        }
+        });
     </script>
 </body>
 </html>
