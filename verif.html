@@ -65,9 +65,12 @@
 
         .main-container {
             width: 100%;
-            max-width: 650px;
+            max-width: 900px; /* Increased max-width for two columns */
             perspective: 1000px;
             animation: fadeIn 0.8s ease-out;
+            display: flex;
+            gap: 20px; /* Space between the two blocks */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
         }
 
         @keyframes fadeIn {
@@ -86,6 +89,8 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            flex: 1; /* Make cards take equal width */
+            min-width: 300px; /* Minimum width before wrapping */
         }
 
         .brand-section {
@@ -379,6 +384,10 @@
 
         @keyframes toastIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; }
+            .glass-card { min-width: unset; }
+        }
         @media (max-width: 500px) {
             .glass-card { padding: 25px; }
             .action-grid { grid-template-columns: 1fr; }
@@ -389,11 +398,43 @@
 <body>
 
     <div class="main-container">
+        <!-- Bloc 1: Scan QR et Reconnexion -->
         <div class="glass-card">
             <div class="brand-section">
-                <i class="fas fa-shield-halved brand-logo"></i>
-                <h1 class="brand-name">LGT HUB VERIFY</h1>
-                <p class="brand-tagline">Vérification de Diplômes ISC via Blockchain</p>
+                <i class="fas fa-qrcode brand-logo"></i>
+                <h2 class="brand-name">SCANNER RAPIDE</h2>
+                <p class="brand-tagline">Scannez un QR Code de diplôme pour une vérification instantanée.</p>
+            </div>
+
+            <button class="btn btn-accent" onclick="toggleQRScanner()" id="btnQR">
+                <i class="fas fa-camera"></i>
+                DÉMARRER LE SCANNER QR
+            </button>
+
+            <div id="qr-reader-container">
+                <div id="qr-reader"></div>
+                <button class="btn btn-danger" style="border-radius: 0 0 16px 16px; padding: 10px;" onclick="stopQRScanner()">
+                    FERMER LE SCANNER
+                </button>
+            </div>
+
+            <button class="btn btn-outline" style="margin-top: 20px;" onclick="initBlockchainConnection()">
+                <i class="fas fa-sync"></i>
+                RECONNECTER BLOCKCHAIN
+            </button>
+
+            <div class="status-badge" id="statusBadge" style="margin-top: 20px;">
+                <i class="fas fa-circle-nodes"></i>
+                <span id="connectionStatus">Connexion au réseau...</span>
+            </div>
+        </div>
+
+        <!-- Bloc 2: Saisie Manuelle et Vérification -->
+        <div class="glass-card">
+            <div class="brand-section">
+                <i class="fas fa-id-card-alt brand-logo" style="color: var(--primary);"></i>
+                <h2 class="brand-name">VÉRIFICATION MANUELLE</h2>
+                <p class="brand-tagline">Entrez les informations du diplôme pour vérifier son authenticité.</p>
             </div>
 
             <div class="input-section">
@@ -417,29 +458,6 @@
                     <i class="fas fa-magnifying-glass"></i>
                     VÉRIFIER L'AUTHENTICITÉ
                 </button>
-
-                <div class="action-grid">
-                    <button class="btn btn-outline" onclick="toggleQRScanner()" id="btnQR">
-                        <i class="fas fa-qrcode"></i>
-                        SCANNER QR
-                    </button>
-                    <button class="btn btn-outline" onclick="initBlockchainConnection()">
-                        <i class="fas fa-sync"></i>
-                        RECONNECTER
-                    </button>
-                </div>
-            </div>
-
-            <div id="qr-reader-container">
-                <div id="qr-reader"></div>
-                <button class="btn btn-danger" style="border-radius: 0; padding: 10px;" onclick="stopQRScanner()">
-                    FERMER LE SCANNER
-                </button>
-            </div>
-
-            <div class="status-badge" id="statusBadge">
-                <i class="fas fa-circle-nodes"></i>
-                <span id="connectionStatus">Connexion au réseau...</span>
             </div>
 
             <div id="verifResult"></div>
@@ -533,6 +551,7 @@
             
             try {
                 statusText.innerText = "Connexion en cours...";
+                statusBadge.className = "status-badge"; // Reset status
                 
                 // 1. Essayer MetaMask
                 if (window.ethereum) {
@@ -542,7 +561,7 @@
                     if (network.chainId === 11155111) { // Sepolia
                         contractInstance = new ethers.Contract(contractAddress, contractABI, provider);
                         statusText.innerText = "Connecté : MetaMask (Sepolia)";
-                        statusBadge.className = "status-badge status-online";
+                        statusBadge.classList.add("status-online");
                         toast("Blockchain connectée via MetaMask", "success");
                         return;
                     }
@@ -550,19 +569,19 @@
 
                 // 2. Fallback : RPC Public (Sepolia)
                 // Note: Utilisez un RPC public stable pour Sepolia
-                const publicRPC = "https://ethereum-sepolia-rpc.publicnode.com";
+                const publicRPC = "https://ethereum-sepolia-rpc.publicnode.com"; // Ou "https://rpc.sepolia.org" ou votre clé Infura/Alchemy
                 provider = new ethers.providers.JsonRpcProvider(publicRPC);
                 contractInstance = new ethers.Contract(contractAddress, contractABI, provider);
                 
                 statusText.innerText = "Connecté : RPC Public (Sepolia)";
-                statusBadge.className = "status-badge status-online";
+                statusBadge.classList.add("status-online");
                 toast("Blockchain connectée via RPC Public", "info");
                 
             } catch (error) {
-                console.error(error);
+                console.error("Erreur de connexion blockchain:", error);
                 statusText.innerText = "Erreur de connexion";
-                statusBadge.className = "status-badge status-offline";
-                toast("Échec de connexion blockchain", "error");
+                statusBadge.classList.add("status-offline");
+                toast("Problème de connexion au réseau blockchain. " + error.message, "error");
             }
         }
 
@@ -624,7 +643,11 @@
             const btn = document.getElementById('btnVerifier');
 
             if (!mat) return toast("Veuillez entrer un matricule", "error");
-            if (!contractInstance) return toast("Blockchain non connectée", "error");
+            if (!contractInstance) {
+                toast("Blockchain non connectée. Tentative de reconnexion...", "warn");
+                await initBlockchainConnection(); // Tente de reconnecter
+                if (!contractInstance) return; // Si toujours pas connecté, arrête
+            }
 
             try {
                 btn.disabled = true;
@@ -700,8 +723,8 @@
                 else toast("Attention : Le fichier ne correspond pas !", "error");
 
             } catch (error) {
-                console.error(error);
-                toast("Erreur lors de la vérification", "error");
+                console.error("Erreur de vérification:", error);
+                toast("Erreur lors de la vérification : " + error.message, "error");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-magnifying-glass"></i> VÉRIFIER L\'AUTHENTICITÉ';
@@ -718,7 +741,7 @@
             const mat = urlParams.get('mat');
             if (mat) {
                 document.getElementById('verifMat').value = mat;
-                setTimeout(verifierIntegrite, 1500);
+                setTimeout(verifierIntegrite, 1500); // Délai pour s'assurer que la connexion blockchain est établie
             }
         });
     </script>
