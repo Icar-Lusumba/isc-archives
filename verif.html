@@ -655,6 +655,12 @@
                 resultBox.innerHTML = '';
 
                 // Interrogation Blockchain
+                console.log("Contrat :", contractAddress);
+
+const code = await provider.getCode(contractAddress);
+console.log("Bytecode :", code);
+
+console.log("Matricule envoyé :", mat);
                 const data = await contractInstance.verifierDiplome(mat);
 
                 if (!data.estValide) {
