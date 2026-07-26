@@ -594,7 +594,7 @@
 
         // Configuration Blockchain
         let provider, contractInstance = null;
-        const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+        const contractAddress = "0xAA95c2D9A2F9CD30391ecFf7a61c66142140a10c";
         const contractABI = [
             { "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }], "name": "verifierDiplome",
               "outputs": [ { "components": [
@@ -759,7 +759,18 @@
                 resultBox.innerHTML = '';
 
                 // Interrogation Blockchain
-                const onChainData = await contractInstance.verifierDiplome(mat);
+                console.log("Adresse contrat :", contractAddress);
+
+console.log("Matricule :", mat);
+
+console.log("Provider :", provider);
+
+console.log("Contract :", contractInstance);
+const network = await provider.getNetwork();
+
+console.log(network);
+
+                ;const onChainData = await contractInstance.verifierDiplome(mat);
 
                 if (!onChainData.estValide) {
                     resultBox.innerHTML = `
