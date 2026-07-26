@@ -46,7 +46,8 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Changed to column to stack header, main, footer */
+            justify-content: space-between; /* Distribute space */
             align-items: center;
             background: linear-gradient(rgba(248, 250, 252, 0.35), rgba(248, 250, 252, 0.45)), var(--bg-image);
             background-size: cover;
@@ -63,14 +64,35 @@
             background-attachment: fixed !important;
         }
 
+        .header-section {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: var(--glass-bg);
+            border-radius: var(--card-radius);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px var(--shadow-glow);
+        }
+
+        .header-logo {
+            height: 40px; /* Adjust as needed */
+            width: auto;
+        }
+
         .main-container {
             width: 100%;
-            max-width: 900px; /* Increased max-width for two columns */
+            max-width: 900px;
             perspective: 1000px;
             animation: fadeIn 0.8s ease-out;
             display: flex;
-            gap: 20px; /* Space between the two blocks */
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 20px;
+            flex-wrap: wrap;
+            flex-grow: 1; /* Allow main content to grow */
+            justify-content: center;
         }
 
         @keyframes fadeIn {
@@ -89,8 +111,8 @@
             text-align: center;
             position: relative;
             overflow: hidden;
-            flex: 1; /* Make cards take equal width */
-            min-width: 300px; /* Minimum width before wrapping */
+            flex: 1;
+            min-width: 300px;
         }
 
         .brand-section {
@@ -324,6 +346,25 @@
             margin-top: 5px;
         }
 
+        .doc-actions-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .doc-actions-buttons .btn {
+            padding: 10px 15px;
+            font-size: 0.8rem;
+            border-radius: 12px;
+            box-shadow: none;
+        }
+
+        .doc-actions-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
         .live-clock-box {
             position: fixed;
             bottom: 20px;
@@ -339,12 +380,14 @@
             border-radius: 20px;
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
+            z-index: 100;
         }
 
         .theme-toggle-box {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            z-index: 100;
         }
 
         .theme-btn {
@@ -384,18 +427,56 @@
 
         @keyframes toastIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 
+        .footer-section {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 10px;
+            background: var(--glass-bg);
+            border-radius: var(--card-radius);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 -5px 20px var(--shadow-glow);
+            z-index: 100;
+        }
+
+        /* PDF Modal */
+        #pdfModalOverlay {
+            display: none; position: fixed; inset: 0; z-index: 500;
+            background: rgba(0,0,0,0.65); align-items: center; justify-content: center; padding: 30px;
+        }
+        #pdfModalBox {
+            background: var(--bg-body); width: min(900px, 100%); height: 100%; max-height: 85vh;
+            border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+        #pdfModalHead { display:flex; justify-content: space-between; align-items:center; padding: 14px 18px; background: var(--primary); color: white; }
+        #pdfModalHead h3 { margin: 0; font-size: 0.95rem; }
+        #pdfModalFrame { flex: 1; border: none; width: 100%; background: #525659; }
+
         @media (max-width: 900px) {
             .main-container { flex-direction: column; }
             .glass-card { min-width: unset; }
+            .header-section { flex-direction: column; gap: 10px; }
         }
         @media (max-width: 500px) {
             .glass-card { padding: 25px; }
             .action-grid { grid-template-columns: 1fr; }
             .brand-name { font-size: 1.5rem; }
+            .header-logo { height: 30px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Header Section -->
+    <div class="header-section">
+        <img src="https://firebasestorage.googleapis.com/v0/b/lgt-hub-archives-isc-59416.appspot.com/o/logos%2Flgt_logo.png?alt=media&token=YOUR_LGT_LOGO_TOKEN" alt="LGT Logo" class="header-logo">
+        <h1 class="brand-name" style="margin:0;">LGT HUB VERIFY</h1>
+        <img src="https://firebasestorage.googleapis.com/v0/b/lgt-hub-archives-isc-59416.appspot.com/o/logos%2Fisc_logo.png?alt=media&token=YOUR_ISC_LOGO_TOKEN" alt="ISC Logo" class="header-logo">
+    </div>
 
     <div class="main-container">
         <!-- Bloc 1: Scan QR et Reconnexion -->
@@ -464,6 +545,11 @@
         </div>
     </div>
 
+    <!-- Footer Section -->
+    <div class="footer-section">
+        <p>&copy; 2024 LGT HUB. All rights reserved. By Mr Lusumba.</p>
+    </div>
+
     <div class="live-clock-box">
         <i class="fas fa-clock"></i>
         <span id="liveClock">Chargement...</span>
@@ -476,6 +562,19 @@
     </div>
 
     <div id="toastContainer"></div>
+
+    <!-- PDF Modal -->
+    <div id="pdfModalOverlay">
+        <div id="pdfModalBox">
+            <div id="pdfModalHead">
+                <h3 id="pdfModalTitle">Visualisation du document</h3>
+                <button class="btn btn-danger btn-sm" onclick="document.getElementById('pdfModalOverlay').style.display='none';"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe id="pdfModalFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <iframe id="printFrame" style="display:none;"></iframe>
 
     <script>
         // Configuration Firebase
@@ -495,7 +594,7 @@
 
         // Configuration Blockchain
         let provider, contractInstance = null;
-        const contractAddress = "0xAA95c2D9A2F9CD30391ecFf7a61c66142140a10c";
+        const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
         const contractABI = [
             { "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }], "name": "verifierDiplome",
               "outputs": [ { "components": [
@@ -533,7 +632,7 @@
         function startClock() {
             setInterval(() => {
                 const now = new Date();
-                document.getElementById('liveClock').innerText = now.toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                document.getElementById("liveClock").innerText = now.toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
             }, 1000);
         }
 
@@ -568,7 +667,6 @@
                 }
 
                 // 2. Fallback : RPC Public (Sepolia)
-                // Note: Utilisez un RPC public stable pour Sepolia
                 const publicRPC = "https://ethereum-sepolia-rpc.publicnode.com"; // Ou "https://rpc.sepolia.org" ou votre clé Infura/Alchemy
                 provider = new ethers.providers.JsonRpcProvider(publicRPC);
                 contractInstance = new ethers.Contract(contractAddress, contractABI, provider);
@@ -589,10 +687,13 @@
         let html5QrCode;
         function toggleQRScanner() {
             const container = document.getElementById('qr-reader-container');
+            const btnQR = document.getElementById('btnQR');
             if (container.style.display === 'block') {
                 stopQRScanner();
+                btnQR.innerHTML = '<i class="fas fa-camera"></i> DÉMARRER LE SCANNER QR';
             } else {
                 startQRScanner();
+                btnQR.innerHTML = '<i class="fas fa-stop-circle"></i> ARRÊTER LE SCANNER QR';
             }
         }
 
@@ -602,7 +703,6 @@
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
             html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
-                // Analyse de l'URL du QR
                 let matricule = decodedText;
                 if (decodedText.includes('mat=')) {
                     const url = new URL(decodedText);
@@ -629,6 +729,8 @@
         }
 
         // --- Logique de Vérification ---
+        let currentDocUrl = null; // Variable pour stocker l'URL du document
+
         async function hashFile(file) {
             const buffer = await file.arrayBuffer();
             const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -641,6 +743,8 @@
             const file = document.getElementById('verifFile').files[0];
             const resultBox = document.getElementById('verifResult');
             const btn = document.getElementById('btnVerifier');
+
+            currentDocUrl = null; // Réinitialiser l'URL du document
 
             if (!mat) return toast("Veuillez entrer un matricule", "error");
             if (!contractInstance) {
@@ -655,15 +759,9 @@
                 resultBox.innerHTML = '';
 
                 // Interrogation Blockchain
-                console.log("Contrat :", contractAddress);
+                const onChainData = await contractInstance.verifierDiplome(mat);
 
-const code = await provider.getCode(contractAddress);
-console.log("Bytecode :", code);
-
-console.log("Matricule envoyé :", mat);
-                const data = await contractInstance.verifierDiplome(mat);
-
-                if (!data.estValide) {
+                if (!onChainData.estValide) {
                     resultBox.innerHTML = `
                         <div class="result-card" style="border-left-color: var(--danger);">
                             <div class="result-header" style="color: var(--danger);">
@@ -676,13 +774,23 @@ console.log("Matricule envoyé :", mat);
                     return;
                 }
 
+                // Récupérer l'URL du document depuis Firebase
+                const firebaseDoc = await db.ref('archives/' + mat).once('value');
+                const firebaseData = firebaseDoc.val();
+
+                if (firebaseData && firebaseData.PDFURL) {
+                    currentDocUrl = firebaseData.PDFURL;
+                } else {
+                    toast("URL du document introuvable dans la base de données.", "warn");
+                }
+
                 // Vérification du fichier si présent
                 let fileMatch = true;
                 let fileStatusHtml = '';
                 
                 if (file) {
                     const localHash = await hashFile(file);
-                    fileMatch = localHash.toLowerCase() === data.documentHash.toLowerCase();
+                    fileMatch = localHash.toLowerCase() === onChainData.documentHash.toLowerCase();
                     
                     fileStatusHtml = `
                         <div class="result-item">
@@ -695,7 +803,7 @@ console.log("Matricule envoyé :", mat);
                     `;
                 }
 
-                const dateStr = new Date(data.dateEnregistrement.toNumber() * 1000).toLocaleDateString('fr-FR', {
+                const dateStr = new Date(onChainData.dateEnregistrement.toNumber() * 1000).toLocaleDateString('fr-FR', {
                     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
 
@@ -707,11 +815,15 @@ console.log("Matricule envoyé :", mat);
                         </div>
                         <div class="result-item">
                             <span class="result-label">Étudiant</span>
-                            <span class="result-value">${data.nomEtudiant}</span>
+                            <span class="result-value">${onChainData.nomEtudiant}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Matricule</span>
+                            <span class="result-value">${onChainData.matricule}</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Faculté / Filière</span>
-                            <span class="result-value">${data.faculte} — ${data.filiere}</span>
+                            <span class="result-value">${onChainData.faculte} — ${onChainData.filiere}</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Date d'Ancrage</span>
@@ -720,8 +832,15 @@ console.log("Matricule envoyé :", mat);
                         ${fileStatusHtml}
                         <div class="result-item">
                             <span class="result-label">Empreinte Numérique (Hash)</span>
-                            <div class="hash-value">${data.documentHash}</div>
+                            <div class="hash-value">${onChainData.documentHash}</div>
                         </div>
+                        ${currentDocUrl ? `
+                        <div class="doc-actions-buttons">
+                            <button class="btn" onclick="voirDocument('${currentDocUrl}')"><i class="fas fa-eye"></i> Voir</button>
+                            <button class="btn" onclick="telechargerDocument('${currentDocUrl}', 'Diplome_${mat}')"><i class="fas fa-download"></i> Télécharger</button>
+                            <button class="btn" onclick="printDocument('${currentDocUrl}')"><i class="fas fa-print"></i> Imprimer</button>
+                        </div>
+                        ` : ''}
                     </div>
                 `;
 
@@ -735,6 +854,43 @@ console.log("Matricule envoyé :", mat);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-magnifying-glass"></i> VÉRIFIER L\'AUTHENTICITÉ';
             }
+        }
+
+        // --- Fonctions Voir / Télécharger / Imprimer ---
+        function voirDocument(url) {
+            if (!url) {
+                toast("URL du document non disponible.", "warn");
+                return;
+            }
+            document.getElementById('pdfModalFrame').src = url;
+            document.getElementById('pdfModalOverlay').style.display = 'flex';
+        }
+
+        function telechargerDocument(url, filename) {
+            if (!url) {
+                toast("URL du document non disponible.", "warn");
+                return;
+            }
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename + (url.includes('.pdf') ? '.pdf' : '.png'); 
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast("Téléchargement lancé. Vérifiez vos téléchargements.", "info");
+        }
+
+        function printDocument(url) {
+            if (!url) {
+                toast("URL du document non disponible.", "warn");
+                return;
+            }
+            const printFrame = document.getElementById('printFrame');
+            printFrame.src = url;
+            printFrame.onload = () => {
+                printFrame.contentWindow.focus();
+                printFrame.contentWindow.print();
+            };
         }
 
         // Initialisation
