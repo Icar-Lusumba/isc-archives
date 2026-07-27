@@ -747,7 +747,9 @@ db.ref("roles/" + user.uid).once("value").then(s=>{
 db.ref('roles/' + user.uid).once('value').then(snap => {
     const data = snap.val();
 
-    console.log("Données Firebase :", data);
+   console.log("UID :", user.uid);
+console.log("Données Firebase :", data);
+console.log("Rôle Firebase :", data ? data.role : "Aucun");
 
     console.log("===== DEBUG ROLE =====");
 console.log("UID :", user.uid);
