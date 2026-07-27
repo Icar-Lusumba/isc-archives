@@ -749,6 +749,11 @@ db.ref('roles/' + user.uid).once('value').then(snap => {
 
     console.log("Données Firebase :", data);
 
+    console.log("===== DEBUG ROLE =====");
+console.log("UID :", user.uid);
+console.log("Data :", data);
+console.log("Role Firebase :", data ? data.role : "AUCUN");
+console.log("======================");
     currentRole = data ? data.role : 'lecteur';
                     document.getElementById('displayAdminName').innerText = (data && data.nom) || user.email;
                     document.getElementById('displayAdminEmail').innerText = user.email;
