@@ -22,7 +22,7 @@
             --danger: #ef4444;
             --warn: #f59e0b;
             --bg-body: #f8fafc;
-            --bg-image: url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070");
+            --bg-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070');
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text: #0f172a;
@@ -301,345 +301,285 @@
         <div class="glass-card">
             <div style="text-align:center; margin-bottom: 14px;">
                 <i class="fas fa-cubes" style="font-size: 30px; color: var(--accent);"></i>
-                <div style="font-weight:800; margin-top:6px; color: var(--primary);">LGT HUB ADMIN</div>
-                <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">Connectez-vous pour gérer les diplômes</p>
+                <div style="font-weight:800; margin-top:6px; color: var(--primary);">LGT HUB &mdash; ADMIN ISC</div>
+                <div style="font-size:0.72rem; color: var(--text-secondary); margin-top:4px;">Accès réservé au personnel autorisé</div>
             </div>
 
             <div class="auth-tabs">
-                <div class="auth-tab active" id="tabLogin" onclick="showAuthTab(\'login\')">Connexion</div>
-                <div class="auth-tab" id="tabRegister" onclick="showAuthTab(\'register\')">Inscription</div>
+                <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Connexion</div>
+                <div class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Inscription</div>
             </div>
 
-            <div id="loginForm">
-                <div class="input-group" style="margin-bottom: 10px;">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" placeholder="votre@email.com">
-                </div>
-                <div class="input-group" style="margin-bottom: 20px;">
-                    <label for="loginPassword">Mot de passe</label>
-                    <input type="password" id="loginPassword" placeholder="********">
-                </div>
-                <button class="btn" onclick="login()">CONNEXION</button>
+            <div id="loginPane">
+                <input type="email" id="loginEmail" placeholder="Email professionnel" style="margin-bottom:10px;">
+                <input type="password" id="loginPass" placeholder="Mot de passe" style="margin-bottom:14px;">
+                <button class="btn" style="width:100%;" onclick="doLogin()"><i class="fas fa-right-to-bracket"></i> SE CONNECTER</button>
             </div>
 
-            <div id="registerForm" style="display: none;">
-                <div class="input-group" style="margin-bottom: 10px;">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" placeholder="votre@email.com">
+            <div id="signupPane" style="display:none;">
+                <input type="text" id="signupName" placeholder="Nom complet" style="margin-bottom:10px;">
+                <input type="email" id="signupEmail" placeholder="Email professionnel" style="margin-bottom:10px;">
+                <input type="password" id="signupPass" placeholder="Mot de passe (min. 6 caractères)" style="margin-bottom:14px;">
+                <button class="btn btn-accent" style="width:100%;" onclick="doSignup()"><i class="fas fa-user-plus"></i> CRÉER UN COMPTE</button>
+                <div style="font-size:0.62rem; color:var(--text-secondary); margin-top:10px; text-align:center;">
+                    Les nouveaux comptes reçoivent le rôle "Lecteur" par défaut. Un Super Admin doit valider les droits d'écriture depuis la Gestion des Accès.
                 </div>
-                <div class="input-group" style="margin-bottom: 10px;">
-                    <label for="registerPassword">Mot de passe</label>
-                    <input type="password" id="registerPassword" placeholder="********">
-                </div>
-                <div class="input-group" style="margin-bottom: 20px;">
-                    <label for="confirmPassword">Confirmer Mot de passe</label>
-                    <input type="password" id="confirmPassword" placeholder="********">
-                </div>
-                <button class="btn btn-accent" onclick="register()">INSCRIPTION</button>
             </div>
 
-            <button class="btn btn-secondary" style="margin-top: 15px;" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Connexion avec Google</button>
-
-            <!-- Bouton de secours pour forcer le rôle Admin -->
-            <button class="btn btn-danger btn-sm" style="margin-top: 20px;" onclick="forceAdminRole()">
-                <i class="fas fa-user-shield"></i> Forcer le rôle Admin (DEV ONLY)
-            </button>
-
+            <div id="authError" style="color:var(--danger); font-size:0.72rem; font-weight:700; text-align:center; margin-top:12px; display:none;"></div>
         </div>
     </div>
 
-    <!-- ===================== APP ROOT ===================== -->
-    <div id="appRoot">
-        <!-- Left Column -->
-        <div class="col-left">
-            <div class="brand-header">
-                <img src="https://firebasestorage.googleapis.com/v0/b/lgt-hub-archives-isc-59416.appspot.com/o/logos%2Flgt_logo.png?alt=media&token=YOUR_LGT_LOGO_TOKEN" alt="LGT Logo" style="height: 30px;">
-                <span class="brand-title">ADMIN</span>
-                <img src="https://firebasestorage.googleapis.com/v0/b/lgt-hub-archives-isc-59416.appspot.com/o/logos%2Fisc_logo.png?alt=media&token=YOUR_ISC_LOGO_TOKEN" alt="ISC Logo" style="height: 30px;">
-            </div>
+    <!-- ===================== TOASTS ===================== -->
+    <div id="toastContainer"></div>
 
-            <div class="glass-card" style="padding: 15px;">
-                <div class="profile-pic-container">
-                    <div class="profile-pic-box" onclick="document.getElementById(\'profilePicInput\').click()">
-                        <img id="profilePicDisplay" src="https://via.placeholder.com/90" alt="Profile" style="width:100%; height:100%; object-fit:cover; display:none;">
-                        <i class="fas fa-user" id="profilePicIcon" style="font-size: 40px; color: var(--text-secondary);"></i>
-                    </div>
-                    <input type="file" id="profilePicInput" accept="image/*" style="display:none;">
-                </div>
-                <h3 id="userName" style="margin: 0; font-size: 1.1rem; color: var(--primary);">Chargement...</h3>
-                <p id="userEmail" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 5px;"></p>
-                <div id="userRoleBadge" class="badge badge-lecteur" style="margin-top: 10px;">LECTEUR</div>
-                <button class="btn btn-danger btn-sm" style="margin-top: 15px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
-            </div>
-
-            <div class="glass-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Actions Rapides</h3>
-                <button class="btn" onclick="showOverlay(\'ancrage\')"><i class="fas fa-file-signature"></i> Ancrer Diplôme</button>
-                <button class="btn" style="margin-top: 10px;" onclick="showOverlay(\'registre\')"><i class="fas fa-book"></i> Registre Diplômes</button>
-                <button class="btn" style="margin-top: 10px;" onclick="showOverlay(\'audit\')"><i class="fas fa-clipboard-list"></i> Journal d\'Audit</button>
-            </div>
-
-            <div class="live-clock-box">
-                <i class="fas fa-clock"></i>
-                <span id="liveClock">Chargement...</span>
-            </div>
-        </div>
-
-        <!-- Middle Column -->
-        <div class="col-mid">
-            <h1 style="color: var(--primary); font-size: 2rem; font-weight: 800; text-align: center;">TABLEAU DE BORD ADMIN</h1>
-
-            <div class="glass-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Statistiques Blockchain</h3>
-                <div class="faculty-monitor">
-                    <div class="faculty-card">
-                        <h4 id="totalDiplomes">0</h4>
-                        <p>Diplômes Ancrés</p>
-                    </div>
-                    <div class="faculty-card">
-                        <h4 id="totalFacultes">0</h4>
-                        <p>Facultés</p>
-                    </div>
-                    <div class="faculty-card">
-                        <h4 id="totalFiliere">0</h4>
-                        <p>Filières</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Derniers Ancrages</h3>
-                <div class="table-wrap">
-                    <table id="latestAnchorsTable">
-                        <thead>
-                            <tr>
-                                <th>Matricule</th>
-                                <th>Étudiant</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Latest anchors will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Activités Récentes</h3>
-                <div class="table-wrap">
-                    <table id="recentActivitiesTable">
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>Par</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Recent activities will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Right Column -->
-        <div class="col-right">
-            <div class="glass-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Paramètres</h3>
-                <button class="btn btn-secondary" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i> Mode Sombre/Clair</button>
-                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="showOverlay(\'settings\')"><i class="fas fa-cog"></i> Gérer les Rôles</button>
-            </div>
-
-            <div class="glass-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Aide & Support</h3>
-                <p style="font-size: 0.8rem; color: var(--text-secondary);">Besoin d\'aide ? Contactez le support technique.</p>
-                <button class="btn btn-outline" style="margin-top: 10px;"><i class="fas fa-life-ring"></i> Contacter le Support</button>
-            </div>
-
-            <div class="qr-display-center">
-                <div class="qr-halo-wrapper" id="qrCodeWrapper">
-                    <div id="qrCode"></div>
-                </div>
-                <p style="font-size: 0.75rem; color: var(--text-secondary);">Scannez pour vérifier</p>
-            </div>
-        </div>
-
-        <!-- ===================== OVERLAYS ===================== -->
-
-        <!-- Ancrage Diplôme Overlay -->
-        <div id="ancrageOverlay" class="overlay-panel">
-            <div class="overlay-head">
-                <h2><i class="fas fa-file-signature"></i> ANCRER UN NOUVEAU DIPLÔME</h2>
-                <button class="btn btn-danger btn-sm" onclick="hideOverlay(\'ancrage\')"><i class="fas fa-times"></i> Fermer</button>
-            </div>
-            <div class="glass-card" style="padding: 25px;">
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label for="nomEtudiant">Nom Étudiant</label>
-                        <input type="text" id="nomEtudiant" placeholder="Nom Complet">
-                    </div>
-                    <div class="input-group">
-                        <label for="matricule">Matricule</label>
-                        <input type="text" id="matricule" placeholder="Ex: ISC-2026-001">
-                    </div>
-                    <div class="input-group">
-                        <label for="faculte">Faculté</label>
-                        <input type="text" id="faculte" placeholder="Ex: Sciences Informatiques">
-                    </div>
-                    <div class="input-group">
-                        <label for="filiere">Filière</label>
-                        <input type="text" id="filiere" placeholder="Ex: Génie Logiciel">
-                    </div>
-                    <div class="input-group">
-                        <label for="promotion">Promotion</label>
-                        <input type="text" id="promotion" placeholder="Ex: 2023-2024">
-                    </div>
-                    <div class="input-group">
-                        <label for="mention">Mention</label>
-                        <select id="mention">
-                            <option value="">Sélectionner</option>
-                            <option value="Distinction">Distinction</option>
-                            <option value="Grande Distinction">Grande Distinction</option>
-                            <option value="La Plus Grande Distinction">La Plus Grande Distinction</option>
-                            <option value="Satisfaction">Satisfaction</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="sexe">Sexe</label>
-                        <select id="sexe">
-                            <option value="">Sélectionner</option>
-                            <option value="M">Masculin</option>
-                            <option value="F">Féminin</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="diplomeFile">Fichier Diplôme (PDF/Image)</label>
-                        <input type="file" id="diplomeFile" accept=".pdf,image/*">
-                    </div>
-                </div>
-                <button class="btn btn-accent" style="margin-top: 20px;" onclick="ancrerDiplome()" id="btnAncrer">
-                    <i class="fas fa-upload"></i> ANCRER LE DIPLÔME SUR BLOCKCHAIN
-                </button>
-            </div>
-        </div>
-
-        <!-- Registre Diplômes Overlay -->
-        <div id="registreOverlay" class="overlay-panel">
-            <div class="overlay-head">
-                <h2><i class="fas fa-book"></i> REGISTRE DES DIPLÔMES</h2>
-                <button class="btn btn-danger btn-sm" onclick="hideOverlay(\'registre\')"><i class="fas fa-times"></i> Fermer</button>
-            </div>
-            <div class="search-box">
-                <input type="text" id="registreSearch" placeholder="Rechercher par matricule, nom, faculté...">
-                <button class="btn" onclick="updateRegistre()">Rechercher</button>
-            </div>
-            <div class="table-wrap">
-                <table id="registreTable">
-                    <thead>
-                        <tr>
-                            <th>Matricule</th>
-                            <th>Nom</th>
-                            <th>Faculté</th>
-                            <th>Promotion</th>
-                            <th>Hash</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Diplômes will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagination" id="registrePagination">
-                <button class="btn btn-sm" onclick="prevPage(\'registre\')"><i class="fas fa-chevron-left"></i></button>
-                <span id="registrePageInfo">Page 1/1</span>
-                <button class="btn btn-sm" onclick="nextPage(\'registre\')"><i class="fas fa-chevron-right"></i></button>
-            </div>
-        </div>
-
-        <!-- Journal d'Audit Overlay -->
-        <div id="auditOverlay" class="overlay-panel">
-            <div class="overlay-head">
-                <h2><i class="fas fa-clipboard-list"></i> JOURNAL D\'AUDIT</h2>
-                <button class="btn btn-danger btn-sm" onclick="hideOverlay(\'audit\')"><i class="fas fa-times"></i> Fermer</button>
-            </div>
-            <div class="search-box">
-                <input type="text" id="auditSearch" placeholder="Rechercher par action, utilisateur...">
-                <button class="btn" onclick="updateAuditLog()">Rechercher</button>
-            </div>
-            <div class="table-wrap">
-                <table id="auditTable">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Action</th>
-                            <th>Utilisateur</th>
-                            <th>Détails</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Audit logs will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagination" id="auditPagination">
-                <button class="btn btn-sm" onclick="prevPage(\'audit\')"><i class="fas fa-chevron-left"></i></button>
-                <span id="auditPageInfo">Page 1/1</span>
-                <button class="btn btn-sm" onclick="nextPage(\'audit\')"><i class="fas fa-chevron-right"></i></button>
-            </div>
-        </div>
-
-        <!-- Gérer les Rôles Overlay -->
-        <div id="settingsOverlay" class="overlay-panel">
-            <div class="overlay-head">
-                <h2><i class="fas fa-cog"></i> GÉRER LES RÔLES UTILISATEURS</h2>
-                <button class="btn btn-danger btn-sm" onclick="hideOverlay(\'settings\')"><i class="fas fa-times"></i> Fermer</button>
-            </div>
-            <div class="search-box">
-                <input type="text" id="userSearch" placeholder="Rechercher par email...">
-                <button class="btn" onclick="loadUsers()">Rechercher</button>
-            </div>
-            <div class="table-wrap">
-                <table id="usersTable">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>Rôle</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Users will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagination" id="usersPagination">
-                <button class="btn btn-sm" onclick="prevPage(\'users\')"><i class="fas fa-chevron-left"></i></button>
-                <span id="usersPageInfo">Page 1/1</span>
-                <button class="btn btn-sm" onclick="nextPage(\'users\')"><i class="fas fa-chevron-right"></i></button>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- PDF Modal -->
+    <!-- ===================== PDF MODAL ===================== -->
     <div id="pdfModalOverlay">
         <div id="pdfModalBox">
             <div id="pdfModalHead">
-                <h3 id="pdfModalTitle">Visualisation du document</h3>
-                <button class="btn btn-danger btn-sm" onclick="document.getElementById(\'pdfModalOverlay\').style.display=\'none\';"><i class="fas fa-times"></i></button>
+                <h3 id="pdfModalTitle"><i class="fas fa-file-pdf"></i> Diplôme</h3>
+                <button class="btn btn-danger btn-sm" onclick="closePdfModal()"><i class="fas fa-times"></i></button>
             </div>
             <iframe id="pdfModalFrame" src=""></iframe>
         </div>
     </div>
 
+    <div id="appRoot">
+
+    <div class="col-left">
+        <div class="brand-header">
+            <div style="text-align: center;"><i class="fas fa-cubes" style="font-size: 24px; color: var(--accent);"></i><div style="font-size:0.55rem; font-weight:800;">LGT HUB</div></div>
+            <div style="width: 1px; height: 30px; background: var(--glass-border);"></div>
+            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="35" height="35" alt="Logo ISC" style="border-radius: 6px; object-fit: cover;">
+        </div>
+        <div class="brand-title">SYSTEME DE SCELLAGE NUMERIQUE</div>
+
+        <button class="btn btn-secondary" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i> <span id="themeText">Mode Sombre</span></button>
+        <hr style="width:100%; border:none; height:1px; background:var(--glass-border);">
+
+        <button class="btn btn-accent" id="btnNouveau" onclick="document.getElementById('nom').focus();"><i class="fas fa-plus-circle"></i> NOUVEAU SCELLAGE</button>
+        <button class="btn btn-secondary" id="globalPrintBtn" onclick="printTargetedDoc()"><i class="fas fa-print"></i> IMPRIMER LE DOCUMENT</button>
+
+        <div class="glass-card" style="padding: 14px; margin-top: 5px;">
+            <label><i class="fas fa-camera"></i> Contrôle Caméra QR</label>
+            <div id="reader" style="margin-top:8px; border-radius: 10px; overflow:hidden; display:none;"></div>
+            <button id="btnStart" class="btn" style="width:100%; margin-top:8px; font-size: 0.8rem;" onclick="startScan()"><i class="fas fa-video"></i> Activer Scanner</button>
+            <button id="btnStop" class="btn btn-danger" style="width:100%; margin-top:5px; display:none; font-size: 0.8rem;" onclick="stopScan()"><i class="fas fa-stop"></i> Arrêter</button>
+        </div>
+
+        <button class="btn" style="background: rgba(30, 58, 138, 0.15); color: var(--primary);" onclick="toggleOverlay('registreSection')"><i class="fas fa-folder-open"></i> Registre Central</button>
+        <button class="btn" style="background: rgba(246,133,27,0.15); color: var(--accent);" onclick="toggleOverlay('verifSection')"><i class="fas fa-shield-halved"></i> Vérifier un Hash</button>
+        <button class="btn" style="background: rgba(16,185,129,0.15); color: var(--success);" onclick="toggleOverlay('auditSection')"><i class="fas fa-clipboard-list"></i> Journal d'Audit</button>
+        <button class="btn" id="btnGestionAcces" style="background: rgba(148,163,184,0.2); color: var(--text-secondary); display:none;" onclick="toggleOverlay('accessSection')"><i class="fas fa-user-shield"></i> Gestion des Accès</button>
+
+        <div class="live-clock-box">
+            <i class="far fa-clock"></i>
+            <span id="liveClock">Chargement date...</span>
+        </div>
+    </div>
+
+    <div class="col-mid">
+        <div style="text-align: center; margin-bottom: 5px;">
+            <img src="assets/img/logo ISC.png" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A_8Xh9_70IeO0Z6I0j4RNoB37p3mIclO0A&s'" width="65" alt="Logo ISC" style="border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.15);">
+        </div>
+
+        <div class="faculty-monitor">
+            <div class="faculty-card">
+                <h4 id="countInfo">000</h4>
+                <p>Informatique</p>
+                <span class="faculty-subtext">CSI & Réseaux</span>
+            </div>
+            <div class="faculty-card">
+                <h4 id="countCom">000</h4>
+                <p>Sc. Commerciales</p>
+                <span class="faculty-subtext">Compta, Mkt, Douane, Banque</span>
+            </div>
+            <div class="faculty-card">
+                <h4 id="countSec">000</h4>
+                <p>Secrétariat</p>
+                <span class="faculty-subtext">SGA Ass. de Direction</span>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="margin:0 0 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.05rem;">ANCRAGE BLOCKCHAIN IMMUABLE</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Nom Complet de l'Étudiant</label>
+                    <input type="text" id="nom" placeholder="Ex: Jean Mukendi">
+                </div>
+                <div class="input-group">
+                    <label>Matricule Académique</label>
+                    <input type="text" id="mat" placeholder="2026-ISC-001">
+                </div>
+                <div class="input-group">
+                    <label>Faculté / Section</label>
+                    <select id="fac" onchange="updateFiliere()">
+                        <option value="Informatique de Gestion">Informatique de Gestion</option>
+                        <option value="Sciences Commerciales et Financières">Sciences Commerciales et Financières</option>
+                        <option value="Secrétariat de Direction">Secrétariat de Direction</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Filière / Option</label>
+                    <select id="filiere"></select>
+                </div>
+                <div class="input-group">
+                    <label>Sexe de l'étudiant</label>
+                    <select id="sexe">
+                        <option value="Masculin (M)">Masculin (M)</option>
+                        <option value="Féminin (F)">Féminin (F)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Diplôme Numérique Source (PDF ou Image)</label>
+                    <input type="file" id="fileInput" accept=".pdf,image/*">
+                </div>
+            </div>
+            <button class="btn btn-accent" style="width:100%; margin-top:18px; padding:15px; font-size:1rem;" onclick="scellerMaintenant()">
+                <i class="fas fa-link"></i> EFFECTUER L'ANCRAGE SECURISE
+            </button>
+            <div id="statusTag" style="text-align: center; margin-top: 12px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 1px;">
+                PRÊT POUR LE SCELLAGE
+            </div>
+        </div>
+
+        <div class="qr-display-center">
+            <div class="qr-halo-wrapper" id="qrWrapper">
+                <div id="qrcode"></div>
+            </div>
+            <div class="doc-actions-box" id="docActions">
+                <button class="btn btn-secondary" title="Voir le PDF" onclick="actionVoir()"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-accent" title="Télécharger" onclick="actionTelecharger()"><i class="fas fa-download"></i></button>
+                <button class="btn btn-secondary" title="Imprimer" onclick="printTargetedDoc()"><i class="fas fa-print"></i></button>
+                <button class="btn btn-danger" title="Supprimer du registre" onclick="supprimerDiplomeSelectionne()"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-right">
+        <div class="glass-card" style="text-align: center;">
+            <div class="profile-pic-container">
+                <div class="profile-pic-box" onclick="document.getElementById('adminPic').click()">
+                    <img id="displayAvatar" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                    <i id="plus" class="fas fa-user" style="font-size:24px; color:var(--primary);"></i>
+                </div>
+                <input type="file" id="adminPic" style="display:none;" onchange="previewImg(this)">
+            </div>
+            <div id="roleBadgeWrap" style="margin-bottom:8px;"><span class="badge badge-lecteur" id="roleBadge">LECTEUR</span></div>
+            <h2 id="displayAdminName" style="margin:0; font-size:1.05rem; font-weight:800;">ADMIN</h2>
+            <p id="displayAdminEmail" style="margin:4px 0 15px 0; font-size:0.72rem; color:var(--primary); font-weight:600;"></p>
+            <button class="btn btn-danger" style="width:100%;" onclick="deconnecterAdmin()"><i class="fas fa-sign-out-alt"></i> DÉCONNEXION</button>
+        </div>
+
+        <div class="glass-card">
+            <label><i class="fas fa-chart-simple"></i> TABLEAU DE BORD</label>
+            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.78rem; font-weight:700;">
+                <span>Total diplômes</span><span id="dashTotal" style="color:var(--primary);">0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.78rem; font-weight:700;">
+                <span>Scellés (7 derniers jours)</span><span id="dashWeek" style="color:var(--success);">0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.78rem; font-weight:700;">
+                <span>Actions au journal</span><span id="dashAudit" style="color:var(--accent);">0</span>
+            </div>
+        </div>
+
+        <div class="glass-card" style="margin-top: auto;">
+            <label><i class="fas fa-network-wired"></i> CONNECTEUR WEB3 NODE</label>
+            <button class="btn" style="width:100%; margin-top:10px; background:#161b22; border:1px solid #30363d;" onclick="connectWallet()">
+                <i class="fas fa-wallet"></i> MetaMask Connection
+            </button>
+            <div id="walletAddr" style="font-size:0.55rem; color:var(--accent); margin-top:8px; font-family:monospace; text-align:center; word-break: break-all;">0x000... Non synchronisé</div>
+        </div>
+
+        console.log("PDF =", archive.urlPDF);
+        <button class="btn btn-secondary" style="padding: 14px;" onclick="window.open('https://isc-archives.vercel.app/verif.html', '_blank')"><i class="fas fa-external-link-alt"></i> Ouvrir le portail public</button>
+    </div>
+
+    <!-- ===================== REGISTRE ===================== -->
+    <div id="registreSection" class="overlay-panel">
+        <div class="overlay-head">
+            <h2><i class="fas fa-database"></i> REGISTRE CENTRAL ISC</h2>
+            <button class="btn btn-danger btn-sm" onclick="toggleOverlay('registreSection')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher par nom ou matricule..." onkeyup="filterRegistre()">
+            <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Matricule</th><th>Nom Étudiant</th><th>Sexe</th><th>Filière</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="registrePagination"></div>
+    </div>
+
+    <!-- ===================== VERIFICATION HASH ===================== -->
+    <div id="verifSection" class="overlay-panel">
+        <div class="overlay-head">
+            <h2><i class="fas fa-shield-halved"></i> VÉRIFICATION D'INTÉGRITÉ (HASH SHA-256)</h2>
+            <button class="btn btn-danger btn-sm" onclick="toggleOverlay('verifSection')"><i class="fas fa-times"></i></button>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); max-width: 640px;">
+            Chargez le fichier du diplôme à contrôler et indiquez son matricule. L'empreinte SHA-256 recalculée localement sera comparée à celle ancrée sur la blockchain (nécessite une connexion MetaMask active).
+        </p>
+        <div class="input-grid" style="max-width:640px;">
+            <div class="input-group">
+                <label>Matricule à vérifier</label>
+                <input type="text" id="verifMat" placeholder="2026-ISC-001">
+            </div>
+            <div class="input-group">
+                <label>Fichier à contrôler</label>
+                <input type="file" id="verifFile" accept=".pdf,image/*">
+            </div>
+        </div>
+        <button class="btn btn-accent" style="margin-top:16px;" onclick="verifierIntegrite()"><i class="fas fa-magnifying-glass"></i> LANCER LA VÉRIFICATION</button>
+        <div id="verifResult" style="margin-top:18px; max-width:640px;"></div>
+    </div>
+
+    <!-- ===================== AUDIT LOG ===================== -->
+    <div id="auditSection" class="overlay-panel">
+        <div class="overlay-head">
+            <h2><i class="fas fa-clipboard-list"></i> JOURNAL D'AUDIT</h2>
+            <button class="btn btn-danger btn-sm" onclick="toggleOverlay('auditSection')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Action</th><th>Matricule</th><th>Effectué par</th></tr>
+                </thead>
+                <tbody id="auditTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="auditPagination"></div>
+    </div>
+
+    <!-- ===================== GESTION DES ACCES ===================== -->
+    <div id="accessSection" class="overlay-panel">
+        <div class="overlay-head">
+            <h2><i class="fas fa-user-shield"></i> GESTION DES ACCÈS</h2>
+            <button class="btn btn-danger btn-sm" onclick="toggleOverlay('accessSection')"><i class="fas fa-times"></i></button>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-secondary);">Réservé aux Super Admins. Ajustez le rôle de chaque compte inscrit.</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Nom</th><th>Email</th><th>Rôle actuel</th><th>Changer le rôle</th></tr></thead>
+                <tbody id="accessTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    </div><!-- /appRoot -->
+
     <iframe id="printFrame" style="display:none;"></iframe>
 
     <script>
-        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDfbXYFsxWMEGlswSsk13BFrdNj_WCAp-Y",
             authDomain: "lgt-hub-archives-isc-59416.firebaseapp.com",
@@ -652,198 +592,669 @@
         };
 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const auth = firebase.auth();
         const db = firebase.database();
-        const storage = firebase.storage();
+        const auth = firebase.auth();
 
-        // Configuration Blockchain
+        // ---------- State ----------
+        let html5QrCode;
+        let currentActiveDocUrl = "";
+        let currentActiveDocName = "diplome";
+        let currentActiveMatricule = "";
+        let currentUser = null;
+        let currentRole = "lecteur"; // 'superadmin' | 'admin' | 'lecteur'
+        let allArchives = [];
+        let allAudit = [];
+        let registrePage = 1, auditPage = 1;
+        const PAGE_SIZE = 8;
+
         let provider, signer, contractInstance = null;
-        const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+        const contractAddress = "0xAA95c2D9A2F9CD30391ecFf7a61c66142140a10c";
         const contractABI = [
-            { "inputs": [{ "internalType": "string", "name": "_nomEtudiant", "type": "string" }, { "internalType": "string", "name": "_matricule", "type": "string" }, { "internalType": "string", "name": "_faculte", "type": "string" }, { "internalType": "string", "name": "_filiere", "type": "string" }, { "internalType": "string", "name": "_promotion", "type": "string" }, { "internalType": "string", "name": "_mention", "type": "string" }, { "internalType": "string", "name": "_sexe", "type": "string" }, { "internalType": "string", "name": "_documentHash", "type": "string" }], "name": "ancrerDiplome", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-            { "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }], "name": "verifierDiplome", "outputs": [{ "components": [{ "internalType": "string", "name": "nomEtudiant", "type": "string" }, { "internalType": "string", "name": "matricule", "type": "string" }, { "internalType": "string", "name": "faculte", "type": "string" }, { "internalType": "string", "name": "filiere", "type": "string" }, { "internalType": "string", "name": "promotion", "type": "string" }, { "internalType": "string", "name": "mention", "type": "string" }, { "internalType": "string", "name": "sexe", "type": "string" }, { "internalType": "string", "name": "documentHash", "type": "string" }, { "internalType": "uint256", "name": "dateEnregistrement", "type": "uint256" }, { "internalType": "address", "name": "auteurAction", "type": "address" }, { "internalType": "bool", "name": "estValide", "type": "bool" }], "internalType": "struct LGT_HUB_Archives.Diplome", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" },
-            { "inputs": [{ "internalType": "string", "name": "_matricule", "type": "string" }], "name": "supprimerDiplome", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
+            { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+            { "anonymous": false, "inputs": [
+                { "indexed": true, "internalType": "string", "name": "matricule", "type": "string" },
+                { "indexed": false, "internalType": "string", "name": "nom", "type": "string" },
+                { "indexed": false, "internalType": "address", "name": "auteur", "type": "address" }
+            ], "name": "DiplomeScelle", "type": "event" },
+            { "inputs": [ { "components": [
+                { "internalType": "string", "name": "nom", "type": "string" },
+                { "internalType": "string", "name": "mat", "type": "string" },
+                { "internalType": "string", "name": "fac", "type": "string" },
+                { "internalType": "string", "name": "fil", "type": "string" },
+                { "internalType": "string", "name": "promo", "type": "string" },
+                { "internalType": "string", "name": "mention", "type": "string" },
+                { "internalType": "string", "name": "sexe", "type": "string" },
+                { "internalType": "string", "name": "docHash", "type": "string" }
+            ], "internalType": "struct LGT_HUB_Archives.DiplomeInput", "name": "d", "type": "tuple" } ],
+              "name": "scellerDiplome", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+            { "inputs": [], "name": "adminSGA", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+            { "inputs": [], "name": "totalDiplomes", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+            { "inputs": [{ "internalType": "string", "name": "_mat", "type": "string" }], "name": "verifierDiplome",
+              "outputs": [ { "components": [
+                { "internalType": "string", "name": "nomEtudiant", "type": "string" },
+                { "internalType": "string", "name": "matricule", "type": "string" },
+                { "internalType": "string", "name": "faculte", "type": "string" },
+                { "internalType": "string", "name": "filiere", "type": "string" },
+                { "internalType": "string", "name": "promotion", "type": "string" },
+                { "internalType": "string", "name": "mention", "type": "string" },
+                { "internalType": "string", "name": "sexe", "type": "string" },
+                { "internalType": "string", "name": "documentHash", "type": "string" },
+                { "internalType": "uint256", "name": "dateEnregistrement", "type": "uint256" },
+                { "internalType": "address", "name": "auteurAction", "type": "address" },
+                { "internalType": "bool", "name": "estValide", "type": "bool" }
+              ], "internalType": "struct LGT_HUB_Archives.Diplome", "name": "", "type": "tuple" } ],
+              "stateMutability": "view", "type": "function" }
         ];
 
-        // --- Variables Globales ---
-        let currentUser = null;
-        let userRole = "lecteur"; // Default role
-        const itemsPerPage = 10;
-        let registreCurrentPage = 1;
-        let auditCurrentPage = 1;
-        let usersCurrentPage = 1;
-
-        // --- Fonctions Utilitaires ---
-        function toast(message, type = "info") {
-            const container = document.getElementById("toastContainer");
+        // ---------- Toasts ----------
+        function toast(message, type) {
+            type = type || "info";
             const el = document.createElement("div");
-            el.className = `toast ${type}`;
-            const icon = type === "success" ? "fa-check-circle" : type === "error" ? "fa-exclamation-circle" : type === "warn" ? "fa-exclamation-triangle" : "fa-info-circle";
+            el.className = "toast " + type;
+            const icon = type === "success" ? "fa-circle-check" : type === "error" ? "fa-circle-xmark" : type === "warn" ? "fa-triangle-exclamation" : "fa-circle-info";
             el.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
-            container.appendChild(el);
-            setTimeout(() => {
-                el.style.opacity = "0";
-                el.style.transform = "translateY(10px)";
-                el.style.transition = "all 0.4s ease";
-                setTimeout(() => el.remove(), 400);
-            }, 4000);
+            document.getElementById("toastContainer").appendChild(el);
+            setTimeout(() => { el.style.opacity = "0"; el.style.transition = "opacity .3s"; setTimeout(() => el.remove(), 300); }, 4200);
         }
 
+        // ---------- Clock / Theme ----------
         function startClock() {
             setInterval(() => {
                 const now = new Date();
-                document.getElementById("liveClock").innerText = now.toLocaleString("fr-FR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('liveClock').innerText = `${now.toLocaleDateString('fr-FR', options)} à ${now.toLocaleTimeString('fr-FR')}`;
             }, 1000);
         }
 
         function toggleTheme() {
-            document.body.classList.toggle("dark-mode-body");
-            document.documentElement.classList.toggle("dark-mode");
-            const isDark = document.documentElement.classList.contains("dark-mode");
-            document.getElementById("themeIcon").className = isDark ? "fas fa-sun" : "fas fa-moon";
+            document.body.classList.toggle('dark-mode-body');
+            document.documentElement.classList.toggle('dark-mode');
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            document.getElementById('themeIcon').className = isDark ? "fas fa-sun" : "fas fa-moon";
+            document.getElementById('themeText').innerText = isDark ? "Mode Clair" : "Mode Sombre";
         }
 
-        function showOverlay(id) {
-            document.getElementById(id + "Overlay").style.display = "flex";
-            if (id === "registre") updateRegistre();
-            if (id === "audit") updateAuditLog();
-            if (id === "settings") loadUsers();
-        }
-
-        function hideOverlay(id) {
-            document.getElementById(id + "Overlay").style.display = "none";
-        }
-
-        // --- Authentification Firebase ---
-        function showAuthTab(tab) {
-            document.getElementById("tabLogin").classList.remove("active");
-            document.getElementById("tabRegister").classList.remove("active");
-            document.getElementById("loginForm").style.display = "none";
-            document.getElementById("registerForm").style.display = "none";
-
-            if (tab === "login") {
-                document.getElementById("tabLogin").classList.add("active");
-                document.getElementById("loginForm").style.display = "block";
-            } else {
-                document.getElementById("tabRegister").classList.add("active");
-                document.getElementById("registerForm").style.display = "block";
+        function toggleOverlay(id) {
+            const panels = ["registreSection", "verifSection", "auditSection", "accessSection"];
+            panels.forEach(p => { if (p !== id) document.getElementById(p).style.display = "none"; });
+            const el = document.getElementById(id);
+            const willOpen = el.style.display !== "block";
+            el.style.display = willOpen ? "block" : "none";
+            if (willOpen) {
+                if (id === "registreSection") updateRegistre();
+                if (id === "auditSection") updateAudit();
+                if (id === "accessSection") loadAccessTable();
             }
         }
 
-        async function login() {
-            const email = document.getElementById("loginEmail").value;
-            const password = document.getElementById("loginPassword").value;
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                toast("Connexion réussie !", "success");
-            } catch (error) {
-                toast("Erreur de connexion: " + error.message, "error");
-            }
+        // ---------- Auth ----------
+        function switchAuthTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+            document.getElementById('loginPane').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('signupPane').style.display = tab === 'signup' ? 'block' : 'none';
+            document.getElementById('authError').style.display = 'none';
         }
 
-        async function register() {
-            const email = document.getElementById("registerEmail").value;
-            const password = document.getElementById("registerPassword").value;
-            const confirmPassword = document.getElementById("confirmPassword").value;
-
-            if (password !== confirmPassword) {
-                toast("Les mots de passe ne correspondent pas.", "error");
-                return;
-            }
-            try {
-                await auth.createUserWithEmailAndPassword(email, password);
-                // Attribuer le rôle 'lecteur' par défaut aux nouveaux utilisateurs
-                await db.ref("roles/" + auth.currentUser.uid).set("lecteur");
-                toast("Inscription réussie !", "success");
-            } catch (error) {
-                toast("Erreur d\'inscription: " + error.message, "error");
-            }
+        function showAuthError(msg) {
+            const e = document.getElementById('authError');
+            e.innerText = msg;
+            e.style.display = 'block';
         }
 
-        async function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                await auth.signInWithPopup(provider);
-                // Vérifier et attribuer le rôle 'lecteur' si l'utilisateur est nouveau
-                const userRef = db.ref("roles/" + auth.currentUser.uid);
-                userRef.once("value", snapshot => {
-                    if (!snapshot.exists()) {
-                        userRef.set("lecteur");
-                    }
-                });
-                toast("Connexion Google réussie !", "success");
-            } catch (error) {
-                toast("Erreur de connexion Google: " + error.message, "error");
-            }
+        function doLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            if (!email || !pass) return showAuthError("Veuillez renseigner email et mot de passe.");
+            auth.signInWithEmailAndPassword(email, pass).catch(err => showAuthError(traduireErreurAuth(err)));
         }
 
-        function logout() {
+        function doSignup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const pass = document.getElementById('signupPass').value;
+            if (!name || !email || !pass) return showAuthError("Tous les champs sont requis.");
+            auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+                const roleRef = db.ref("roles/" + cred.user.uid);
+
+const snap = await roleRef.once("value");
+
+if (!snap.exists()) {
+
+    await roleRef.set({
+        nom: name,
+        email: email,
+        role: "lecteur",
+        creeLe: new Date().toISOString()
+    });
+
+}
+            }).catch(err => showAuthError(traduireErreurAuth(err)));
+        }
+
+        function traduireErreurAuth(err) {
+            const map = {
+                'auth/user-not-found': "Compte introuvable.",
+                'auth/wrong-password': "Mot de passe incorrect.",
+                'auth/email-already-in-use': "Cet email est déjà utilisé.",
+                'auth/weak-password': "Mot de passe trop faible (6 caractères min.).",
+                'auth/invalid-email': "Email invalide."
+            };
+            return map[err.code] || err.message;
+        }
+
+        function deconnecterAdmin() {
             auth.signOut();
-            toast("Déconnexion réussie.", "info");
         }
 
-        // --- Gestion des Rôles (pour le développement) ---
-        async function forceAdminRole() {
-            if (!currentUser) {
-                toast("Veuillez vous connecter d'abord.", "warn");
-                return;
-            }
-            try {
-                await db.ref("roles/" + currentUser.uid).set("admin");
-                userRole = "admin";
-                updateUIForUser(currentUser);
-                toast("Rôle défini sur Admin pour le test !", "success");
-            } catch (error) {
-                toast("Erreur lors de la définition du rôle: " + error.message, "error");
-            }
-        }
-
-        auth.onAuthStateChanged(async (user) => {
-            currentUser = user;
+        auth.onAuthStateChanged(user => {
             if (user) {
-                document.getElementById("authGate").style.display = "none";
-                document.getElementById("appRoot").style.display = "grid";
-                
-                // Récupérer le rôle de l'utilisateur
-                const roleSnapshot = await db.ref("roles/" + user.uid).once("value");
-                userRole = roleSnapshot.val() || "lecteur"; // Default to lecteur if no role found
+                currentUser = user;
+                console.log("UID connecté :", user.uid);
+                console.log("Chemin recherché :", "roles/" + user.uid);
 
-                // TEMPORARY: Force admin role for specific user or if no role is set
-                // REMOVE THIS IN PRODUCTION
-                // if (user.email === "your_admin_email@example.com" || !roleSnapshot.exists()) {
-                //     userRole = "admin";
-                //     await db.ref("roles/" + user.uid).set("admin"); // Persist for future sessions
-                //     toast("Rôle Admin forcé pour le développement.", "warn
-                // }
+db.ref("roles/" + user.uid).once("value").then(s=>{
+    console.log("Valeur brute :", s.val());
+});
 
-                updateUIForUser(user);
-                initBlockchainConnection();
-                updateStats();
-                updateLatestAnchors();
-                updateAuditLog();
+db.ref('roles/' + user.uid).once('value').then(snap => {
+    const data = snap.val();
+
+    console.log("Données Firebase :", data);
+
+    currentRole = data ? data.role : 'lecteur';
+                    document.getElementById('displayAdminName').innerText = (data && data.nom) || user.email;
+                    document.getElementById('displayAdminEmail').innerText = user.email;
+                    const badge = document.getElementById('roleBadge');
+                    badge.className = 'badge ' + (currentRole === 'superadmin' ? 'badge-super' : currentRole === 'admin' ? 'badge-admin' : 'badge-lecteur');
+                    badge.innerText = currentRole === 'superadmin' ? 'SUPER ADMIN' : currentRole === 'admin' ? 'ADMIN' : 'LECTEUR';
+                    document.getElementById('btnGestionAcces').style.display = currentRole === 'superadmin' ? 'flex' : 'none';
+                    applyRolePermissions();
+
+                    document.getElementById('authGate').style.display = 'none';
+                    document.getElementById('appRoot').style.display = 'contents';
+                    toast("Bienvenue, " + ((data && data.nom) || user.email), "success");
+                    updateRegistre();
+                    updateAudit();
+                });
             } else {
-                document.getElementById("authGate").style.display = "flex";
-                document.getElementById("appRoot").style.display = "none";
-                userRole = "lecteur";
+                currentUser = null;
+                currentRole = 'lecteur';
+                document.getElementById('authGate').style.display = 'flex';
+                document.getElementById('appRoot').style.display = 'none';
             }
         });
 
-        function updateUIForUser(user) {
-            document.getElementById("userName").innerText = user.displayName || user.email;
-            document.getElementById("userEmail").innerText = user.email;
-            const roleBadge = document.getElementById("userRoleBadge");
-            roleBadge.innerText = userRole.toUpperCase();
-            roleBadge.className = `badge badge-${userRole}`;
+        function applyRolePermissions() {
+            const canWrite = currentRole === 'admin' || currentRole === 'superadmin';
+            document.getElementById('btnNouveau').disabled = !canWrite;
+        }
 
-            // Gérer la visibilité des éléments selon le rôle
-            const adminElements = document.querySelectorAll("[data-admin-only]");
-            adminElements.forEach(el => {
-                if (userRole === "admin") {
-                    el.style.display = el.dataset.originalDisplay || "block"; // Restore original display
-                } else {
-                    el.dataset.originalDisplay = el.style.display; // Save original display
-                    el.style.display = "none";
-                }
+        // ---------- Audit ----------
+        function logAudit(action, matricule, details) {
+            if (!currentUser) return;
+            db.ref('audit').push({
+                action: action,
+                matricule: matricule || "-",
+                effectuePar: currentUser.email,
+                uid: currentUser.uid,
+                details: details || "",
+                date: new Date().toISOString()
+            });
+        }
+
+        function updateAudit() {
+            db.ref('audit').orderByChild('date').limitToLast(300).on('value', snapshot => {
+                allAudit = [];
+                snapshot.forEach(child => allAudit.push(child.val()));
+                allAudit.reverse();
+                document.getElementById('dashAudit').innerText = allAudit.length;
+                auditPage = 1;
+                renderAuditTable();
+            });
+        }
+
+        function renderAuditTable() {
+            const body = document.getElementById('auditTableBody');
+            const start = (auditPage - 1) * PAGE_SIZE;
+            const pageItems = allAudit.slice(start, start + PAGE_SIZE);
+            body.innerHTML = "";
+            const colors = { "SCELLAGE": "var(--success)", "SUPPRESSION": "var(--danger)", "CONNEXION": "var(--primary)" };
+            pageItems.forEach(a => {
+                const row = body.insertRow();
+                const dateStr = a.date ? new Date(a.date).toLocaleString('fr-FR') : "-";
+                const color = colors[a.action] || "var(--text-secondary)";
+                row.innerHTML = `
+                    <td>${dateStr}</td>
+                    <td><span class="audit-row-action" style="background:${color};">${a.action}</span></td>
+                    <td>${a.matricule || '-'}</td>
+                    <td>${a.effectuePar || '-'}</td>
+                `;
+            });
+            renderPagination('auditPagination', allAudit.length, auditPage, p => { auditPage = p; renderAuditTable(); });
+        }
+
+        // ---------- Access management ----------
+        function loadAccessTable() {
+            if (currentRole !== 'superadmin') { toast("Accès réservé aux Super Admins.", "error"); return; }
+            db.ref('roles').once('value').then(snapshot => {
+                const body = document.getElementById('accessTableBody');
+                body.innerHTML = "";
+                snapshot.forEach(child => {
+                    const uid = child.key;
+                    const d = child.val();
+                    const row = body.insertRow();
+                    row.innerHTML = `
+                        <td>${d.nom || '-'}</td>
+                        <td>${d.email || '-'}</td>
+                        <td><span class="badge ${d.role === 'superadmin' ? 'badge-super' : d.role === 'admin' ? 'badge-admin' : 'badge-lecteur'}">${(d.role || 'lecteur').toUpperCase()}</span></td>
+                        <td>
+                            <select onchange="changerRole('${uid}', this.value)">
+                                <option value="lecteur" ${d.role === 'lecteur' ? 'selected' : ''}>Lecteur</option>
+                                <option value="admin" ${d.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                <option value="superadmin" ${d.role === 'superadmin' ? 'selected' : ''}>Super Admin</option>
+                            </select>
+                        </td>
+                    `;
+                });
+            });
+        }
+
+        function changerRole(uid, newRole) {
+            db.ref('roles/' + uid + '/role').set(newRole).then(() => toast("Rôle mis à jour.", "success"));
+        }
+
+        // ---------- Pagination helper ----------
+        function renderPagination(containerId, totalItems, page, onChange) {
+            const container = document.getElementById(containerId);
+            const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+            container.innerHTML = "";
+            const prev = document.createElement('button');
+            prev.className = 'btn btn-secondary btn-sm';
+            prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prev.disabled = page <= 1;
+            prev.onclick = () => onChange(Math.max(1, page - 1));
+            const next = document.createElement('button');
+            next.className = 'btn btn-secondary btn-sm';
+            next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            next.disabled = page >= totalPages;
+            next.onclick = () => onChange(Math.min(totalPages, page + 1));
+            const label = document.createElement('span');
+            label.innerText = `Page ${page} / ${totalPages}`;
+            container.appendChild(prev);
+            container.appendChild(label);
+            container.appendChild(next);
+        }
+
+        // ---------- Registre ----------
+        function updateRegistre() {
+            db.ref("archives/").on("value", (snapshot) => {
+                allArchives = [];
+                let infoCount = 0, comCount = 0, secCount = 0, weekCount = 0;
+                const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    if (data.MATRICULE) {
+                        allArchives.push(data);
+                        if (data.FACULTE === "Informatique de Gestion") infoCount++;
+                        else if (data.FACULTE === "Sciences Commerciales et Financières") comCount++;
+                        else if (data.FACULTE === "Secrétariat de Direction") secCount++;
+                        if (data.DATE && new Date(data.DATE).getTime() >= weekAgo) weekCount++;
+                    }
+                });
+
+                document.getElementById("countInfo").innerText = String(infoCount).padStart(3, "0");
+                document.getElementById("countCom").innerText = String(comCount).padStart(3, "0");
+                document.getElementById("countSec").innerText = String(secCount).padStart(3, "0");
+                document.getElementById("dashTotal").innerText = allArchives.length;
+                document.getElementById("dashWeek").innerText = weekCount;
+
+                registrePage = 1;
+                renderTable(allArchives);
+            });
+        }
+
+        function renderTable(dataList) {
+            const start = (registrePage - 1) * PAGE_SIZE;
+            const pageItems = dataList.slice(start, start + PAGE_SIZE);
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = "";
+
+            pageItems.forEach((data) => {
+                const row = tableBody.insertRow();
+                row.onclick = () => selectDocument(data.MATRICULE);
+                row.innerHTML = `
+                    <td>${data.MATRICULE}</td>
+                    <td>${data.NOM}</td>
+                    <td>${data.SEXE}</td>
+                    <td>${data.FILIERE}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openPdfModal('${data.PDFURL}', '${data.MATRICULE}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); actionTelechargerDirect('${data.PDFURL}', 'Diplome_${data.MATRICULE}')"><i class="fas fa-download"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); supprimerDiplome('${data.MATRICULE}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
             });
 
-            // Afficher/cacher le bouton 
+            renderPagination('registrePagination', dataList.length, registrePage, p => {
+                registrePage = p;
+                renderTable(currentFilteredList || allArchives);
+            });
+        }
+
+        let currentFilteredList = null;
+        function filterRegistre() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            currentFilteredList = allArchives.filter(item =>
+                item.NOM.toLowerCase().includes(query) || item.MATRICULE.toLowerCase().includes(query)
+            );
+            registrePage = 1;
+            renderTable(currentFilteredList);
+        }
+
+        function actionTelechargerDirect(url, name) {
+            if (!url) return toast("URL non disponible.", "error");
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name + ".pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // ---------- Profile picture ----------
+        function previewImg(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('displayAvatar').src = e.target.result;
+                    document.getElementById('displayAvatar').style.display = 'block';
+                    document.getElementById('plus').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // ---------- QR ----------
+        function genererQrCode(matricule) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = "";
+            const lienVerification = `https://isc-archives.vercel.app/verif.html?mat=${matricule}`;
+            new QRCode(qrContainer, { text: lienVerification, width: 100, height: 100 });
+        }
+
+        // ---------- PDF modal & print/download ----------
+        function openPdfModal(url, label) {
+            if (!url) return toast("Aucun document disponible.", "error");
+            document.getElementById('pdfModalTitle').innerHTML = `<i class="fas fa-file-pdf"></i> Diplôme ${label || ''}`;
+            document.getElementById('pdfModalFrame').src = url;
+            document.getElementById('pdfModalOverlay').style.display = 'flex';
+        }
+        function closePdfModal() {
+            document.getElementById('pdfModalOverlay').style.display = 'none';
+            document.getElementById('pdfModalFrame').src = '';
+        }
+
+        function actionVoir() { openPdfModal(currentActiveDocUrl, currentActiveMatricule); }
+        function actionTelecharger() {
+            if (!currentActiveDocUrl) return toast("Aucun document chargé.", "error");
+            actionTelechargerDirect(currentActiveDocUrl, currentActiveDocName);
+        }
+
+        function printTargetedDoc() {
+            if (!currentActiveDocUrl) return toast("Sélectionnez ou scellez un document à imprimer.", "warn");
+            const pFrame = document.getElementById('printFrame');
+            pFrame.src = currentActiveDocUrl;
+            pFrame.onload = function() { pFrame.contentWindow.focus(); pFrame.contentWindow.print(); };
+        }
+
+        // ---------- Filiere ----------
+        function updateFiliere() {
+            const fac = document.getElementById('fac').value;
+            const filiere = document.getElementById('filiere');
+            filiere.innerHTML = "";
+            if (fac === "Informatique de Gestion") {
+                filiere.innerHTML = "<option value='CSI (Conception des Systèmes Informatiques)'>CSI (Conceptions Systèmes)</option><option value='Réseaux Informatiques'>Réseaux Informatiques</option>";
+            } else if (fac === "Sciences Commerciales et Financières") {
+                filiere.innerHTML = "<option value='Banque et Assurance'>Banque & Assurance</option><option value='Douane'>Douane</option><option value='Marketing'>Marketing</option><option value='Comptabilité'>Comptabilité</option><option value='Gestion Financière'>Gestion Financière</option>";
+            } else {
+                filiere.innerHTML = "<option value='Secrétariat de Direction'>Assistant de Direction (SGA)</option>";
+            }
+        }
+
+        // ---------- MetaMask ----------
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) return toast("MetaMask n'est pas installé.", "error");
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                const address = await signer.getAddress();
+
+                const network = await provider.getNetwork();
+                if (network.chainId !== 11155111) return toast("🛑 Réseau incorrect : connectez-vous à Sepolia.", "error");
+
+                contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
+                console.log("Adresse du contrat :", contractAddress);
+
+try {
+    const admin = await contractInstance.adminSGA();
+    console.log("Admin du contrat :", admin);
+} catch(e){
+    console.error("Impossible de lire adminSGA :", e);
+}
+                document.getElementById("walletAddr").innerText = address;
+                toast("Portefeuille connecté sur Sepolia.", "success");
+            } catch (error) {
+                toast("Erreur connexion : " + error.message, "error");
+            }
+        }
+
+        // ---------- Hash SHA-256 (fichier réel, pas la dataURL) ----------
+        async function hashFileSHA256(file) {
+            const buffer = await file.arrayBuffer();
+            const digest = await crypto.subtle.digest('SHA-256', buffer);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // ---------- Scellage ----------
+        async function scellerMaintenant() {
+    if (!currentUser) return toast("🛑 Connectez-vous d'abord.", "error");
+
+    console.log("Utilisateur :", currentUser);
+    console.log("Rôle :", currentRole);
+
+    if (currentRole !== 'admin' && currentRole !== 'superadmin')
+        return toast("🛑 Accès refusé : rôle Admin requis.", "error");
+            if (!contractInstance) return toast("🛑 Connectez MetaMask avant de sceller.", "error");
+
+            const mat = document.getElementById('mat').value.trim().toUpperCase();
+            const nom = document.getElementById('nom').value.trim();
+            const fac = document.getElementById('fac').value;
+            const fil = document.getElementById('filiere').value;
+            const sexe = document.getElementById('sexe').value;
+            const file = document.getElementById('fileInput').files[0];
+
+            if (!mat || !nom || !file) return toast("Champs ou fichier source manquant.", "warn");
+
+            try {
+                document.getElementById('statusTag').innerText = "CALCUL DE L'EMPREINTE SHA-256...";
+                const docHash = "0x" + await hashFileSHA256(file);
+
+                const diplome = { nom, mat, fac, fil, promo: "LMD", mention: "SATISFAISANT", sexe, docHash };
+
+                const admin = await contractInstance.adminSGA();
+                const user = await signer.getAddress();
+                if (user.toLowerCase() !== admin.toLowerCase()) throw new Error("Vous n'utilisez pas le portefeuille administrateur du contrat.");
+
+                document.getElementById('statusTag').innerText = "ANCRAGE BLOCKCHAIN EN COURS...";
+                const tx = await contractInstance.scellerDiplome(diplome);
+                await tx.wait();
+
+                document.getElementById('statusTag').innerText = "SAUVEGARDE CLOUDINARY...";
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", "diplomes_upload");
+                const response = await fetch("https://api.cloudinary.com/v1_1/vuzn106k/auto/upload", { method: "POST", body: formData });
+                if (!response.ok) throw new Error("Échec de l'envoi vers Cloudinary.");
+                const result = await response.json();
+                const downloadURL = result.secure_url;
+
+                document.getElementById('statusTag').innerText = "ENREGISTREMENT REGISTRE...";
+                await db.ref('archives/' + mat).set({
+                    MATRICULE: mat, NOM: nom, FACULTE: fac, FILIERE: fil, SEXE: sexe,
+                    PDFURL: downloadURL, HASH: docHash, DATE: new Date().toISOString(), TXHASH: tx.hash,
+                    SCELLE_PAR: currentUser.email
+                });
+
+                logAudit("SCELLAGE", mat, "Diplôme scellé et ancré on-chain (tx " + tx.hash.slice(0, 10) + "…)");
+
+                document.getElementById('statusTag').innerText = "ANCRAGE REUSSI !";
+                currentActiveMatricule = mat;
+                currentActiveDocUrl = downloadURL;
+                currentActiveDocName = "Diplome_" + mat;
+
+                genererQrCode(mat);
+                document.getElementById('qrWrapper').classList.add('qr-glow-active');
+                document.getElementById('docActions').style.display = 'grid';
+
+                toast("Document ancré et enregistré avec succès.", "success");
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusTag').innerText = "ERREUR D'ANCRAGE";
+                toast("Erreur : " + error.message, "error");
+            }
+        }
+
+        // ---------- Vérification d'intégrité ----------
+        async function verifierIntegrite() {
+            const resultBox = document.getElementById('verifResult');
+            resultBox.innerHTML = "";
+            const mat = document.getElementById('verifMat').value.trim().toUpperCase();
+            const file = document.getElementById('verifFile').files[0];
+            if (!mat) return toast("Indiquez un matricule.", "warn");
+            if (!contractInstance) return toast("Connectez MetaMask pour interroger la blockchain.", "warn");
+
+            try {
+                resultBox.innerHTML = `<p style="font-size:0.8rem;">Interrogation de la blockchain…</p>`;
+                const onChain = await contractInstance.verifierDiplome(mat);
+                if (!onChain.estValide) {
+                    resultBox.innerHTML = `<div class="glass-card" style="border-color:var(--danger);"><i class="fas fa-circle-xmark" style="color:var(--danger);"></i> Aucun enregistrement valide pour <b>${mat}</b>.</div>`;
+                    return;
+                }
+
+                let matchLine = "";
+                if (file) {
+                    const localHash = "0x" + await hashFileSHA256(file);
+                    const same = localHash.toLowerCase() === onChain.documentHash.toLowerCase();
+                    matchLine = `<div style="margin-top:10px; font-weight:800; color:${same ? 'var(--success)' : 'var(--danger)'};">
+                        <i class="fas ${same ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                        ${same ? 'Le fichier correspond exactement au document ancré.' : 'ATTENTION : le fichier ne correspond PAS au hash ancré sur la blockchain.'}
+                    </div>`;
+                    toast(same ? "Intégrité confirmée." : "Intégrité compromise !", same ? "success" : "error");
+                }
+
+                const dateStr = new Date(onChain.dateEnregistrement.toNumber() * 1000).toLocaleString('fr-FR');
+                resultBox.innerHTML = `
+                    <div class="glass-card" style="border-color: var(--success);">
+                        <p style="margin:2px 0;"><b>Étudiant :</b> ${onChain.nomEtudiant}</p>
+                        <p style="margin:2px 0;"><b>Matricule :</b> ${onChain.matricule}</p>
+                        <p style="margin:2px 0;"><b>Faculté :</b> ${onChain.faculte} — ${onChain.filiere}</p>
+                        <p style="margin:2px 0;"><b>Enregistré le :</b> ${dateStr}</p>
+                        <p style="margin:2px 0; font-family:monospace; font-size:0.7rem; word-break:break-all;"><b>Hash ancré :</b> ${onChain.documentHash}</p>
+                        ${matchLine}
+                    </div>
+                `;
+            } catch (error) {
+                resultBox.innerHTML = `<div class="glass-card" style="border-color:var(--danger);">Erreur de vérification : ${error.message}</div>`;
+            }
+        }
+
+        // ---------- Scanner QR ----------
+        function startScan() {
+            document.getElementById('reader').style.display = 'block';
+            document.getElementById('btnStart').style.display = 'none';
+            document.getElementById('btnStop').style.display = 'block';
+
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                qrCodeMessage => {
+                    stopScan();
+                    if (qrCodeMessage.includes("mat=")) {
+                        const url = new URL(qrCodeMessage);
+                        selectDocument(url.searchParams.get('mat'));
+                    } else {
+                        selectDocument(qrCodeMessage.trim().toUpperCase());
+                    }
+                },
+                errorMessage => { /* frame sans QR, silencieux */ }
+            ).catch(err => {
+                toast("Impossible d'accéder à la caméra : " + err, "error");
+                stopScan();
+            });
+        }
+
+        function stopScan() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('reader').style.display = 'none';
+                    document.getElementById('btnStart').style.display = 'block';
+                    document.getElementById('btnStop').style.display = 'none';
+                }).catch(err => console.error(err));
+            }
+        }
+
+        function selectDocument(matricule) {
+            db.ref('archives/' + matricule).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (data && data.PDFURL) {
+                    currentActiveDocUrl = data.PDFURL;
+                    currentActiveMatricule = matricule;
+                    currentActiveDocName = "Diplome_" + matricule;
+                    document.getElementById('docActions').style.display = 'grid';
+                    genererQrCode(matricule);
+
+                    document.getElementById('nom').value = data.NOM;
+                    document.getElementById('mat').value = data.MATRICULE;
+                    document.getElementById('fac').value = data.FACULTE;
+                    updateFiliere();
+                    document.getElementById('filiere').value = data.FILIERE;
+                    document.getElementById('sexe').value = data.SEXE;
+
+                    document.getElementById('statusTag').innerText = "DOCUMENT SÉLECTIONNÉ";
+                    toast("Document de " + data.NOM + " chargé.", "success");
+                } else {
+                    toast("Document introuvable.", "error");
+                }
+            });
+        }
+
+        function supprimerDiplome(matricule) {
+            console.log("UID :", auth.currentUser.uid);
+console.log("Rôle :", currentRole);
+            if (currentRole !== 'admin' && currentRole !== 'superadmin') return toast("🛑 Accès refusé.", "error");
+            if (confirm(`Supprimer définitivement le diplôme ${matricule} du registre ?`)) {
+                db.ref('archives/' + matricule).remove().then(() => {
+                    logAudit("SUPPRESSION", matricule, "Diplôme retiré du registre central");
+                    toast("Diplôme supprimé avec succès.", "success");
+                }).catch(error => toast("Erreur lors de la suppression : " + error.message, "error"));
+            }
+        }
+
+        function supprimerDiplomeSelectionne() {
+            if (!currentActiveMatricule) return toast("Aucun diplôme sélectionné.", "warn");
+            supprimerDiplome(currentActiveMatricule);
+        }
+
+        // ---------- Boot ----------
+        document.addEventListener("DOMContentLoaded", () => {
+            updateFiliere();
+            startClock();
+            switchAuthTab('login');
+        });
+    </script>
+</body>
+</html>
