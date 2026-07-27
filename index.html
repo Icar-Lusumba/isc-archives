@@ -715,7 +715,20 @@
             const pass = document.getElementById('signupPass').value;
             if (!name || !email || !pass) return showAuthError("Tous les champs sont requis.");
             auth.createUserWithEmailAndPassword(email, pass).then(cred => {
-                return db.ref('roles/' + cred.user.uid).set({ nom: name, email: email, role: 'lecteur', creeLe: new Date().toISOString() });
+                const roleRef = db.ref("roles/" + cred.user.uid);
+
+const snap = await roleRef.once("value");
+
+if (!snap.exists()) {
+
+    await roleRef.set({
+        nom: name,
+        email: email,
+        role: "lecteur",
+        creeLe: new Date().toISOString()
+    });
+
+}
             }).catch(err => showAuthError(traduireErreurAuth(err)));
         }
 
@@ -1220,6 +1233,8 @@ try {
         }
 
         function supprimerDiplome(matricule) {
+            console.log("UID :", auth.currentUser.uid);
+console.log("Rôle :", currentRole);
             if (currentRole !== 'admin' && currentRole !== 'superadmin') return toast("🛑 Accès refusé.", "error");
             if (confirm(`Supprimer définitivement le diplôme ${matricule} du registre ?`)) {
                 db.ref('archives/' + matricule).remove().then(() => {
