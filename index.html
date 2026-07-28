@@ -1059,7 +1059,7 @@ try {
     console.log("Utilisateur :", currentUser);
     console.log("Rôle :", currentRole);
 
-    if (currentRole !== 'admin' && currentRole !== 'superadmin')
+    if (currentRole !== 'Admin')
         return toast("🛑 Accès refusé : rôle Admin requis.", "error");
             if (!contractInstance) return toast("🛑 Connectez MetaMask avant de sceller.", "error");
 
